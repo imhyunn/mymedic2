@@ -8,4 +8,5 @@ class Palette{
   static const Color buttonColor = Color(0xE82843A4);
   static const Color backColor = Color(0xFFFFFFFF);
   static const Color buttonColor2 = Color(0xFF3D3D3D);
+
 }
