@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "966216998642",
+    "project_id": "mymedic-bb72c",
+    "storage_bucket": "mymedic-bb72c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:966216998642:android:b7cd8b99228009ad1c3a6b",
+        "android_client_info": {
+          "package_name": "com.example.mymedic1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxOprzrbKPeC4r63ES8TJWF9GZk0_qPh0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
