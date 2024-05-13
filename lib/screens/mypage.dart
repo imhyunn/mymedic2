@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mymedic1/screens/signup_screen.dart';
+import 'package:mymedic1/screens/sign/signup_screen.dart';
 
 import '../config/palette.dart';
 

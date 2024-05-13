@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mymedic1/screens/bulletinboard/board_list.dart';
-import 'package:mymedic1/screens/home_screen.dart';
+import 'package:mymedic1/screens/home/home_screen.dart';
 
 import 'package:mymedic1/screens/mypage.dart';
 

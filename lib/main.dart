@@ -3,8 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:mymedic1/screens/bulletinboard/board_edit.dart';
 import 'package:mymedic1/screens/bulletinboard/board_list.dart';
 import 'package:mymedic1/screens/bulletinboard/board_view_screen.dart';
-import 'package:mymedic1/screens/home_screen.dart';
-import 'package:mymedic1/screens/login_screen.dart';
+import 'package:mymedic1/screens/home/home_screen.dart';
+import 'package:mymedic1/screens/sign/login_screen.dart';
 import 'package:mymedic1/screens/myapp.dart';
 
 void main() async {

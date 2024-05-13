@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mymedic1/screens/home_screen.dart';
+import 'package:mymedic1/screens/home/home_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../config/palette.dart';
+import 'package:mymedic1/config/palette.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});

@@ -2,11 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mymedic1/screens/home/drawing/drawingPage.dart';
+import 'package:mymedic1/screens/home/test_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-
-
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -35,7 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +44,29 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Center(
         child: Column(
           children: [
-
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (Context) => WordTest(),
+                  ),
+                );
+              },
+              child: Text('test'),
+            ),
+            SizedBox(height: 20,),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (Context) => DrawingPage(),
+                  ),
+                );
+              },
+              child: Text('drawing'),
+            ),
           ],
         ),
       ),
