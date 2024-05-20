@@ -58,13 +58,9 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: 20,),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (Context) => DrawingPage(),
-                  ),
-                );
-              },
+                Navigator.pushNamed(context, DrawingPage.routeName).then((value) {
+                  setState(() {});
+                });              },
               child: Text('drawing'),
             ),
           ],
