@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 120, width: 283,
                             child: TextButton(
                               onPressed: () {
-                                Navigator.of(context).push(
+                               Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (BuildContext) => WordNote(),
                                   ),
