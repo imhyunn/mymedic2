@@ -126,7 +126,6 @@ class _MyPageState extends State<MyPage> {
                 child: ElevatedButton(
                   onPressed: () => _getCameraImage(),
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0x0),
                     backgroundColor: Palette.buttonColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5.0),
@@ -151,7 +150,6 @@ class _MyPageState extends State<MyPage> {
                 child: ElevatedButton(
                   onPressed: () => _getPhotoLibraryImage(),
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0x0),
                     backgroundColor: Palette.buttonColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5.0),

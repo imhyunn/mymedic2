@@ -81,7 +81,7 @@ class _WordNoteState extends State<WordNote> {
                             ),
                             Container(
                               height: 100,
-                              child: Text(
+                            child: Text(
                                 krword[index],
                                 style: TextStyle(fontSize: 17),
                               ),
@@ -90,31 +90,11 @@ class _WordNoteState extends State<WordNote> {
                         ),
                       ),
                       InkWell(
-                        onTap: (){
-                          // PopupMenuButton<String>(
-                          //   color: Colors.white,
-                          //   onSelected: ,
-                          //   itemBuilder: (BuildContext context) {
-                          //     return {'카메라', '라이브러리에서 불러오기', '그리기'}.map((String choice) {
-                          //       return PopupMenuItem<String>(
-                          //         value: choice,
-                          //         child: Text(choice),
-                          //         onTap: () {
-                          //           switch (choice) {
-                          //             case "카메라":
-                          //               break;
-                          //             case "라이브러리에서 불러오기":
-                          //               break;
-                          //             case "그리기":
-                          //               break;
-                          //           }
-                          //         },
-                          //       );
-                          //     }).toList();
-                          //   },
-                          // );
-
-                          // Navigator.push(context, MaterialPageRoute(builder: (context) => DrawingPage()));
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DrawingPage()));
                         },
                         child: Container(
                           width: size.width * 0.2,
@@ -138,11 +118,12 @@ class _WordNoteState extends State<WordNote> {
           }),
     );
   }
+
   RelativeRect buttonMenuPosition(BuildContext context) {
     final bool isEnglish = false;
     final RenderBox bar = context.findRenderObject() as RenderBox;
     final RenderBox overlay =
-    Overlay.of(context).context.findRenderObject() as RenderBox;
+        Overlay.of(context).context.findRenderObject() as RenderBox;
     const Offset offset = Offset.zero;
     final RelativeRect position = RelativeRect.fromRect(
       Rect.fromPoints(
@@ -161,6 +142,7 @@ class _WordNoteState extends State<WordNote> {
     );
     return position;
   }
+
   Future<bool?> _addword(BuildContext context) {
     return showDialog<bool>(
       context: context,
@@ -250,5 +232,14 @@ class _WordNoteState extends State<WordNote> {
         );
       },
     );
+  }
+
+  void handleClick(String value) {
+    switch (value) {
+      case '편집':
+        break;
+      case '삭제':
+        break;
+    }
   }
 }

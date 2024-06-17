@@ -44,7 +44,6 @@ class _BoardEditScreenState extends State<BoardEditScreen> {
             child:  ElevatedButton(
               onPressed: _saveBoard,
               style: ElevatedButton.styleFrom(
-                primary: Color(0x0),
                 backgroundColor: Palette.buttonColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5.0),

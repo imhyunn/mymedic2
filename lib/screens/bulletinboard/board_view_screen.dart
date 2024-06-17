@@ -143,7 +143,6 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0x0),
                     backgroundColor: Palette.buttonColor2,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5.0),
@@ -162,7 +161,6 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
                     Navigator.popUntil(context, (route) => route.isFirst);
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0x0),
                     backgroundColor: Palette.buttonColor2,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5.0),
