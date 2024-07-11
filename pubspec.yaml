@@ -37,7 +37,7 @@ dependencies:
   sqflite: ^2.3.2
   intl: ^0.19.0
   image_picker: ^1.0.4+11
-  flutter_colorpicker: ^1.0.3
+  flutter_colorpicker: ^1.1.0
   selector_wheel: ^1.1.2
   dotted_border: ^2.1.0
   scribble: ^0.10.0
