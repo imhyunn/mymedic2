@@ -23,8 +23,10 @@ class _MyPageState extends State<MyPage> {
 
   void _getUserProfile() async {
     final user = FirebaseAuth.instance.currentUser;
-    final userData = await FirebaseFirestore.instance.collection('user')
-        .doc(user!.uid).get();
+    final userData = await FirebaseFirestore.instance
+        .collection('user')
+        .doc(user!.uid)
+        .get();
     if (userData.exists) {
       setState(() {
         _userData = userData.data()!;
@@ -43,10 +45,7 @@ class _MyPageState extends State<MyPage> {
 
   @override
   Widget build(BuildContext context) {
-    final _imageSize = MediaQuery
-        .of(context)
-        .size
-        .width / 4;
+    final _imageSize = MediaQuery.of(context).size.width / 4;
 
     return SafeArea(
       child: Scaffold(
@@ -69,29 +68,26 @@ class _MyPageState extends State<MyPage> {
                 },
                 child: _pickedFile == null
                     ? Center(
-                  child: Icon(
-                    Icons.account_circle,
-                    size: _imageSize,
-                  ),
-                )
+                        child: Icon(
+                          Icons.account_circle,
+                          size: _imageSize,
+                        ),
+                      )
                     : Center(
-                  child: Container(
-                    width: _imageSize,
-                    height: _imageSize,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                          width: 2,
-                          color: Theme
-                              .of(context)
-                              .colorScheme
-                              .primary),
-                      image: DecorationImage(
-                          image: FileImage(File(_pickedFile!.path)),
-                          fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
+                        child: Container(
+                          width: _imageSize,
+                          height: _imageSize,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                                width: 2,
+                                color: Theme.of(context).colorScheme.primary),
+                            image: DecorationImage(
+                                image: FileImage(File(_pickedFile!.path)),
+                                fit: BoxFit.cover),
+                          ),
+                        ),
+                      ),
               ),
             ),
             SizedBox(
@@ -171,7 +167,7 @@ class _MyPageState extends State<MyPage> {
 
   _getCameraImage() async {
     final pickedFile =
-    await ImagePicker().pickImage(source: ImageSource.camera);
+        await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
         _pickedFile = pickedFile;
@@ -185,7 +181,7 @@ class _MyPageState extends State<MyPage> {
 
   _getPhotoLibraryImage() async {
     final pickedFile =
-    await ImagePicker().pickImage(source: ImageSource.gallery);
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _pickedFile = _pickedFile;

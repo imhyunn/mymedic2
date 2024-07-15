@@ -5,6 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mymedic1/screens/home/test_screen.dart';
 import 'package:mymedic1/screens/home/wordNote.dart';
 
+
+
+
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -13,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   final _authentication = FirebaseAuth.instance;
   User? loggedUser;
 
@@ -44,13 +49,13 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Padding(
               padding: EdgeInsets.all(30),
-              child: Text(
-                'MYMEDIC',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              // child: Text(
+              //   'MYMEDIC',
+              //   style: TextStyle(
+              //     fontSize: 32,
+              //     fontWeight: FontWeight.bold,
+              //   ),
+              // ),
             ),
             Column(
               children: [
@@ -60,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 400,
                     width: 300,
                     decoration: BoxDecoration(
-                      color: Color(0xFF88CC7B),
+                      color: Color(0xFF6F726E),
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     child: Column(
