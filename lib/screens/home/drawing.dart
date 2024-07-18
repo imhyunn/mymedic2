@@ -16,6 +16,8 @@ class _DrawingPageState extends State<DrawingPage> {
   Color _currentColor = Colors.black;
   List<bool> _isSelected = [true, false, false, false];
 
+  Image? image = null;
+
   @override
   void initState() {
     notifier = ScribbleNotifier();
@@ -27,40 +29,51 @@ class _DrawingPageState extends State<DrawingPage> {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
         appBar: AppBar(
+          title: Row(
+            children: [
+              ValueListenableBuilder(
+                valueListenable: notifier,
+                builder: (context, value, child) => IconButton(
+                    onPressed: notifier.canUndo ? notifier.undo : null,
+                    icon: Icon(Icons.undo)),
+              ),
+              ValueListenableBuilder(
+                valueListenable: notifier,
+                builder: (context, value, child) => IconButton(
+                    onPressed: notifier.canRedo ? notifier.redo : null,
+                    icon: Icon(Icons.redo)),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete),
+                tooltip: "Clear",
+                onPressed: notifier.clear,
+              ),
+            ],
+          ),
           actions: [
-            Row(
-              children: [
-                ValueListenableBuilder(
-                  valueListenable: notifier,
-                  builder: (context, value, child) => IconButton(
-                      onPressed: notifier.canUndo ? notifier.undo : null,
-                      icon: Icon(Icons.undo)),
-                ),
-                ValueListenableBuilder(
-                  valueListenable: notifier,
-                  builder: (context, value, child) => IconButton(
-                      onPressed: notifier.canRedo ? notifier.redo : null,
-                      icon: Icon(Icons.redo)),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  tooltip: "Clear",
-                  onPressed: notifier.clear,
-                ),
-              ],
-            )
+            IconButton(
+              icon: const Icon(Icons.check),
+              tooltip: "check",
+              onPressed: () async{
+                var renderImage = await notifier.renderImage();
+                setState(() {
+                  image = Image.memory(renderImage.buffer.asUint8List());
+                });
+                var result = Navigator.pop(context, image);
+              },
+            ),
           ],
-          // title: Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          //   children: [
-          //     InkWell(onTap: (){ notifier.setColor(Colors.red);}, child: Container(width: 30, height: 30, color: Colors.red,),),
-          //     InkWell(onTap: (){ notifier.setColor(Colors.blue);}, child: Container(width: 30, height: 30, color: Colors.blue,),),
-          //     InkWell(onTap: (){ notifier.setColor(Colors.green);}, child: Container(width: 30, height: 30, color: Colors.green,),),
-          //     InkWell(onTap: (){ notifier.setColor(Colors.yellow);}, child: Container(width: 30, height: 30, color: Colors.yellow,),),
-          //     InkWell(onTap: (){ notifier.setColor(Colors.black);}, child: Container(width: 30, height: 30, color: Colors.black,),)
-          //   ],
-          // ),
         ),
+        // title: Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        //   children: [
+        //     InkWell(onTap: (){ notifier.setColor(Colors.red);}, child: Container(width: 30, height: 30, color: Colors.red,),),
+        //     InkWell(onTap: (){ notifier.setColor(Colors.blue);}, child: Container(width: 30, height: 30, color: Colors.blue,),),
+        //     InkWell(onTap: (){ notifier.setColor(Colors.green);}, child: Container(width: 30, height: 30, color: Colors.green,),),
+        //     InkWell(onTap: (){ notifier.setColor(Colors.yellow);}, child: Container(width: 30, height: 30, color: Colors.yellow,),),
+        //     InkWell(onTap: (){ notifier.setColor(Colors.black);}, child: Container(width: 30, height: 30, color: Colors.black,),)
+        //   ],
+        // ),
         body: Column(
           children: [
             Expanded(child: Scribble(notifier: notifier)),
@@ -191,17 +204,19 @@ class _DrawingPageState extends State<DrawingPage> {
                                   ? Border.all(color: Colors.grey, width: 2.5)
                                   : null,
                               color: _isSelected[3] ? _pickedColor : null,
-                              gradient: _isSelected[3] ? null : LinearGradient(
-                                colors: [
-                                  Color(0xFFFF0000),
-                                  Color(0xFFFFC400),
-                                  Color(0xFF1AFF00),
-                                  Color(0xFF00FFD0),
-                                  Color(0xFF003CFF),
-                                  Color(0xFFD000FF),
-                                  Color(0xFFFF0000),
-                                ],
-                              ),
+                              gradient: _isSelected[3]
+                                  ? null
+                                  : LinearGradient(
+                                      colors: [
+                                        Color(0xFFFF0000),
+                                        Color(0xFFFFC400),
+                                        Color(0xFF1AFF00),
+                                        Color(0xFF00FFD0),
+                                        Color(0xFF003CFF),
+                                        Color(0xFFD000FF),
+                                        Color(0xFFFF0000),
+                                      ],
+                                    ),
                             ),
                           ),
                         ),

@@ -19,6 +19,7 @@ class WordNote extends StatefulWidget {
 
 class _WordNoteState extends State<WordNote> {
   XFile? _pickedFile;
+  List<XFile?> _pickedFiles = [];
   final List<String> wordlist = <String>[
     'apple',
     'home',
@@ -26,21 +27,29 @@ class _WordNoteState extends State<WordNote> {
   TextEditingController _engController = TextEditingController();
   TextEditingController _krController = TextEditingController();
   final List<String> krword = <String>['사과', '집'];
+  late Offset _tapPosition;
 
   void renew() {
     setState(() {
       wordlist.add(_engController.text);
       krword.add(_krController.text);
+      _pickedFiles.add(null);
       _engController.clear();
       _krController.clear();
     });
   }
 
   @override
+  void initState() {
+    for (int i = 0; i < wordlist.length; ++i) {
+      _pickedFiles.add(null);
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery
-        .of(context)
-        .size;
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: Text(''),
@@ -96,13 +105,15 @@ class _WordNoteState extends State<WordNote> {
                         ),
                       ),
                       InkWell(
-
                         onTap: () {
                           // Navigator.push(
                           //     context,
                           //     MaterialPageRoute(
                           //         builder: (context) => DrawingPage()));
-                          _popUpbutton();
+                          _popUpbutton(index);
+                        },
+                        onTapDown: (details) {
+                          _tapPosition = details.globalPosition;
                         },
                         child: Container(
                           width: size.width * 0.2,
@@ -111,15 +122,16 @@ class _WordNoteState extends State<WordNote> {
                             radius: Radius.circular(20),
                             color: Colors.grey,
                             child: Center(
-                              child: Icon(Icons.add),
-                              // child: Container(
-                              //
-                              //   // decoration: BoxDecoration(
-                              //   //   image: DecorationImage(
-                              //   //       image: FileImage(File(_pickedFile!.path)),
-                              //   //       fit: BoxFit.cover),
-                              //   // ),
-                              // ),
+                              child: _pickedFiles[index] == null
+                                  ? Icon(Icons.add)
+                                  : Container(
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: FileImage(File(
+                                                _pickedFiles[index]!.path)),
+                                            fit: BoxFit.cover),
+                                      ),
+                                    ),
                             ),
                           ),
                         ),
@@ -137,30 +149,10 @@ class _WordNoteState extends State<WordNote> {
   }
 
   RelativeRect buttonMenuPosition(BuildContext context) {
-    final bool isEnglish = false;
-    final RenderBox bar = context.findRenderObject() as RenderBox;
     final RenderBox overlay =
-    Overlay
-        .of(context)
-        .context
-        .findRenderObject() as RenderBox;
-    const Offset offset = Offset.zero;
-    final RelativeRect position = RelativeRect.fromRect(
-      Rect.fromPoints(
-        bar.localToGlobal(
-            isEnglish
-                ? bar.size.centerRight(offset)
-                : bar.size.centerLeft(offset),
-            ancestor: overlay),
-        bar.localToGlobal(
-            isEnglish
-                ? bar.size.centerRight(offset)
-                : bar.size.centerLeft(offset),
-            ancestor: overlay),
-      ),
-      offset & overlay.size,
-    );
-    return position;
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+    return RelativeRect.fromRect(
+        _tapPosition & Size(40, 40), Offset.zero & overlay.size);
   }
 
   Future<bool?> _addword(BuildContext context) {
@@ -170,7 +162,7 @@ class _WordNoteState extends State<WordNote> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '영단어 추가',
           ),
@@ -254,12 +246,12 @@ class _WordNoteState extends State<WordNote> {
     );
   }
 
-  _getCameraImage() async {
+  _getCameraImage(int index) async {
     final pickedFile =
-    await ImagePicker().pickImage(source: ImageSource.camera);
+        await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
-        _pickedFile = pickedFile;
+        _pickedFiles[index] = pickedFile;
       });
     } else {
       if (kDebugMode) {
@@ -268,12 +260,12 @@ class _WordNoteState extends State<WordNote> {
     }
   }
 
-  _getPhotoLibraryImage() async {
+  _getPhotoLibraryImage(int index) async {
     final pickedFile =
-    await ImagePicker().pickImage(source: ImageSource.gallery);
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _pickedFile = _pickedFile;
+        _pickedFiles[index] = _pickedFile;
       });
     } else {
       if (kDebugMode) {
@@ -282,25 +274,23 @@ class _WordNoteState extends State<WordNote> {
     }
   }
 
-  _popUpbutton() {
-    final position =
-    buttonMenuPosition(context);
+  _popUpbutton(int index) {
+    final position = buttonMenuPosition(context);
     showMenu(context: context, position: position, items: [
       PopupMenuItem<Menu>(
         value: Menu.camera,
         onTap: () {
-          _getCameraImage();
+          _getCameraImage(index);
         },
         child: ListTile(
-          leading:
-          Icon(Icons.camera_alt_outlined),
+          leading: Icon(Icons.camera_alt_outlined),
           title: Text('사진 찍기'),
         ),
       ),
       PopupMenuItem<Menu>(
         value: Menu.gallery,
         onTap: () {
-          _getPhotoLibraryImage();
+          _getPhotoLibraryImage(index);
         },
         child: ListTile(
           leading: Icon(Icons.image),
@@ -309,12 +299,14 @@ class _WordNoteState extends State<WordNote> {
       ),
       PopupMenuItem<Menu>(
         value: Menu.drawing,
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      DrawingPage()));
+        onTap: () async {
+          var result = await Navigator.push(
+              context, MaterialPageRoute(builder: (context) => DrawingPage()));
+          if(result != null){
+            setState(() {
+
+            });
+          }
         },
         child: ListTile(
           leading: Icon(Icons.draw_outlined),
