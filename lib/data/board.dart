@@ -9,29 +9,25 @@ class Board {
 
   final String title;
   final String body;
-  final int? id;
+  final String? id;
+  final String uid;
   final String createAt;
 
-  Board(
-    this.body,
-    this.createAt, {
-    this.id,
-    this.title = '',
-  });
+  Board(this.title, this.body, this.id, this.uid, this.createAt);
 
-  Board.fromRow(Map<String, dynamic> row)
-      : this(
-          row[columnBody],
-          row[columnCreateAt],
-          id: row[columnId],
-          title: row[columnTitle],
-        );
-
-  Map<String, dynamic> toRow() {
-    return {
-      columnTitle: title,
-      columnBody: body,
-      columnCreateAt: DateTime.now().toString()
-    };
-  }
+// Board.fromRow(Map<String, dynamic> row)
+  //     : this(
+  //         row[columnBody],
+  //         row[columnCreateAt],
+  //         id: row[columnId],
+  //         title: row[columnTitle],
+  //       );
+  //
+  // Map<String, dynamic> toRow() {
+  //   return {
+  //     columnTitle: title,
+  //     columnBody: body,
+  //     columnCreateAt: DateTime.now().toString()
+  //   };
+  // }
 }

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mymedic1/config/palette.dart';
 import 'package:mymedic1/data/board.dart';
@@ -8,6 +10,7 @@ class BoardEditScreen extends StatefulWidget {
   static const routeName = '/edit';
 
   final int? id;
+
   BoardEditScreen(this.id);
 
   @override
@@ -15,22 +18,25 @@ class BoardEditScreen extends StatefulWidget {
 }
 
 class _BoardEditScreenState extends State<BoardEditScreen> {
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final titleController = TextEditingController();
-
   final bodyController = TextEditingController();
+
+  String title = '';
+  String body = '';
+
 
 
   @override
   void initState() {
     super.initState();
     final boardId = widget.id;
-    if (boardId != null) {
-      boardManager().getBoard(boardId).then((board) {
-        titleController.text = board.title;
-        bodyController.text = board.body;
-      });
-
-    }
+    // if (boardId != null) {
+    //   boardManager().getBoard(boardId).then((board) {
+    //     titleController.text = board.title;
+    //     bodyController.text = board.body;
+    //   });
+    // }
   }
 
   @override
@@ -40,17 +46,26 @@ class _BoardEditScreenState extends State<BoardEditScreen> {
         centerTitle: true,
         actions: [
           Padding(
-            padding: EdgeInsets.all(8.0),
-            child:  ElevatedButton(
-              onPressed: _saveBoard,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Palette.buttonColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0),
+              padding: EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () async {
+                  await _firestore.collection('boards').doc()
+                      .set({
+                    'title' : titleController.text,
+                    'body' : bodyController.text,
+                    'time' : DateTime.now().toString(),
+                    'uid' : FirebaseAuth.instance.currentUser!.uid,
+                  });
+                  Navigator.pop(context, titleController.text);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.buttonColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
                 ),
-              ),
-              child: const Text('발행', style: TextStyle(color: Colors.white),),
-            )
+                child: const Text('발행', style: TextStyle(color: Colors.white),),
+              )
           ),
         ],
       ),
@@ -101,27 +116,27 @@ class _BoardEditScreenState extends State<BoardEditScreen> {
     );
   }
 
-  void _saveBoard() {
-    if (bodyController.text.isNotEmpty) {
-      final board = Board(
-        bodyController.text,
-        DateTime.now().toString(),
-        title: titleController.text,
-      );
-
-      final boardId= widget.id;
-      if(boardId != null) {
-        boardManager().updateBoard(boardId, board);
-      } else {
-        boardManager().addBoard(board);
-      }
-
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('내용을 입력하세요'),
-        behavior: SnackBarBehavior.floating,
-      ));
-    }
-  }
+  // void _saveBoard() {
+  //   if (bodyController.text.isNotEmpty) {
+  //     final board = Board(
+  //       titleController.text,
+  //       bodyController.text,
+  //       DateTime.now().toString(),
+  //     );
+  //
+  //     final boardId = widget.id;
+  //     if (boardId != null) {
+  //       boardManager().updateBoard(boardId, board);
+  //     } else {
+  //       boardManager().addBoard(board);
+  //     }
+  //
+  //     Navigator.pop(context);
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //       content: Text('내용을 입력하세요'),
+  //       behavior: SnackBarBehavior.floating,
+  //     ));
+  //   }
+  // }
 }

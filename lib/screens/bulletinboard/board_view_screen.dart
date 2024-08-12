@@ -1,4 +1,9 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mymedic1/providers.dart';
 import 'package:mymedic1/screens/bulletinboard/board_edit.dart';
 import 'package:mymedic1/data/board_manager.dart';
@@ -9,7 +14,7 @@ import '../../config/palette.dart';
 
 class BoardViewScreen extends StatefulWidget {
   static const routeName = '/view';
-  final int id;
+  final String id;
 
   BoardViewScreen(this.id);
 
@@ -18,10 +23,40 @@ class BoardViewScreen extends StatefulWidget {
 }
 
 class _BoardViewScreenState extends State<BoardViewScreen> {
+  XFile? _pickedFile;
+
+  String _username = 'name';
+  Map<String, dynamic> _userData = {};
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+
+  void _getUserProfile() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final userData = await FirebaseFirestore.instance
+        .collection('user')
+        .doc(user!.uid)
+        .get();
+    if (userData.exists) {
+      setState(() {
+        _userData = userData.data()!;
+        _username = _userData['userName'];
+        print(_username);
+      });
+    }
+    print(_userData);
+  }
+
+  @override
+  void initState() {
+    _getUserProfile();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final _imageSize = MediaQuery.of(context).size.width / 10 ;
     return FutureBuilder<Board>(
-      future: boardManager().getBoard(widget.id),
+      future: null,
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {
           return Center(
@@ -79,9 +114,59 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
                         child: Text(
                           board.title.isEmpty ? '(제목 없음)' : board.title,
                           style: TextStyle(
-                            fontSize: 28,
+                            fontSize: 32,
                           ),
                         )),
+                    SizedBox(height: 8,),
+                    Padding(
+                      padding: EdgeInsets.only(left: 5),
+                      child: Row(
+                        children: [
+                          Container(
+                            child: _pickedFile == null
+                                ? Center(
+                              child: Icon(
+                                Icons.account_circle,
+                                size: _imageSize,
+                              ),
+                            )
+                                : Center(
+                              child: Container(
+                                width: _imageSize,
+                                height: _imageSize,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      width: 2,
+                                      color: Colors.white),
+                                  image: DecorationImage(
+                                      image: FileImage(File(_pickedFile!.path)),
+                                      fit: BoxFit.cover),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 2,),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                child: Text(_username, style: TextStyle(
+                                    fontSize: 15
+                                ),),
+                              ),
+                              Container(
+                                child: Text(
+                                  board.createAt.split(".")[0] ?? "NO",
+                                  style: TextStyle(fontSize: 15),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
                     SizedBox(height: 5.0),
                     Container(
                       child: Row(
@@ -100,7 +185,9 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
                     ),
                     Container(
                         padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text(board.body)),
+                        child: Text(board.body, style: TextStyle(
+                            fontSize: 18
+                        ),)),
                   ],
                 ),
               ),
@@ -111,7 +198,7 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
     );
   }
 
-  void _edit(int id) {
+  void _edit(String id) {
     Navigator.pushNamed(
       context,
       BoardEditScreen.routeName,
@@ -121,14 +208,14 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
     });
   }
 
-  void _confirmDelete(int id) {
+  void _confirmDelete(String id) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '노트 삭제',
           ),
@@ -157,7 +244,7 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    boardManager().deleteBoard(id);
+                    // boardManager().deleteBoard(id);
                     Navigator.popUntil(context, (route) => route.isFirst);
                   },
                   style: ElevatedButton.styleFrom(

@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
           return BoardEditScreen(id);
         },
         BoardViewScreen.routeName: (context) {
-          final id = ModalRoute.of(context)!.settings.arguments as int;
+          final id = ModalRoute.of(context)!.settings.arguments as String;
           return BoardViewScreen(id);
         },
       },
