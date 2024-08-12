@@ -54,48 +54,63 @@ class _MyPageState extends State<MyPage> {
         ),
         body: Column(
           children: [
-            const SizedBox(
-              height: 20,
-            ),
-            Container(
-              constraints: BoxConstraints(
-                minHeight: _imageSize,
-                minWidth: _imageSize,
-              ),
-              child: GestureDetector(
-                onTap: () {
-                  _showBottomSheet();
-                },
-                child: _pickedFile == null
-                    ? Center(
-                        child: Icon(
-                          Icons.account_circle,
-                          size: _imageSize,
-                        ),
-                      )
-                    : Center(
-                        child: Container(
-                          width: _imageSize,
-                          height: _imageSize,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                width: 2,
-                                color: Theme.of(context).colorScheme.primary),
-                            image: DecorationImage(
-                                image: FileImage(File(_pickedFile!.path)),
-                                fit: BoxFit.cover),
+            Row(
+              children: [
+                const SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  constraints: BoxConstraints(
+                    minHeight: _imageSize,
+                    minWidth: _imageSize,
+                  ),
+                  child: GestureDetector(
+                    onTap: () {
+                      _showBottomSheet();
+                    },
+                    child: _pickedFile == null
+                        ? Center(
+                            child: Icon(
+                              Icons.account_circle,
+                              size: _imageSize,
+                            ),
+                          )
+                        : Center(
+                            child: Container(
+                              width: _imageSize,
+                              height: _imageSize,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    width: 2,
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                                image: DecorationImage(
+                                    image: FileImage(File(_pickedFile!.path)),
+                                    fit: BoxFit.cover),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  child: Text(_username),
+                ),
+              ],
+            ),
+            Expanded(
+              child: ListView(
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text('개인정보'),
+                  )
+                ],
               ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Container(
-              child: Text(_username),
-            ),
+            )
           ],
         ),
       ),
