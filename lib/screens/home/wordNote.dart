@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,8 @@ class _WordNoteState extends State<WordNote> {
   TextEditingController _krController = TextEditingController();
   final List<String> krword = <String>['사과', '집'];
   late Offset _tapPosition;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
 
   void renew() {
     setState(() {
@@ -227,7 +230,13 @@ class _WordNoteState extends State<WordNote> {
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    var result = Navigator.pop(context, true);
+                    await _firestore.collection('word').doc()
+                        .set({
+                      'english' : _engController.text,
+                      'korean' : _krController.text,
+                    });
+                    Navigator.pop(context, true);
+
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.buttonColor2,

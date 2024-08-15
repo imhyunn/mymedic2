@@ -30,6 +30,7 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
 
+
   void _getUserProfile() async {
     final user = FirebaseAuth.instance.currentUser;
     final userData = await FirebaseFirestore.instance

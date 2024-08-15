@@ -77,6 +77,7 @@ class _BoardListState extends State<BoardList> {
           }
 
           final boards = snap.requireData;
+
           return ListView.builder(
             padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 16.0),
             itemCount: boards.length,

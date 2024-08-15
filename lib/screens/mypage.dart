@@ -57,7 +57,7 @@ class _MyPageState extends State<MyPage> {
             Row(
               children: [
                 const SizedBox(
-                  height: 20,
+                  width: 15,
                 ),
                 Container(
                   constraints: BoxConstraints(
@@ -94,7 +94,7 @@ class _MyPageState extends State<MyPage> {
                   ),
                 ),
                 SizedBox(
-                  height: 20,
+                  width: 20,
                 ),
                 Container(
                   child: Text(_username),
@@ -107,7 +107,7 @@ class _MyPageState extends State<MyPage> {
                   ListTile(
                     leading: Icon(Icons.person),
                     title: Text('개인정보'),
-                  )
+                  ),
                 ],
               ),
             )
