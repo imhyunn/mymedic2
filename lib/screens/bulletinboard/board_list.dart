@@ -37,14 +37,21 @@ class _BoardListState extends State<BoardList> {
   }
 
   Future<List<Board>> _getBoards() async {
-    var snapshot = await _firestore.collection("boards").orderBy("time", descending: true).get();
+    var snapshot = await _firestore
+        .collection("boards")
+        .orderBy("time", descending: true)
+        .get();
 
-    var map = snapshot.docs
-        .map((element) => Board(element.data()["body"], element.data()["time"],
-            element.id, element.data()['uid'], element.data()['time']))
-        .toList();
+    List<Board> boards = snapshot.docs
+        .map((element) {
+          return Board(element.data()['title'], element.data()['body'], element.id, element.data()['uid'], element.data()['time']);
+    }).toList();
 
-    return map;
+    for (int i = 0; i < boards.length; ++i) {
+      var data = await _firestore.collection('user').doc(boards[i].uid).get();
+      boards[i].uid = data.data()!['userName'];
+    }
+    return boards;
   }
 
   @override
@@ -139,7 +146,7 @@ class _BoardListState extends State<BoardList> {
                   children: [
                     Container(
                       child: Text(
-                        _username,
+                        board.uid,
                         style: TextStyle(fontSize: 15),
                       ),
                     ),

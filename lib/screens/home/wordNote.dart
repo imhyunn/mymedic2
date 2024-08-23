@@ -236,6 +236,7 @@ class _WordNoteState extends State<WordNote> {
                       'korean' : _krController.text,
                     });
                     Navigator.pop(context, true);
+                    print('dd');
 
                   },
                   style: ElevatedButton.styleFrom(

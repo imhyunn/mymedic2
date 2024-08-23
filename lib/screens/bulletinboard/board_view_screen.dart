@@ -47,6 +47,7 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
     print(_userData);
   }
 
+
   @override
   void initState() {
     _getUserProfile();
