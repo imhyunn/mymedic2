@@ -6,18 +6,14 @@ import 'package:mymedic1/data/board.dart';
 import 'package:mymedic1/providers.dart';
 import 'package:mymedic1/data/board_manager.dart';
 
-class BoardEditScreen extends StatefulWidget {
-  static const routeName = '/edit';
-
-  final Board board;
-
-  BoardEditScreen(this.board);
+class BoardNewScreen extends StatefulWidget {
+  static const routeName = '/new';
 
   @override
-  State<BoardEditScreen> createState() => _BoardEditScreenState();
+  State<BoardNewScreen> createState() => _BoardNewScreenState();
 }
 
-class _BoardEditScreenState extends State<BoardEditScreen> {
+class _BoardNewScreenState extends State<BoardNewScreen> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final titleController = TextEditingController();
   final bodyController = TextEditingController();
@@ -25,14 +21,9 @@ class _BoardEditScreenState extends State<BoardEditScreen> {
   String title = '';
   String body = '';
 
-
-
   @override
   void initState() {
     super.initState();
-    final boardId = widget.board.id;
-    titleController.text = widget.board.title;
-    bodyController.text = widget.board.body;
   }
 
   @override
@@ -45,8 +36,13 @@ class _BoardEditScreenState extends State<BoardEditScreen> {
               padding: EdgeInsets.all(8.0),
               child: ElevatedButton(
                 onPressed: () async {
-                  List<String> result = await editData();
-                  Navigator.pop(context, result);
+                  await _firestore.collection('boards').doc().set({
+                    'title': titleController.text,
+                    'body': bodyController.text,
+                    'time': DateTime.now().toString(),
+                    'uid': FirebaseAuth.instance.currentUser!.uid,
+                  });
+                  Navigator.pop(context, titleController.text);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.buttonColor,
@@ -54,9 +50,11 @@ class _BoardEditScreenState extends State<BoardEditScreen> {
                     borderRadius: BorderRadius.circular(5.0),
                   ),
                 ),
-                child: const Text('발행', style: TextStyle(color: Colors.white),),
-              )
-          ),
+                child: const Text(
+                  '발행',
+                  style: TextStyle(color: Colors.white),
+                ),
+              )),
         ],
       ),
       body: SingleChildScrollView(
@@ -66,6 +64,7 @@ class _BoardEditScreenState extends State<BoardEditScreen> {
             TextField(
               decoration: InputDecoration(
                 border: InputBorder.none,
+                hintText: '제목',
                 contentPadding: EdgeInsets.symmetric(horizontal: 20),
               ),
               maxLines: 1,
@@ -91,6 +90,7 @@ class _BoardEditScreenState extends State<BoardEditScreen> {
             TextField(
               decoration: InputDecoration(
                 border: InputBorder.none,
+                hintText: '내용을 입력하세요!',
                 contentPadding: EdgeInsets.symmetric(horizontal: 20),
               ),
               maxLines: null,
@@ -103,21 +103,4 @@ class _BoardEditScreenState extends State<BoardEditScreen> {
       ),
     );
   }
-
-
-  Future<List<String>> editData() async {
-    await _firestore.collection('boards').doc(widget.board.id).set({
-      'title' : titleController.text,
-      'body' : bodyController.text,
-      'time' : widget.board.createAt,
-      'uid' : widget.board.uid,
-    });
-
-    List<String> result = [];
-    result.add(titleController.text);
-    result.add(bodyController.text);
-    return result;
-  }
-
-
 }

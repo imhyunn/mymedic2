@@ -8,6 +8,8 @@ import 'package:mymedic1/providers.dart';
 import 'package:mymedic1/screens/bulletinboard/board_edit.dart';
 import 'package:mymedic1/screens/bulletinboard/board_view_screen.dart';
 
+import 'board_new.dart';
+
 class BoardList extends StatefulWidget {
   static const routeName = '/list';
 
@@ -49,7 +51,7 @@ class _BoardListState extends State<BoardList> {
 
     for (int i = 0; i < boards.length; ++i) {
       var data = await _firestore.collection('user').doc(boards[i].uid).get();
-      boards[i].uid = data.data()!['userName'];
+      boards[i].username = data.data()!['userName'];
     }
     return boards;
   }
@@ -100,7 +102,7 @@ class _BoardListState extends State<BoardList> {
         ),
         tooltip: '글 작성',
         onPressed: () {
-          Navigator.pushNamed(context, BoardEditScreen.routeName).then((value) {
+          Navigator.pushNamed(context, BoardNewScreen.routeName).then((value) {
             setState(() {});
           });
         },
@@ -114,7 +116,7 @@ class _BoardListState extends State<BoardList> {
         Navigator.pushNamed(
           context,
           BoardViewScreen.routeName,
-          arguments: board.id,
+          arguments: board,
         ).then((value) {
           setState(() {});
         });
@@ -146,7 +148,7 @@ class _BoardListState extends State<BoardList> {
                   children: [
                     Container(
                       child: Text(
-                        board.uid,
+                        board.username!,
                         style: TextStyle(fontSize: 15),
                       ),
                     ),

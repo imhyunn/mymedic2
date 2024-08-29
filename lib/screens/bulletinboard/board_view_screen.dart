@@ -14,9 +14,8 @@ import '../../config/palette.dart';
 
 class BoardViewScreen extends StatefulWidget {
   static const routeName = '/view';
-  final String id;
-
-  BoardViewScreen(this.id);
+  final Board board;
+  BoardViewScreen(this.board);
 
   @override
   State<BoardViewScreen> createState() => _BoardViewScreenState();
@@ -24,59 +23,16 @@ class BoardViewScreen extends StatefulWidget {
 
 class _BoardViewScreenState extends State<BoardViewScreen> {
   XFile? _pickedFile;
-
-  String _username = 'name';
-  Map<String, dynamic> _userData = {};
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-
-
-  void _getUserProfile() async {
-    final user = FirebaseAuth.instance.currentUser;
-    final userData = await FirebaseFirestore.instance
-        .collection('user')
-        .doc(user!.uid)
-        .get();
-    if (userData.exists) {
-      setState(() {
-        _userData = userData.data()!;
-        _username = _userData['userName'];
-        print(_username);
-      });
-    }
-    print(_userData);
-  }
-
 
   @override
   void initState() {
-    _getUserProfile();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     final _imageSize = MediaQuery.of(context).size.width / 10 ;
-    return FutureBuilder<Board>(
-      future: null,
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-
-        if (snap.hasError) {
-          return Scaffold(
-            appBar: AppBar(),
-            body: Center(
-              child: Text('오류가 발생했습니다.'),
-            ),
-          );
-        }
-
-        final board = snap.requireData;
-
         return Scaffold(
           appBar: AppBar(
             actions: <Widget>[
@@ -91,10 +47,10 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
                       onTap: () {
                         switch (choice) {
                           case "편집":
-                            _edit(widget.id);
+                            _edit(widget.board.id!);
                             break;
                           case "삭제":
-                            _confirmDelete(widget.id);
+                            _confirmDelete(widget.board.id!);
                             break;
                         }
                       },
@@ -114,7 +70,7 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
                     Container(
                         padding: EdgeInsets.symmetric(horizontal: 10),
                         child: Text(
-                          board.title.isEmpty ? '(제목 없음)' : board.title,
+                          widget.board.title.isEmpty ? '(제목 없음)' : widget.board.title,
                           style: TextStyle(
                             fontSize: 32,
                           ),
@@ -153,13 +109,13 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                child: Text(_username, style: TextStyle(
+                                child: Text(widget.board.username!, style: TextStyle(
                                     fontSize: 15
                                 ),),
                               ),
                               Container(
                                 child: Text(
-                                  board.createAt.split(".")[0] ?? "NO",
+                                  widget.board.createAt.split(".")[0] ?? "NO",
                                   style: TextStyle(fontSize: 15),
                                   textAlign: TextAlign.end,
                                 ),
@@ -187,7 +143,7 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
                     ),
                     Container(
                         padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text(board.body, style: TextStyle(
+                        child: Text(widget.board.body, style: TextStyle(
                             fontSize: 18
                         ),)),
                   ],
@@ -196,17 +152,21 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
             ),
           ),
         );
-      },
-    );
   }
 
   void _edit(String id) {
     Navigator.pushNamed(
       context,
       BoardEditScreen.routeName,
-      arguments: id,
-    ).then((_) {
-      setState(() {});
+      arguments: widget.board,
+    ).then((result) {
+      if (result != null) {
+        var res = result as List<String>;
+        setState(() {
+          widget.board.title = res[0];
+          widget.board.body = res[1];
+        });
+      }
     });
   }
 
@@ -245,8 +205,9 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
             Padding(
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     // boardManager().deleteBoard(id);
+                    await deleteData();
                     Navigator.popUntil(context, (route) => route.isFirst);
                   },
                   style: ElevatedButton.styleFrom(
@@ -265,6 +226,11 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
       },
     );
   }
+
+  Future<void> deleteData() async {
+    await _firestore.collection('boards').doc(widget.board.id).delete();
+  }
+
 
   void handleClick(String value) {
     switch (value) {

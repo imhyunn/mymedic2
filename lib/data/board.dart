@@ -7,27 +7,28 @@ class Board {
   static const columnBody = 'body';
   static const columnCreateAt = 'createAt';
 
-  final String title;
-  final String body;
+  String title;
+  String body;
   final String? id;
-   String uid;
+  final String uid;
+  String? username;
   final String createAt;
 
   Board(this.title, this.body, this.id, this.uid, this.createAt);
 
 // Board.fromRow(Map<String, dynamic> row)
-  //     : this(
-  //         row[columnBody],
-  //         row[columnCreateAt],
-  //         id: row[columnId],
-  //         title: row[columnTitle],
-  //       );
-  //
-  // Map<String, dynamic> toRow() {
-  //   return {
-  //     columnTitle: title,
-  //     columnBody: body,
-  //     columnCreateAt: DateTime.now().toString()
-  //   };
-  // }
+//     : this(
+//         row[columnBody],
+//         row[columnCreateAt],
+//         id: row[columnId],
+//         title: row[columnTitle],
+//       );
+//
+// Map<String, dynamic> toRow() {
+//   return {
+//     columnTitle: title,
+//     columnBody: body,
+//     columnCreateAt: DateTime.now().toString()
+//   };
+// }
 }

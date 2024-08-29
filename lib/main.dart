@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mymedic1/screens/bulletinboard/board_edit.dart';
 import 'package:mymedic1/screens/bulletinboard/board_list.dart';
+import 'package:mymedic1/screens/bulletinboard/board_new.dart';
 import 'package:mymedic1/screens/bulletinboard/board_view_screen.dart';
 import 'package:mymedic1/screens/home/home_screen.dart';
 import 'package:mymedic1/screens/sign/login_screen.dart';
 import 'package:mymedic1/screens/myapp.dart';
 import 'package:mymedic1/test.dart';
 import 'package:mymedic1/test2.dart';
+
+import 'data/board.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,14 +31,14 @@ class MyApp extends StatelessWidget {
       routes: {
         LoginScreen.routeName: (context) => LoginScreen(),
         BoardList.routeName: (context) => BoardList(),
+        BoardNewScreen.routeName: (context) => BoardNewScreen(),
         BoardEditScreen.routeName: (context) {
-          final args = ModalRoute.of(context)!.settings.arguments;
-          final id = args != null ? args as int : null;
-          return BoardEditScreen(id);
+          final board = ModalRoute.of(context)!.settings.arguments as Board;
+          return BoardEditScreen(board);
         },
         BoardViewScreen.routeName: (context) {
-          final id = ModalRoute.of(context)!.settings.arguments as String;
-          return BoardViewScreen(id);
+          final board = ModalRoute.of(context)!.settings.arguments as Board;
+          return BoardViewScreen(board);
         },
       },
     );
