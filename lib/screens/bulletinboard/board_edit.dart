@@ -30,7 +30,6 @@ class _BoardEditScreenState extends State<BoardEditScreen> {
   @override
   void initState() {
     super.initState();
-    final boardId = widget.board.id;
     titleController.text = widget.board.title;
     bodyController.text = widget.board.body;
   }

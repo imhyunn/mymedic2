@@ -54,7 +54,7 @@ class _AppState extends State<App> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Color(0xFF394B81),
+        selectedItemColor: Color(0xFF4567BD),
         onTap: _onItemTapped,
       ),
     );

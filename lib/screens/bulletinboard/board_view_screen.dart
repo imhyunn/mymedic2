@@ -15,6 +15,7 @@ import '../../config/palette.dart';
 class BoardViewScreen extends StatefulWidget {
   static const routeName = '/view';
   final Board board;
+
   BoardViewScreen(this.board);
 
   @override
@@ -32,126 +33,134 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final _imageSize = MediaQuery.of(context).size.width / 10 ;
-        return Scaffold(
-          appBar: AppBar(
-            actions: <Widget>[
-              PopupMenuButton<String>(
-                color: Colors.white,
-                onSelected: handleClick,
-                itemBuilder: (BuildContext context) {
-                  return {'편집', '삭제'}.map((String choice) {
-                    return PopupMenuItem<String>(
-                      value: choice,
-                      child: Text(choice),
-                      onTap: () {
-                        switch (choice) {
-                          case "편집":
-                            _edit(widget.board.id!);
-                            break;
-                          case "삭제":
-                            _confirmDelete(widget.board.id!);
-                            break;
-                        }
-                      },
-                    );
-                  }).toList();
-                },
-              ),
-            ],
+    final _imageSize = MediaQuery.of(context).size.width / 10;
+    return Scaffold(
+      appBar: AppBar(
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            color: Colors.white,
+            onSelected: handleClick,
+            itemBuilder: (BuildContext context) {
+              return {'편집', '삭제'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                  onTap: () {
+                    switch (choice) {
+                      case "편집":
+                        _edit(widget.board.id!);
+                        break;
+                      case "삭제":
+                        _confirmDelete(widget.board.id!);
+                        break;
+                    }
+                  },
+                );
+              }).toList();
+            },
           ),
-          body: SizedBox.expand(
-            child: Container(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text(
-                          widget.board.title.isEmpty ? '(제목 없음)' : widget.board.title,
-                          style: TextStyle(
-                            fontSize: 32,
-                          ),
-                        )),
-                    SizedBox(height: 8,),
-                    Padding(
-                      padding: EdgeInsets.only(left: 5),
-                      child: Row(
+        ],
+      ),
+      body: SizedBox.expand(
+        child: Container(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      widget.board.title.isEmpty
+                          ? '(제목 없음)'
+                          : widget.board.title,
+                      style: TextStyle(
+                        fontSize: 32,
+                      ),
+                    )),
+                SizedBox(
+                  height: 8,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 5),
+                  child: Row(
+                    children: [
+                      Container(
+                        child: _pickedFile == null
+                            ? Center(
+                                child: Icon(
+                                  Icons.account_circle,
+                                  size: _imageSize,
+                                ),
+                              )
+                            : Center(
+                                child: Container(
+                                  width: _imageSize,
+                                  height: _imageSize,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        width: 2, color: Colors.white),
+                                    image: DecorationImage(
+                                        image:
+                                            FileImage(File(_pickedFile!.path)),
+                                        fit: BoxFit.cover),
+                                  ),
+                                ),
+                              ),
+                      ),
+                      SizedBox(
+                        width: 2,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            child: _pickedFile == null
-                                ? Center(
-                              child: Icon(
-                                Icons.account_circle,
-                                size: _imageSize,
-                              ),
-                            )
-                                : Center(
-                              child: Container(
-                                width: _imageSize,
-                                height: _imageSize,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                      width: 2,
-                                      color: Colors.white),
-                                  image: DecorationImage(
-                                      image: FileImage(File(_pickedFile!.path)),
-                                      fit: BoxFit.cover),
-                                ),
-                              ),
+                            child: Text(
+                              widget.board.username!,
+                              style: TextStyle(fontSize: 15),
                             ),
                           ),
-                          SizedBox(width: 2,),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                child: Text(widget.board.username!, style: TextStyle(
-                                    fontSize: 15
-                                ),),
-                              ),
-                              Container(
-                                child: Text(
-                                  widget.board.createAt.split(".")[0] ?? "NO",
-                                  style: TextStyle(fontSize: 15),
-                                  textAlign: TextAlign.end,
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 5.0),
-                    Container(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Divider(
-                              thickness: 0.5,
-                              color: Colors.grey[400],
+                          Container(
+                            child: Text(
+                              widget.board.createAt.split(".")[0] ?? "NO",
+                              style: TextStyle(fontSize: 15),
+                              textAlign: TextAlign.end,
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 5.0,
-                    ),
-                    Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text(widget.board.body, style: TextStyle(
-                            fontSize: 18
-                        ),)),
-                  ],
+                      )
+                    ],
+                  ),
                 ),
-              ),
+                SizedBox(height: 5.0),
+                Container(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                          thickness: 0.5,
+                          color: Colors.grey[400],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 5.0,
+                ),
+                Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      widget.board.body,
+                      style: TextStyle(fontSize: 18),
+                    )),
+              ],
             ),
           ),
-        );
+        ),
+      ),
+    );
   }
 
   void _edit(String id) {
@@ -177,7 +186,7 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '노트 삭제',
           ),
@@ -230,7 +239,6 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
   Future<void> deleteData() async {
     await _firestore.collection('boards').doc(widget.board.id).delete();
   }
-
 
   void handleClick(String value) {
     switch (value) {

@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,7 +21,8 @@ class MyPage extends StatefulWidget {
 class _MyPageState extends State<MyPage> {
   XFile? _pickedFile;
   Map<String, dynamic> _userData = {};
-  String _username = "초기값";
+  String _username = "";
+  FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
   void _getUserProfile() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -35,6 +38,13 @@ class _MyPageState extends State<MyPage> {
       });
     }
     print(_userData);
+  }
+
+  Future<void> saveImage(XFile image) async {
+    var dateTime = DateTime.now().toString().replaceAll(' ', '_');
+     var ref = _firebaseStorage.ref().child("images/$dateTime.jpg");
+     // 해결했다 ^^... 2024-08-30 20:51 - 원인은 라이브러리 버전... App Check token 뭐시기 그거는 에러가 아니래..
+    var putFile = ref.putFile(File(image.path), SettableMetadata(contentType: "image/jpeg"));
   }
 
   @override
@@ -101,16 +111,6 @@ class _MyPageState extends State<MyPage> {
                 ),
               ],
             ),
-            Expanded(
-              child: ListView(
-                children: [
-                  ListTile(
-                    leading: Icon(Icons.person),
-                    title: Text('개인정보'),
-                  ),
-                ],
-              ),
-            )
           ],
         ),
       ),
@@ -135,7 +135,13 @@ class _MyPageState extends State<MyPage> {
             Padding(
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
-                  onPressed: () => _getCameraImage(),
+                  onPressed: () async {
+                    var image = await _getCameraImage();
+                    if (image != null) {
+                      await saveImage(image);
+                    }
+                    // 스토리지에 위에서 가져온 이미지를 저장하는 코드
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.buttonColor,
                     shape: RoundedRectangleBorder(
@@ -180,17 +186,19 @@ class _MyPageState extends State<MyPage> {
     );
   }
 
-  _getCameraImage() async {
+  Future<XFile?> _getCameraImage() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
         _pickedFile = pickedFile;
       });
+      return pickedFile;
     } else {
       if (kDebugMode) {
         print('이미지 선택안함');
       }
+      return null;
     }
   }
 
