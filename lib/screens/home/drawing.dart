@@ -16,7 +16,7 @@ class _DrawingPageState extends State<DrawingPage> {
   Color _currentColor = Colors.black;
   List<bool> _isSelected = [true, false, false, false];
 
-  Image? image = null;
+  MemoryImage? image = null;
 
   @override
   void initState() {
@@ -57,7 +57,7 @@ class _DrawingPageState extends State<DrawingPage> {
               onPressed: () async{
                 var renderImage = await notifier.renderImage();
                 setState(() {
-                  image = Image.memory(renderImage.buffer.asUint8List());
+                  image = MemoryImage(renderImage.buffer.asUint8List());
                 });
                 var result = Navigator.pop(context, image);
               },
