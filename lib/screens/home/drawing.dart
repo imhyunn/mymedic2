@@ -54,7 +54,7 @@ class _DrawingPageState extends State<DrawingPage> {
             IconButton(
               icon: const Icon(Icons.check),
               tooltip: "check",
-              onPressed: () async{
+              onPressed: () async {
                 var renderImage = await notifier.renderImage();
                 setState(() {
                   image = MemoryImage(renderImage.buffer.asUint8List());
@@ -76,7 +76,15 @@ class _DrawingPageState extends State<DrawingPage> {
         // ),
         body: Column(
           children: [
-            Expanded(child: Scribble(notifier: notifier)),
+            Expanded(
+              child: Center(
+                  child: Container(
+                width: size.width,
+                // height: size.width,
+                child: Scribble(notifier: notifier),
+                    decoration: BoxDecoration(border: Border.all(color: Colors.grey, width: 1)),
+              )),
+            ),
             Card(
               child: Container(
                 width: size.width * 0.98,

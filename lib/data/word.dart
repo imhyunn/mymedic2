@@ -1,10 +1,9 @@
-class Word{
-  final String english;
-  final String korean;
-  final String time;
+class Word {
+  String english;
+  String korean;
+  String time;
   String? imagePath;
-  final String id;
+  String? id;
 
   Word(this.english, this.korean, this.time, this.imagePath, this.id);
-
 }

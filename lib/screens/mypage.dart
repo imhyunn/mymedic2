@@ -45,6 +45,10 @@ class _MyPageState extends State<MyPage> {
      var ref = _firebaseStorage.ref().child("images/$dateTime.jpg");
      // 해결했다 ^^... 2024-08-30 20:51 - 원인은 라이브러리 버전... App Check token 뭐시기 그거는 에러가 아니래..
     var putFile = ref.putFile(File(image.path), SettableMetadata(contentType: "image/jpeg"));
+
+    var complete = await putFile.whenComplete(() => {});
+    var s = await complete.ref.getDownloadURL();
+    print(s);
   }
 
   @override
