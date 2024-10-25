@@ -29,6 +29,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
   TextEditingController _krController = TextEditingController();
   late Offset _tapPosition;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
   void renew() {
     setState(() {
@@ -39,7 +40,13 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
   @override
   void initState() {
-      for (int i = 0; i < widget.words.length; ++i) _pickedFiles.add(null);
+    for (int i = 0; i < widget.words.length; ++i) {
+      if (widget.words[i].imagePath == null) {
+        _pickedFiles.add(null);
+      } else if (widget.words[i].imagePath != null) {
+        _pickedFiles.add(NetworkImage(widget.words[i].imagePath!));
+      }
+    }
 
     super.initState();
   }
@@ -59,7 +66,13 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                   }
                 },
                 icon: Icon(Icons.add)),
-            IconButton(onPressed: () {}, icon: Icon(Icons.check))
+            IconButton(
+                onPressed: () async {
+                  await uploadImages();
+                  await updateWords();
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.check))
           ],
         ),
         body: ListView.separated(
@@ -67,6 +80,28 @@ class _WordNoteEditState extends State<WordNoteEdit> {
             itemBuilder: (BuildContext context, int index) {
               return Card(
                 child: ListTile(
+                  trailing: PopupMenuButton<String>(
+                    color: Colors.white,
+                    onSelected: handleClick,
+                    itemBuilder: (BuildContext context) {
+                      return ['수정', '삭제'].map((String choice) {
+                        return PopupMenuItem<String>(
+                          value: choice,
+                          child: Text(choice),
+                          onTap: () {
+                            switch (choice) {
+                              case "수정":
+                                _edit(widget.words[index]);
+                                break;
+                              case "삭제":
+                                _confirmDelete(widget.words[index]);
+                                break;
+                            }
+                          },
+                        );
+                      }).toList();
+                    },
+                  ),
                   onTap: null,
                   title: IntrinsicHeight(
                     child: Row(
@@ -82,24 +117,28 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                           width: 10,
                         ),
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 35,
-                                child: Text(
-                                  widget.words[index].english,
-                                  style: TextStyle(fontSize: 19),
+                          child: Container(
+                            height: 135,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: 35,
+                                  child: Text(
+                                    widget.words[index].english,
+                                    style: TextStyle(fontSize: 19),
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                height: 100,
-                                child: Text(
-                                  widget.words[index].korean,
-                                  style: TextStyle(fontSize: 17),
+                                Container(
+                                  height: 35,
+                                  child: Text(
+                                    widget.words[index].korean,
+                                    style: TextStyle(fontSize: 17),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         InkWell(
@@ -224,7 +263,13 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                 child: ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      widget.words.add(Word(_engController.text, _krController.text, DateTime.now().toString(), null, null));
+                      widget.words.add(Word(
+                          _engController.text,
+                          _krController.text,
+                          DateTime.now().toString(),
+                          null,
+                          null));
+                      _pickedFiles.add(null);
                     });
                     Navigator.pop(context, true);
                   },
@@ -315,5 +360,232 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         ),
       ),
     ]);
+  }
+
+  void _edit(Word word) {
+    _engController.text = word.english;
+    _krController.text = word.korean;
+
+    showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Palette.backColor,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+          title: Text(
+            '영단어 추가',
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                maxLength: 20,
+                controller: _engController,
+                decoration: InputDecoration(
+                  hintText: '영단어',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.black54,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+              ),
+              TextField(
+                maxLength: 20,
+                controller: _krController,
+                decoration: InputDecoration(
+                  hintText: '뜻',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.black54,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            Padding(
+                padding: EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.buttonColor2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                  child: const Text(
+                    '취소',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )),
+            Padding(
+                padding: EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      word.english = _engController.text;
+                      word.korean = _krController.text;
+                    });
+                    Navigator.pop(context, true);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.buttonColor2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                  child: const Text(
+                    '확인',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )),
+          ],
+        );
+      },
+    );
+    // Navigator.pushNamed(
+    //   context,
+    //   arguments: widget.board,
+    // ).then((result) {
+    //   if (result != null) {
+    //     var res = result as List<String>;
+    //     setState(() {
+    //       widget.words.k = res[0];
+    //       widget.board.body = res[1];
+    //     });
+    //   }
+    // });
+  }
+
+  Future<void> updateWords() async {
+    for (int i = 0; i < widget.words.length; i++) {
+      if (widget.words[i].id == null) {
+        await _firestore.collection('words').doc().set({
+          'english': widget.words[i].english,
+          'image': null,
+          'korean': widget.words[i].korean,
+          'time': DateTime.now().toString(),
+        });
+      } else if (widget.words[i].id != null) {
+        await _firestore.collection('words').doc(widget.words[i].id).set({
+          'english': widget.words[i].english,
+          'image': widget.words[i].imagePath,
+          'korean': widget.words[i].korean,
+          'time': widget.words[i].time,
+        });
+      }
+    }
+  }
+
+  Future<void> uploadImages() async {
+    for (int i = 0; i < _pickedFiles.length; i++) {
+      if (_pickedFiles[i] != null && widget.words[i].imagePath == null) {
+        var dateTime = DateTime.now().toString().replaceAll(' ', '_');
+        var ref = _firebaseStorage.ref().child("wordImages/$dateTime.jpg");
+
+        if (_pickedFiles[i] is FileImage) {
+          var image = _pickedFiles[i] as FileImage;
+          var putFile = ref.putFile(File(image.file.path),
+              SettableMetadata(contentType: "image/jpeg"));
+          var complete = await putFile.whenComplete(() => {});
+          var url = await complete.ref.getDownloadURL();
+
+          widget.words[i].imagePath = url;
+        } else if (_pickedFiles[i] is MemoryImage) {
+          var image = _pickedFiles[i] as MemoryImage;
+          var putFile = ref.putData(
+              image.bytes, SettableMetadata(contentType: "image/jpeg"));
+          var complete = await putFile.whenComplete(() => {});
+          var url = await complete.ref.getDownloadURL();
+
+          widget.words[i].imagePath = url;
+
+        }
+      }
+    }
+  }
+
+  void _confirmDelete(Word word) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Palette.backColor,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+          title: Text(
+            '노트 삭제',
+          ),
+          content: Text(
+            '노트를 삭제할까요?',
+          ),
+          actions: [
+            Padding(
+                padding: EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.buttonColor2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                  child: const Text(
+                    '아니오',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )),
+            Padding(
+                padding: EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    // boardManager().deleteBoard(id);
+                    // await deleteData();
+                    Navigator.pop(context);
+                    setState(() {
+                      widget.words.remove(word);
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.buttonColor2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                  child: const Text(
+                    '예',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )),
+          ],
+        );
+      },
+    );
+  }
+
+  void handleClick(String value) {
+    switch (value) {
+      case '수정':
+        break;
+      case '삭제':
+        break;
+    }
   }
 }

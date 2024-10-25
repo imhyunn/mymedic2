@@ -67,12 +67,14 @@ class _WordNoteState extends State<WordNote> {
         title: Text(''),
         actions: [
           IconButton(
-              onPressed: () {
-                Navigator.of(context).push(
+              onPressed: () async {
+                // A
+                await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (BuildContext) => WordNoteEdit(words),
                   ),
                 );
+                // 갱신 코드
               },
               icon: Icon(Icons.mode_edit_outline))
         ],
