@@ -9,7 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mymedic1/data/word.dart';
 import 'package:mymedic1/screens/home/drawing.dart';
 
-import '../../config/palette.dart';
+import 'package:mymedic1/config/palette.dart';
 
 enum Menu { camera, gallery, drawing }
 
@@ -25,6 +25,7 @@ class WordNoteEdit extends StatefulWidget {
 class _WordNoteEditState extends State<WordNoteEdit> {
   XFile? _pickedFile;
   List<ImageProvider?> _pickedFiles = [];
+  List<bool> _isModifiedImage = [];
   TextEditingController _engController = TextEditingController();
   TextEditingController _krController = TextEditingController();
   late Offset _tapPosition;
@@ -47,6 +48,11 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         _pickedFiles.add(NetworkImage(widget.words[i].imagePath!));
       }
     }
+
+    for(int i = 0; i< widget.words.length; ++i){
+      _isModifiedImage.add(false);
+    }
+
 
     super.initState();
   }
@@ -108,10 +114,10 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                       children: [
                         Container(
                           alignment: Alignment.topCenter,
-                          child: Icon(
-                            Icons.volume_up_rounded,
-                            size: size.width * 0.055,
-                          ),
+                          // child: Icon(
+                          //   Icons.volume_up_rounded,
+                          //   size: size.width * 0.055,
+                          // ),
                         ),
                         SizedBox(
                           width: 10,
@@ -153,8 +159,8 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                             _tapPosition = details.globalPosition;
                           },
                           child: Container(
-                            width: size.width * 0.2,
-                            height: size.width * 0.2,
+                            width: size.width * 0.28,
+                            height: size.width * 0.28,
                             child: DottedBorder(
                               radius: Radius.circular(20),
                               color: Colors.grey,
@@ -296,6 +302,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
     if (pickedFile != null) {
       setState(() {
         _pickedFiles[index] = FileImage(File(pickedFile.path));
+        _isModifiedImage[index]= true;
       });
     } else {
       if (kDebugMode) {

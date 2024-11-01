@@ -8,9 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mymedic1/data/word.dart';
 import 'package:mymedic1/screens/home/drawing.dart';
-import 'package:mymedic1/screens/home/wordNote_edit.dart';
-
-import '../../config/palette.dart';
+import 'package:mymedic1/screens/home/words/wordNote_edit.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 enum Menu { camera, gallery, drawing }
 
@@ -29,6 +28,9 @@ class _WordNoteState extends State<WordNote> {
   late Offset _tapPosition;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Word> words = [];
+
+  final FlutterTts tts = FlutterTts();
+
   void renew() {
     setState(() {
       _engController.clear();
@@ -57,6 +59,9 @@ class _WordNoteState extends State<WordNote> {
     // }
     _getWord();
     super.initState();
+
+    tts.setLanguage("en-US");
+    tts.setSpeechRate(0.5);
   }
 
   @override
@@ -108,9 +113,12 @@ class _WordNoteState extends State<WordNote> {
                         children: [
                           Container(
                             alignment: Alignment.topCenter,
-                            child: Icon(
-                              Icons.volume_up_rounded,
-                              size: size.width * 0.055,
+                            child: IconButton(
+                              onPressed: () {},
+                              icon: Icon(
+                                Icons.volume_up_rounded,
+                                size: size.width * 0.055,
+                              ),
                             ),
                           ),
                           SizedBox(
@@ -142,8 +150,8 @@ class _WordNoteState extends State<WordNote> {
                             ),
                           ),
                           Container(
-                            width: size.width * 0.2,
-                            height: size.width * 0.2,
+                            width: size.width * 0.28,
+                            height: size.width * 0.28,
                             child: DottedBorder(
                               radius: Radius.circular(20),
                               color: Colors.grey,
