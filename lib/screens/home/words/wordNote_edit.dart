@@ -317,6 +317,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
     if (pickedFile != null) {
       setState(() {
         _pickedFiles[index] = FileImage(File(pickedFile.path));
+        _isModifiedImage[index]= true;
       });
     } else {
       if (kDebugMode) {
@@ -357,7 +358,8 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
           if (result != null) {
             setState(() {
-              _pickedFiles[index] = result;
+              _pickedFiles[index] = result; // 새로운 값
+              _isModifiedImage[index] = true;
             });
           }
         },
@@ -501,7 +503,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
   Future<void> uploadImages() async {
     for (int i = 0; i < _pickedFiles.length; i++) {
-      if (_pickedFiles[i] != null && widget.words[i].imagePath == null) {
+      if (_pickedFiles[i] != null && _isModifiedImage[i]) {
         var dateTime = DateTime.now().toString().replaceAll(' ', '_');
         var ref = _firebaseStorage.ref().child("wordImages/$dateTime.jpg");
 
