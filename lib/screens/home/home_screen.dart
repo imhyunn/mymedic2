@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mymedic1/screens/home/test_screen.dart';
+import 'package:mymedic1/screens/home/words/wordFolder.dart';
 import 'package:mymedic1/screens/home/words/wordNote.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -91,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           onPressed: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (BuildContext) => WordNote(),
+                                builder: (BuildContext) => WordFolder(),
                               ),
                             );
                           },

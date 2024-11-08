@@ -80,6 +80,8 @@ class _WordNoteState extends State<WordNote> {
                   ),
                 );
                 // 갱신 코드
+                setState(() {
+                });
               },
               icon: Icon(Icons.mode_edit_outline))
         ],
