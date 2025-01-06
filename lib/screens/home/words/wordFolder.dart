@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mymedic1/data/folder.dart';
+import 'package:mymedic1/screens/home/words/wordNote.dart';
 
 import '../../../config/palette.dart';
 
@@ -10,62 +13,120 @@ class WordFolder extends StatefulWidget {
 }
 
 class _WordFolderState extends State<WordFolder> {
-
   TextEditingController _folderController = TextEditingController();
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<List<Folder>> _getFolder() async {
+    var snapshot = await _firestore.collection('folder').get();
+    List<Folder> folders = snapshot.docs.map((element) {
+      Map<String, dynamic> map = element.data();
+      return Folder(map['name'], map['wordCount'], element.id);
+    }).toList();
+    return folders;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [IconButton(onPressed: () {
-          // _addFolder();
-        }, icon: Icon(Icons.add))],
+        actions: [
+          IconButton(
+              onPressed: () async {
+                var result = await _addFolder(context);
+
+                setState(() {
+                  _getFolder();
+                });
+              },
+              icon: Icon(Icons.add))
+        ],
       ),
-      body: ListView.separated(
-          itemBuilder: (BuildContext context, int index) {
-            return Card(
-              child: ListTile(
-                title: Container(
-                    height: 80,
-                    child: Column(children: [
-                      Text(
-                        'data',
-                        style: TextStyle(fontSize: 20),
+      body: FutureBuilder(
+          future: _getFolder(), // 데이터 불러오는 future 함수,,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            if (snapshot.hasError) {
+              print(snapshot.error.toString());
+              return Center(
+                child: Text('오류가 발생했습니다.'),
+              );
+            }
+
+            final folders = snapshot.requireData;
+            // 스냅샷 -> 현재 불러온 날것의 데이터
+            // 스냅샷의 상태에 따라 화면을 그려주는 부분
+            return ListView.separated(
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    child: ListTile(
+                      title: Padding(
+                        padding: EdgeInsets.only(left: 20, top: 14, bottom: 14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              child: Text(
+                                folders[index].name,
+                                style: TextStyle(fontSize: 23),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Container(
+                              child: Text(
+                                '단어 수 : ${folders[index].wordCount}',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            )
+                          ],
+                        ),
                       ),
-                      Text(
-                        '단어 수:',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ])),
-                trailing: PopupMenuButton<String>(
-                  color: Colors.white,
-                  onSelected: handleClick,
-                  itemBuilder: (BuildContext context) {
-                    return ['수정', '삭제'].map((String choice) {
-                      return PopupMenuItem<String>(
-                        value: choice,
-                        child: Text(choice),
-                        onTap: () {
-                          switch (choice) {
-                            case "수정":
-                              // _edit();
-                              break;
-                            case "삭제":
-                              // _confirmDelete();
-                              break;
-                          }
+                      trailing: PopupMenuButton<String>(
+                        color: Colors.white,
+                        onSelected: handleClick,
+                        itemBuilder: (BuildContext context) {
+                          return ['수정', '삭제'].map((String choice) {
+                            return PopupMenuItem<String>(
+                              value: choice,
+                              child: Text(choice),
+                              onTap: () {
+                                switch (choice) {
+                                  case "수정":
+                                    _edit(folders[index]);
+                                    break;
+                                  case "삭제":
+                                    _folderDelete(folders[index].id);
+                                    break;
+                                }
+                              },
+                            );
+                          }).toList();
                         },
-                      );
-                    }).toList();
-                  },
-                ),
-                onTap: null,
-              ),
-            );
-          },
-          itemCount: 4,
-          separatorBuilder: (context, index) {
-            return Divider();
+                      ),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (BuildContext) => WordNote(),
+                          ),
+                        );
+                      },
+                    ),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        side: BorderSide(width: 1)),
+                  );
+                },
+                itemCount: folders.length,
+                separatorBuilder: (context, index) {
+                  return Divider();
+                });
           }),
     );
   }
@@ -77,7 +138,7 @@ class _WordFolderState extends State<WordFolder> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '폴더 추가',
           ),
@@ -124,7 +185,11 @@ class _WordFolderState extends State<WordFolder> {
             Padding(
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    await _firestore.collection('folder').add({
+                      'name': _folderController.text,
+                      'wordCount': 0,
+                    });
                     setState(() {
 
                     });
@@ -147,26 +212,25 @@ class _WordFolderState extends State<WordFolder> {
     );
   }
 
-  void _edit(String id) {
-
+  void _edit(Folder folder) {
     showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
-            '영단어 추가',
+            '폴더 수정',
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 maxLength: 20,
-                controller:  _folderController,
+                controller: _folderController,
                 decoration: InputDecoration(
-                  hintText: '영단어',
+                  hintText: '폴더 이름',
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
                       color: Colors.black54,
@@ -202,8 +266,13 @@ class _WordFolderState extends State<WordFolder> {
             Padding(
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    await _firestore.collection('folder').doc(folder.id).set({
+                      'name' : _folderController.text,
+                      'wordCount' : folder.wordCount
+                    });
                     setState(() {
+
                     });
                     Navigator.pop(context, true);
                   },
@@ -224,20 +293,19 @@ class _WordFolderState extends State<WordFolder> {
     );
   }
 
-
-  void _confirmDelete(String id) {
+  void _folderDelete(String id) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
-            '노트 삭제',
+            '폴더 삭제',
           ),
           content: Text(
-            '노트를 삭제할까요?',
+            '폴더를 삭제할까요?',
           ),
           actions: [
             Padding(
@@ -261,10 +329,12 @@ class _WordFolderState extends State<WordFolder> {
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    // boardManager().deleteBoard(id);
-                    // await deleteData();
+
+                    await _firestore.collection('folder').doc(id).delete();
+                    setState(() {
+
+                    });
                     Navigator.pop(context);
-                    setState(() {});
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.buttonColor2,

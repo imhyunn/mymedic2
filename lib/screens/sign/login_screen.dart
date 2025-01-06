@@ -14,12 +14,16 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
+class Test{
+
+}
 class _LoginScreenState extends State<LoginScreen> {
   final _authentication = FirebaseAuth.instance;
 
   final _formKey = GlobalKey<FormState>();
   String userEmail = '';
   String userPassword = '';
+  late Test test;
 
   void _tryValidation() {
     final isValid = _formKey.currentState!.validate();

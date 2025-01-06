@@ -6,6 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mymedic1/screens/home/test_screen.dart';
 import 'package:mymedic1/screens/home/words/wordFolder.dart';
 import 'package:mymedic1/screens/home/words/wordNote.dart';
+import 'package:mymedic1/screens/home/words/wordNote_edit.dart';
+import 'package:mymedic1/data/folder.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

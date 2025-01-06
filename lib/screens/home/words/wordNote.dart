@@ -16,9 +16,11 @@ enum Menu { camera, gallery, drawing }
 class WordNote extends StatefulWidget {
   const WordNote({super.key});
 
+
   @override
   State<WordNote> createState() => _WordNoteState();
 }
+
 
 class _WordNoteState extends State<WordNote> {
   XFile? _pickedFile;
@@ -30,6 +32,7 @@ class _WordNoteState extends State<WordNote> {
   List<Word> words = [];
 
   final FlutterTts tts = FlutterTts();
+
 
   void renew() {
     setState(() {
@@ -172,6 +175,12 @@ class _WordNoteState extends State<WordNote> {
                         ],
                       ),
                     ),
+                  ),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      side: BorderSide(width: 1),
+
                   ),
                 );
               },
