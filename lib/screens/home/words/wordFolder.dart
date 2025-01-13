@@ -32,11 +32,7 @@ class _WordFolderState extends State<WordFolder> {
         actions: [
           IconButton(
               onPressed: () async {
-                var result = await _addFolder(context);
-
-                setState(() {
-                  _getFolder();
-                });
+                await _addFolder(context);
               },
               icon: Icon(Icons.add))
         ],
@@ -112,7 +108,7 @@ class _WordFolderState extends State<WordFolder> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (BuildContext) => WordNote(),
+                            builder: (BuildContext) => WordNote(folder: folders[index]),
                           ),
                         );
                       },
@@ -190,9 +186,7 @@ class _WordFolderState extends State<WordFolder> {
                       'name': _folderController.text,
                       'wordCount': 0,
                     });
-                    setState(() {
-
-                    });
+                    setState(() {});
                     Navigator.pop(context, true);
                   },
                   style: ElevatedButton.styleFrom(
@@ -213,6 +207,8 @@ class _WordFolderState extends State<WordFolder> {
   }
 
   void _edit(Folder folder) {
+    _folderController.text = folder.name;
+
     showDialog<bool>(
       context: context,
       builder: (context) {
@@ -268,12 +264,10 @@ class _WordFolderState extends State<WordFolder> {
                 child: ElevatedButton(
                   onPressed: () async {
                     await _firestore.collection('folder').doc(folder.id).set({
-                      'name' : _folderController.text,
-                      'wordCount' : folder.wordCount
+                      'name': _folderController.text,
+                      'wordCount': folder.wordCount
                     });
-                    setState(() {
-
-                    });
+                    setState(() {});
                     Navigator.pop(context, true);
                   },
                   style: ElevatedButton.styleFrom(
@@ -329,11 +323,8 @@ class _WordFolderState extends State<WordFolder> {
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () async {
-
                     await _firestore.collection('folder').doc(id).delete();
-                    setState(() {
-
-                    });
+                    setState(() {});
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(

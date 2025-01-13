@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mymedic1/data/folder.dart';
 import 'package:mymedic1/data/word.dart';
 import 'package:mymedic1/screens/home/drawing.dart';
 import 'package:mymedic1/screens/home/words/wordNote_edit.dart';
@@ -14,13 +15,13 @@ import 'package:flutter_tts/flutter_tts.dart';
 enum Menu { camera, gallery, drawing }
 
 class WordNote extends StatefulWidget {
-  const WordNote({super.key});
+  const WordNote({super.key, required this.folder});
 
+  final Folder folder;
 
   @override
   State<WordNote> createState() => _WordNoteState();
 }
-
 
 class _WordNoteState extends State<WordNote> {
   XFile? _pickedFile;
@@ -33,7 +34,6 @@ class _WordNoteState extends State<WordNote> {
 
   final FlutterTts tts = FlutterTts();
 
-
   void renew() {
     setState(() {
       _engController.clear();
@@ -44,12 +44,13 @@ class _WordNoteState extends State<WordNote> {
   Future<List<Word>> _getWord() async {
     var snapshot = await _firestore
         .collection('words')
+        .where('folderId', isEqualTo: widget.folder.id)
         .orderBy('time', descending: true)
         .get();
     List<Word> words = snapshot.docs.map((element) {
       Map<String, dynamic> map = element.data();
-      return Word(
-          map['english'], map['korean'], map['time'], map['image'], element.id);
+      return Word(map['english'], map['korean'], map['time'], map['image'],
+          element.id, map['folderId']);
     }).toList();
     // for (int i = 0; i < words.length; ++i) _pickedFiles.add(null);
     return words;
@@ -79,12 +80,12 @@ class _WordNoteState extends State<WordNote> {
                 // A
                 await Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (BuildContext) => WordNoteEdit(words),
+                    builder: (BuildContext) =>
+                        WordNoteEdit(words, folder: widget.folder),
                   ),
                 );
                 // 갱신 코드
-                setState(() {
-                });
+                setState(() {});
               },
               icon: Icon(Icons.mode_edit_outline))
         ],
@@ -178,9 +179,8 @@ class _WordNoteState extends State<WordNote> {
                   ),
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                      side: BorderSide(width: 1),
-
+                    borderRadius: BorderRadius.circular(5),
+                    side: BorderSide(width: 1),
                   ),
                 );
               },

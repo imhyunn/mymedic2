@@ -4,7 +4,8 @@ class Word {
   String time;
   String? imagePath;
   String? id;
+  String folderId;
 
-  Word(this.english, this.korean, this.time, this.imagePath, this.id);
+  Word(this.english, this.korean, this.time, this.imagePath, this.id, this.folderId);
 
 }

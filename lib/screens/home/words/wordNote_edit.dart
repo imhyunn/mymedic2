@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mymedic1/data/folder.dart';
 import 'package:mymedic1/data/word.dart';
 import 'package:mymedic1/screens/home/drawing.dart';
 
@@ -14,8 +15,9 @@ import 'package:mymedic1/config/palette.dart';
 enum Menu { camera, gallery, drawing }
 
 class WordNoteEdit extends StatefulWidget {
-  const WordNoteEdit(this.words, {super.key});
+  const WordNoteEdit(this.words, {super.key, required this.folder});
 
+  final Folder folder;
   final List<Word> words;
 
   @override
@@ -49,10 +51,9 @@ class _WordNoteEditState extends State<WordNoteEdit> {
       }
     }
 
-    for(int i = 0; i< widget.words.length; ++i){
+    for (int i = 0; i < widget.words.length; ++i) {
       _isModifiedImage.add(false);
     }
-
 
     super.initState();
   }
@@ -274,7 +275,8 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                           _krController.text,
                           DateTime.now().toString(),
                           null,
-                          null));
+                          null,
+                          widget.folder.id));
                       _pickedFiles.add(null);
                     });
                     Navigator.pop(context, true);
@@ -302,7 +304,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
     if (pickedFile != null) {
       setState(() {
         _pickedFiles[index] = FileImage(File(pickedFile.path));
-        _isModifiedImage[index]= true;
+        _isModifiedImage[index] = true;
       });
     } else {
       if (kDebugMode) {
@@ -317,7 +319,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
     if (pickedFile != null) {
       setState(() {
         _pickedFiles[index] = FileImage(File(pickedFile.path));
-        _isModifiedImage[index]= true;
+        _isModifiedImage[index] = true;
       });
     } else {
       if (kDebugMode) {
@@ -383,7 +385,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
-            '영단어 추가',
+            '영단어 수정',
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -489,6 +491,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
           'image': null,
           'korean': widget.words[i].korean,
           'time': DateTime.now().toString(),
+          'folderId': widget.folder.id
         });
       } else if (widget.words[i].id != null) {
         await _firestore.collection('words').doc(widget.words[i].id).set({
@@ -496,6 +499,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
           'image': widget.words[i].imagePath,
           'korean': widget.words[i].korean,
           'time': widget.words[i].time,
+          'folderId': widget.folder.id
         });
       }
     }
@@ -523,7 +527,6 @@ class _WordNoteEditState extends State<WordNoteEdit> {
           var url = await complete.ref.getDownloadURL();
 
           widget.words[i].imagePath = url;
-
         }
       }
     }
