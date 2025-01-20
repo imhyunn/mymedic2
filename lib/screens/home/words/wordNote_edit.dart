@@ -676,8 +676,10 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                                       'korean': widget.words[i].korean,
                                       'time': widget.words[i].time
                                     });
+                                    widget.words.removeAt(i);
                                   }
                                 }
+                                setState(() {});
                                 Navigator.pop(context);
                                 Navigator.pop(context);
                               },
