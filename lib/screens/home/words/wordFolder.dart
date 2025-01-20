@@ -121,7 +121,7 @@ class _WordFolderState extends State<WordFolder> {
                 },
                 itemCount: folders.length,
                 separatorBuilder: (context, index) {
-                  return Divider();
+                  return Divider(height: 0.9);
                 });
           }),
     );

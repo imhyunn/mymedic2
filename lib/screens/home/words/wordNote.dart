@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -33,6 +34,7 @@ class _WordNoteState extends State<WordNote> {
   List<Word> words = [];
 
   final FlutterTts tts = FlutterTts();
+  final TextEditingController con = TextEditingController();
 
   void renew() {
     setState(() {
@@ -73,7 +75,7 @@ class _WordNoteState extends State<WordNote> {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: Text(''),
+        title: Text(widget.folder.name),
         actions: [
           IconButton(
               onPressed: () async {
@@ -108,85 +110,86 @@ class _WordNoteState extends State<WordNote> {
 
           final words = snap.requireData;
           this.words = words;
-          return ListView.separated(
-              itemCount: words.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Card(
-                  child: ListTile(
-                    onTap: null,
-                    title: IntrinsicHeight(
-                      child: Row(
-                        children: [
-                          Container(
-                            alignment: Alignment.topCenter,
-                            child: IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.volume_up_rounded,
-                                size: size.width * 0.055,
-                              ),
+          return ListView.builder(
+            itemCount: words.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Card(
+                child: ListTile(
+                  onTap: null,
+                  title: IntrinsicHeight(
+                    child: Row(
+                      children: [
+                        Container(
+                          alignment: Alignment.topCenter,
+                          child: IconButton(
+                            onPressed: () {},
+                            icon: Icon(
+                              Icons.volume_up_rounded,
+                              size: size.width * 0.055,
                             ),
                           ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                            child: Container(
-                              height: 135,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    height: 35,
-                                    child: Text(
-                                      words[index].english,
-                                      style: TextStyle(fontSize: 19),
-                                    ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: Container(
+                            height: 135,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: 35,
+                                  child: Text(
+                                    words[index].english,
+                                    style: TextStyle(fontSize: 19),
                                   ),
-                                  Container(
-                                    height: 35,
-                                    child: Text(
-                                      words[index].korean,
-                                      style: TextStyle(fontSize: 17),
-                                    ),
+                                ),
+                                Container(
+                                  height: 35,
+                                  child: Text(
+                                    words[index].korean,
+                                    style: TextStyle(fontSize: 17),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
-                          Container(
-                            width: size.width * 0.28,
-                            height: size.width * 0.28,
-                            child: DottedBorder(
-                              radius: Radius.circular(20),
-                              color: Colors.grey,
-                              child: Center(
-                                  child: words[index].imagePath == null
-                                      ? Text(
-                                          '편집 버튼을 눌러 \n사진을 추가해주세요.',
-                                          style: TextStyle(fontSize: 8),
-                                        )
-                                      : Image.network(
-                                          words[index].imagePath!,
-                                          fit: BoxFit.cover,
-                                        )),
-                            ),
+                        ),
+                        Container(
+                          width: size.width * 0.28,
+                          height: size.width * 0.28,
+                          child: DottedBorder(
+                            radius: Radius.circular(20),
+                            color: Colors.grey,
+                            child: Center(
+                                child: words[index].imagePath == null
+                                    ? Text(
+                                        '편집 버튼을 눌러 \n사진을 추가해주세요.',
+                                        style: TextStyle(fontSize: 8),
+                                      )
+                                    : Image.network(
+                                        words[index].imagePath!,
+                                        fit: BoxFit.cover,
+                                      )),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    side: BorderSide(width: 1),
-                  ),
-                );
-              },
-              separatorBuilder: (context, index) {
-                return Divider();
-              });
+                ),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  side: BorderSide(width: 1),
+                ),
+              );
+            },
+            // separatorBuilder: (context, index) {
+            //   return Divider();
+            // }
+          );
         },
       ),
     );

@@ -33,6 +33,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
   late Offset _tapPosition;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
+  List<bool> _isChecked = [];
 
   void renew() {
     setState(() {
@@ -53,6 +54,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
     for (int i = 0; i < widget.words.length; ++i) {
       _isModifiedImage.add(false);
+      _isChecked.add(false);
     }
 
     super.initState();
@@ -63,8 +65,14 @@ class _WordNoteEditState extends State<WordNoteEdit> {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
         appBar: AppBar(
-          title: Text(''),
+          title: Text(widget.folder.name),
           actions: [
+            IconButton(
+                onPressed: () async {
+                  var result = await getFolder();
+                  moveWord(result);
+                },
+                icon: Icon(Icons.drive_file_move_outline)),
             IconButton(
                 onPressed: () async {
                   var result = await _addword(context);
@@ -114,12 +122,15 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                     child: Row(
                       children: [
                         Container(
-                          alignment: Alignment.topCenter,
-                          // child: Icon(
-                          //   Icons.volume_up_rounded,
-                          //   size: size.width * 0.055,
-                          // ),
-                        ),
+                            // alignment: Alignment.topCenter,
+                            child: Checkbox(
+                                value: _isChecked[index],
+                                activeColor: Color(0xff2a5fa9),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isChecked[index] = value!;
+                                  });
+                                })),
                         SizedBox(
                           width: 10,
                         ),
@@ -541,10 +552,10 @@ class _WordNoteEditState extends State<WordNoteEdit> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
-            '노트 삭제',
+            '단어 삭제',
           ),
           content: Text(
-            '노트를 삭제할까요?',
+            '단어를 삭제할까요?',
           ),
           actions: [
             Padding(
@@ -590,6 +601,112 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         );
       },
     );
+  }
+
+  Future<List<Folder>> getFolder() async {
+    var snapshot = await _firestore
+        .collection('folder')
+        .where('name', isNotEqualTo: widget.folder.name)
+        .get();
+
+    return snapshot.docs.map((element) {
+      var data = element.data();
+      return Folder(data['name'], data['wordCount'], element.id);
+    }).toList();
+  }
+
+  moveWord(List<Folder> folder) {
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (BuildContext context) {
+          return SizedBox(
+            height: MediaQuery.of(context).size.height * 0.75,
+            child: Column(children: [
+              Container(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text(
+                    '다른 폴더로 이동',
+                    style: TextStyle(fontSize: 24),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.separated(
+                  itemCount: folder.length,
+                  itemBuilder: (context, index) => ListTile(
+                    title: Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: Text(folder[index].name)),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(7.0)),
+                          title: Text('단어 이동'),
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Palette.buttonColor2,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                              ),
+                              child: const Text(
+                                '아니오',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                for (int i = 0; i < _isChecked.length; i++) {
+                                  if (_isChecked[i] == true) {
+                                    await _firestore
+                                        .collection('words')
+                                        .doc(widget.words[i].id)
+                                        .set({
+                                      'english': widget.words[i].english,
+                                      'folderId': folder[index].id,
+                                      'image': widget.words[i].imagePath,
+                                      'korean': widget.words[i].korean,
+                                      'time': widget.words[i].time
+                                    });
+                                  }
+                                }
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Palette.buttonColor2,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                              ),
+                              child: const Text(
+                                '예',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            )
+                          ],
+                          content:
+                              Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
+                        ),
+                      );
+                    },
+                  ),
+                  separatorBuilder: (BuildContext context, int index) {
+                    return Divider(thickness: 1);
+                  },
+                ),
+              )
+            ]),
+          );
+        });
   }
 
   void handleClick(String value) {
