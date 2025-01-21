@@ -25,7 +25,6 @@ class WordNoteEdit extends StatefulWidget {
 }
 
 class _WordNoteEditState extends State<WordNoteEdit> {
-  XFile? _pickedFile;
   List<ImageProvider?> _pickedFiles = [];
   List<bool> _isModifiedImage = [];
   TextEditingController _engController = TextEditingController();
@@ -109,7 +108,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                                 _edit(widget.words[index]);
                                 break;
                               case "삭제":
-                                _confirmDelete(widget.words[index]);
+                                _confirmDelete(widget.words[index], index);
                                 break;
                             }
                           },
@@ -280,6 +279,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () {
+                    _isChecked.add(false);
                     setState(() {
                       widget.words.add(Word(
                           _engController.text,
@@ -543,7 +543,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
     }
   }
 
-  void _confirmDelete(Word word) {
+  void _confirmDelete(Word word, int index) {
     showDialog(
       context: context,
       builder: (context) {
@@ -579,12 +579,13 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    // boardManager().deleteBoard(id);
-                    // await deleteData();
-                    Navigator.pop(context);
+                    await _firestore.collection('words').doc(word.id).delete();
+                    _isChecked.removeAt(index);
+                    _pickedFiles.removeAt(index);
                     setState(() {
                       widget.words.remove(word);
                     });
+                    Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.buttonColor2,
