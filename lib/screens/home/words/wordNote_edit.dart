@@ -14,6 +14,10 @@ import 'package:mymedic1/config/palette.dart';
 
 enum Menu { camera, gallery, drawing }
 
+class WordInfo{
+  List<ImageProvider?> _pickedFiles = [];
+  List<bool> _isChecked = [];
+}
 class WordNoteEdit extends StatefulWidget {
   const WordNoteEdit(this.words, {super.key, required this.folder});
 
@@ -34,6 +38,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
   FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
   List<bool> _isChecked = [];
 
+  // List<새로운 클래스> words = [];
   void renew() {
     setState(() {
       _engController.clear();
@@ -665,6 +670,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                             ),
                             ElevatedButton(
                               onPressed: () async {
+                                List<Word>  moveWords = [];
                                 for (int i = 0; i < _isChecked.length; i++) {
                                   if (_isChecked[i] == true) {
                                     await _firestore
@@ -677,9 +683,19 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                                       'korean': widget.words[i].korean,
                                       'time': widget.words[i].time
                                     });
-                                    widget.words.removeAt(i);
+
+                                    moveWords.add(widget.words[i]);
                                   }
                                 }
+
+                                while (moveWords.isNotEmpty){
+                                  widget.words.remove(moveWords[0]);
+                                  moveWords.removeAt(0);
+                                }
+
+
+
+
                                 setState(() {});
                                 Navigator.pop(context);
                                 Navigator.pop(context);
