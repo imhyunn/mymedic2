@@ -29,7 +29,6 @@ class _WordNoteState extends State<WordNote> {
   List<ImageProvider?> _pickedFiles = [];
   TextEditingController _engController = TextEditingController();
   TextEditingController _krController = TextEditingController();
-  late Offset _tapPosition;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Word> words = [];
 

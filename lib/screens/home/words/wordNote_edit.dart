@@ -14,10 +14,14 @@ import 'package:mymedic1/config/palette.dart';
 
 enum Menu { camera, gallery, drawing }
 
-class WordInfo{
-  List<ImageProvider?> _pickedFiles = [];
-  List<bool> _isChecked = [];
+class WordInfo {
+  bool isChecked;
+  ImageProvider pickedFile;
+  Word word;
+
+  WordInfo(this.isChecked, this.pickedFile, this.word);
 }
+
 class WordNoteEdit extends StatefulWidget {
   const WordNoteEdit(this.words, {super.key, required this.folder});
 
@@ -37,8 +41,8 @@ class _WordNoteEditState extends State<WordNoteEdit> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
   List<bool> _isChecked = [];
+  List<WordInfo> wordInfo = [];
 
-  // List<새로운 클래스> words = [];
   void renew() {
     setState(() {
       _engController.clear();
@@ -48,18 +52,31 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
   @override
   void initState() {
-    for (int i = 0; i < widget.words.length; ++i) {
+    // for (int i = 0; i < widget.words.length; ++i) {
+    //   if (widget.words[i].imagePath == null) {
+    //     _pickedFiles.add(null);
+    //   } else if (widget.words[i].imagePath != null) {
+    //     _pickedFiles.add(NetworkImage(widget.words[i].imagePath!));
+    //   }
+    // }
+    //
+    // for (int i = 0; i < widget.words.length; ++i) {
+    //   _isModifiedImage.add(false);
+    //   _isChecked.add(false);
+    // }
+
+    for(int i = 0; i< widget.words.length; ++i){
       if (widget.words[i].imagePath == null) {
-        _pickedFiles.add(null);
-      } else if (widget.words[i].imagePath != null) {
-        _pickedFiles.add(NetworkImage(widget.words[i].imagePath!));
+        wordInfo[i].pickedFile = null;
       }
+      else if (widget.words[i].imagePath != null) {
+        wordInfo[i].pickedFile = NetworkImage(widget.words[i].imagePath!);
+      }
+
+      _isModifiedImage.add(false);
+      wordInfo[i].isChecked = false;
     }
 
-    for (int i = 0; i < widget.words.length; ++i) {
-      _isModifiedImage.add(false);
-      _isChecked.add(false);
-    }
 
     super.initState();
   }
@@ -519,6 +536,10 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         });
       }
     }
+    await _firestore
+        .collection('folder')
+        .doc(widget.folder.id)
+        .set({'name': widget.folder.name, 'wordCount': widget.words.length});
   }
 
   Future<void> uploadImages() async {
@@ -670,7 +691,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                             ),
                             ElevatedButton(
                               onPressed: () async {
-                                List<Word>  moveWords = [];
+                                List<Word> moveWords = [];
                                 for (int i = 0; i < _isChecked.length; i++) {
                                   if (_isChecked[i] == true) {
                                     await _firestore
@@ -688,13 +709,10 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                                   }
                                 }
 
-                                while (moveWords.isNotEmpty){
+                                while (moveWords.isNotEmpty) {
                                   widget.words.remove(moveWords[0]);
                                   moveWords.removeAt(0);
                                 }
-
-
-
 
                                 setState(() {});
                                 Navigator.pop(context);

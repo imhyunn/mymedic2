@@ -105,12 +105,15 @@ class _WordFolderState extends State<WordFolder> {
                           }).toList();
                         },
                       ),
-                      onTap: () {
-                        Navigator.of(context).push(
+                      onTap: () async{
+                        await Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (BuildContext) => WordNote(folder: folders[index]),
                           ),
                         );
+                        setState(() {
+
+                        });
                       },
                     ),
                     elevation: 0,
