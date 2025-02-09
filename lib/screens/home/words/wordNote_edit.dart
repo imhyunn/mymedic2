@@ -16,7 +16,7 @@ enum Menu { camera, gallery, drawing }
 
 class WordInfo {
   bool isChecked;
-  ImageProvider pickedFile;
+  ImageProvider? pickedFile;
   Word word;
 
   WordInfo(this.isChecked, this.pickedFile, this.word);
@@ -65,7 +65,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
     //   _isChecked.add(false);
     // }
 
-    for(int i = 0; i< widget.words.length; ++i){
+    for (int i = 0; i< widget.words.length; ++i){
       if (widget.words[i].imagePath == null) {
         wordInfo[i].pickedFile = null;
       }
@@ -73,9 +73,11 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         wordInfo[i].pickedFile = NetworkImage(widget.words[i].imagePath!);
       }
 
+
       _isModifiedImage.add(false);
       wordInfo[i].isChecked = false;
     }
+
 
 
     super.initState();

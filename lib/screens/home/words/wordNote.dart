@@ -33,7 +33,6 @@ class _WordNoteState extends State<WordNote> {
   List<Word> words = [];
 
   final FlutterTts tts = FlutterTts();
-  final TextEditingController con = TextEditingController();
 
   void renew() {
     setState(() {
@@ -121,7 +120,9 @@ class _WordNoteState extends State<WordNote> {
                         Container(
                           alignment: Alignment.topCenter,
                           child: IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              tts.speak(words[index].english);
+                            },
                             icon: Icon(
                               Icons.volume_up_rounded,
                               size: size.width * 0.055,
