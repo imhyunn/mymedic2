@@ -11,9 +11,12 @@ class _WordTestState extends State<WordTest> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('test'),
-      ),
+      appBar: AppBar(title: Text(''),),
+      body: Column(
+        children: [
+
+        ],
+      )
     );
   }
 }

@@ -33,7 +33,6 @@ class _WordNoteState extends State<WordNote> {
   List<Word> words = [];
 
   final FlutterTts tts = FlutterTts();
-  final TextEditingController con = TextEditingController();
 
   void renew() {
     setState(() {
@@ -121,7 +120,9 @@ class _WordNoteState extends State<WordNote> {
                         Container(
                           alignment: Alignment.topCenter,
                           child: IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              tts.speak(words[index].english);
+                            },
                             icon: Icon(
                               Icons.volume_up_rounded,
                               size: size.width * 0.055,
@@ -165,13 +166,13 @@ class _WordNoteState extends State<WordNote> {
                             child: Center(
                                 child: words[index].imagePath == null
                                     ? Text(
-                                        '편집 버튼을 눌러 \n사진을 추가해주세요.',
-                                        style: TextStyle(fontSize: 8),
-                                      )
+                                  '편집 버튼을 눌러 \n사진을 추가해주세요.',
+                                  style: TextStyle(fontSize: 8),
+                                )
                                     : Image.network(
-                                        words[index].imagePath!,
-                                        fit: BoxFit.cover,
-                                      )),
+                                  words[index].imagePath!,
+                                  fit: BoxFit.cover,
+                                )),
                           ),
                         ),
                       ],

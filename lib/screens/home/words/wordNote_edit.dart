@@ -1,3 +1,4 @@
+
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,7 +17,7 @@ enum Menu { camera, gallery, drawing }
 
 class WordInfo {
   bool isChecked;
-  ImageProvider pickedFile;
+  ImageProvider? pickedFile;
   Word word;
 
   WordInfo(this.isChecked, this.pickedFile, this.word);
@@ -33,14 +34,14 @@ class WordNoteEdit extends StatefulWidget {
 }
 
 class _WordNoteEditState extends State<WordNoteEdit> {
-  List<ImageProvider?> _pickedFiles = [];
+  // List<ImageProvider?> _pickedFiles = [];
   List<bool> _isModifiedImage = [];
   TextEditingController _engController = TextEditingController();
   TextEditingController _krController = TextEditingController();
   late Offset _tapPosition;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
-  List<bool> _isChecked = [];
+  // List<bool> _isChecked = [];
   List<WordInfo> wordInfo = [];
 
   void renew() {
@@ -65,7 +66,13 @@ class _WordNoteEditState extends State<WordNoteEdit> {
     //   _isChecked.add(false);
     // }
 
-    for(int i = 0; i< widget.words.length; ++i){
+
+    for (int i = 0; i < widget.words.length; ++i){
+      WordInfo wordinfo = new WordInfo(isChecked, pickedFile, word);
+      wordInfo.add(wordinfo);
+    }
+
+    for (int i = 0; i< widget.words.length; ++i){
       if (widget.words[i].imagePath == null) {
         wordInfo[i].pickedFile = null;
       }
@@ -76,6 +83,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
       _isModifiedImage.add(false);
       wordInfo[i].isChecked = false;
     }
+
 
 
     super.initState();
@@ -143,13 +151,13 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                     child: Row(
                       children: [
                         Container(
-                            // alignment: Alignment.topCenter,
+                          // alignment: Alignment.topCenter,
                             child: Checkbox(
-                                value: _isChecked[index],
+                                value: wordInfo[index].isChecked,
                                 activeColor: Color(0xff2a5fa9),
                                 onChanged: (value) {
                                   setState(() {
-                                    _isChecked[index] = value!;
+                                    wordInfo[index].isChecked = value!;
                                   });
                                 })),
                         SizedBox(
@@ -198,15 +206,15 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                               radius: Radius.circular(20),
                               color: Colors.grey,
                               child: Center(
-                                child: _pickedFiles[index] == null
+                                child: wordInfo[index].pickedFile == null
                                     ? Icon(Icons.add)
                                     : Container(
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                              image: _pickedFiles[index]!,
-                                              fit: BoxFit.contain),
-                                        ),
-                                      ),
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: wordInfo[index].pickedFile!,
+                                        fit: BoxFit.contain),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -224,7 +232,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
   RelativeRect buttonMenuPosition(BuildContext context) {
     final RenderBox overlay =
-        Overlay.of(context).context.findRenderObject() as RenderBox;
+    Overlay.of(context).context.findRenderObject() as RenderBox;
     return RelativeRect.fromRect(
         _tapPosition & Size(40, 40), Offset.zero & overlay.size);
   }
@@ -236,7 +244,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '영단어 추가',
           ),
@@ -333,10 +341,10 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
   _getCameraImage(int index) async {
     final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.camera);
+    await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
-        _pickedFiles[index] = FileImage(File(pickedFile.path));
+        wordInfo[index].pickedFile = FileImage(File(pickedFile.path));
         _isModifiedImage[index] = true;
       });
     } else {
@@ -348,10 +356,10 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
   _getPhotoLibraryImage(int index) async {
     final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _pickedFiles[index] = FileImage(File(pickedFile.path));
+        wordInfo[index].pickedFile = FileImage(File(pickedFile.path));
         _isModifiedImage[index] = true;
       });
     } else {
@@ -388,12 +396,12 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         value: Menu.drawing,
         onTap: () async {
           var result = await Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => DrawingPage()))
-              as MemoryImage?;
+              MaterialPageRoute(builder: (context) => DrawingPage()))
+          as MemoryImage?;
 
           if (result != null) {
             setState(() {
-              _pickedFiles[index] = result; // 새로운 값
+              wordInfo[index].pickedFile = result; // 새로운 값
               _isModifiedImage[index] = true;
             });
           }
@@ -416,7 +424,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '영단어 수정',
           ),
@@ -576,7 +584,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '단어 삭제',
           ),
@@ -606,8 +614,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                 child: ElevatedButton(
                   onPressed: () async {
                     await _firestore.collection('words').doc(word.id).delete();
-                    _isChecked.removeAt(index);
-                    _pickedFiles.removeAt(index);
+                    wordInfo.removeAt(index);
                     setState(() {
                       widget.words.remove(word);
                     });
@@ -692,8 +699,8 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                             ElevatedButton(
                               onPressed: () async {
                                 List<Word> moveWords = [];
-                                for (int i = 0; i < _isChecked.length; i++) {
-                                  if (_isChecked[i] == true) {
+                                for (int i = 0; i < wordInfo.length; i++) {
+                                  if (wordInfo[i].isChecked == true) {
                                     await _firestore
                                         .collection('words')
                                         .doc(widget.words[i].id)
@@ -731,7 +738,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                             )
                           ],
                           content:
-                              Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
+                          Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
                         ),
                       );
                     },

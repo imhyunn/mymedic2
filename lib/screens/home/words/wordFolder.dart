@@ -17,7 +17,10 @@ class _WordFolderState extends State<WordFolder> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<List<Folder>> _getFolder() async {
-    var snapshot = await _firestore.collection('folder').get();
+    var snapshot = await _firestore
+        .collection('folder')
+        .orderBy('time', descending: true)
+        .get();
     List<Folder> folders = snapshot.docs.map((element) {
       Map<String, dynamic> map = element.data();
       return Folder(map['name'], map['wordCount'], element.id);
@@ -32,7 +35,12 @@ class _WordFolderState extends State<WordFolder> {
         actions: [
           IconButton(
               onPressed: () async {
-                await _addFolder(context);
+                var result = await _addFolder(context);
+                if (result!) {
+                  setState(() {
+                    _folderController.clear();
+                  });
+                }
               },
               icon: Icon(Icons.add))
         ],
@@ -105,15 +113,14 @@ class _WordFolderState extends State<WordFolder> {
                           }).toList();
                         },
                       ),
-                      onTap: () async{
+                      onTap: () async {
                         await Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (BuildContext) => WordNote(folder: folders[index]),
+                            builder: (BuildContext) =>
+                                WordNote(folder: folders[index]),
                           ),
                         );
-                        setState(() {
-
-                        });
+                        setState(() {});
                       },
                     ),
                     elevation: 0,
