@@ -19,7 +19,6 @@ class _WordFolderState extends State<WordFolder> {
   Future<List<Folder>> _getFolder() async {
     var snapshot = await _firestore
         .collection('folder')
-        .orderBy('time', descending: true)
         .get();
     List<Folder> folders = snapshot.docs.map((element) {
       Map<String, dynamic> map = element.data();
@@ -35,12 +34,9 @@ class _WordFolderState extends State<WordFolder> {
         actions: [
           IconButton(
               onPressed: () async {
-                var result = await _addFolder(context);
-                if (result!) {
-                  setState(() {
-                    _folderController.clear();
-                  });
-                }
+                _folderController.clear();
+                await _addFolder(context);
+
               },
               icon: Icon(Icons.add))
         ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mymedic1/screens/home/test/spellingTest.dart';
-import 'package:mymedic1/screens/home/test/wordTest.dart';
+import 'package:mymedic1/screens/home/test/wordTestHome.dart';
 
 class TestScreen extends StatefulWidget {
   const TestScreen({super.key});
@@ -22,7 +22,7 @@ class _TestScreenState extends State<TestScreen> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext) => WordTest(),
+                  builder: (BuildContext) => WordTestHome(),
                 ),
               );
             },

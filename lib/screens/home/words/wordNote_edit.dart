@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,8 +18,9 @@ class WordInfo {
   bool isChecked;
   ImageProvider? pickedFile;
   Word word;
+  bool isModifiedImage;
 
-  WordInfo(this.isChecked, this.pickedFile, this.word);
+  WordInfo(this.isChecked, this.pickedFile, this.word, this.isModifiedImage);
 }
 
 class WordNoteEdit extends StatefulWidget {
@@ -35,14 +35,15 @@ class WordNoteEdit extends StatefulWidget {
 
 class _WordNoteEditState extends State<WordNoteEdit> {
   // List<ImageProvider?> _pickedFiles = [];
-  List<bool> _isModifiedImage = [];
+  // List<bool> _isModifiedImage = [];
   TextEditingController _engController = TextEditingController();
   TextEditingController _krController = TextEditingController();
   late Offset _tapPosition;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
+
   // List<bool> _isChecked = [];
-  List<WordInfo> wordInfo = [];
+  List<WordInfo> wordInfos = [];
 
   void renew() {
     setState(() {
@@ -66,25 +67,16 @@ class _WordNoteEditState extends State<WordNoteEdit> {
     //   _isChecked.add(false);
     // }
 
-
-    for (int i = 0; i < widget.words.length; ++i){
-      WordInfo wordinfo = new WordInfo(isChecked, pickedFile, word);
-      wordInfo.add(wordinfo);
+    for (int i = 0; i < widget.words.length; ++i) {
+      WordInfo wordinfo = new WordInfo(
+          false,
+          widget.words[i].imagePath == null
+              ? null
+              : NetworkImage(widget.words[i].imagePath!),
+          widget.words[i],
+          false);
+      wordInfos.add(wordinfo);
     }
-
-    for (int i = 0; i< widget.words.length; ++i){
-      if (widget.words[i].imagePath == null) {
-        wordInfo[i].pickedFile = null;
-      }
-      else if (widget.words[i].imagePath != null) {
-        wordInfo[i].pickedFile = NetworkImage(widget.words[i].imagePath!);
-      }
-
-      _isModifiedImage.add(false);
-      wordInfo[i].isChecked = false;
-    }
-
-
 
     super.initState();
   }
@@ -120,7 +112,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
           ],
         ),
         body: ListView.separated(
-            itemCount: widget.words.length,
+            itemCount: wordInfos.length,
             itemBuilder: (BuildContext context, int index) {
               return Card(
                 child: ListTile(
@@ -135,10 +127,10 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                           onTap: () {
                             switch (choice) {
                               case "수정":
-                                _edit(widget.words[index]);
+                                _edit(wordInfos[index].word);
                                 break;
                               case "삭제":
-                                _confirmDelete(widget.words[index], index);
+                                _confirmDelete(wordInfos[index].word, index);
                                 break;
                             }
                           },
@@ -153,11 +145,11 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                         Container(
                           // alignment: Alignment.topCenter,
                             child: Checkbox(
-                                value: wordInfo[index].isChecked,
+                                value: wordInfos[index].isChecked,
                                 activeColor: Color(0xff2a5fa9),
                                 onChanged: (value) {
                                   setState(() {
-                                    wordInfo[index].isChecked = value!;
+                                    wordInfos[index].isChecked = value!;
                                   });
                                 })),
                         SizedBox(
@@ -173,14 +165,14 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                                 Container(
                                   height: 35,
                                   child: Text(
-                                    widget.words[index].english,
+                                    wordInfos[index].word.english,
                                     style: TextStyle(fontSize: 19),
                                   ),
                                 ),
                                 Container(
                                   height: 35,
                                   child: Text(
-                                    widget.words[index].korean,
+                                    wordInfos[index].word.korean,
                                     style: TextStyle(fontSize: 17),
                                   ),
                                 ),
@@ -206,12 +198,13 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                               radius: Radius.circular(20),
                               color: Colors.grey,
                               child: Center(
-                                child: wordInfo[index].pickedFile == null
+                                child: wordInfos[index].pickedFile == null
                                     ? Icon(Icons.add)
                                     : Container(
                                   decoration: BoxDecoration(
                                     image: DecorationImage(
-                                        image: wordInfo[index].pickedFile!,
+                                        image:
+                                        wordInfos[index].pickedFile!,
                                         fit: BoxFit.contain),
                                   ),
                                 ),
@@ -309,16 +302,28 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    _isChecked.add(false);
+                    // _isChecked.add(false);
                     setState(() {
-                      widget.words.add(Word(
-                          _engController.text,
-                          _krController.text,
-                          DateTime.now().toString(),
+                      // widget.words.add(Word(
+                      //     _engController.text,
+                      //     _krController.text,
+                      //     DateTime.now().toString(),
+                      //     null,
+                      //     null,
+                      //     widget.folder.id));
+                      // _pickedFiles.add(null);
+
+                      wordInfos.add(WordInfo(
+                          false,
                           null,
-                          null,
-                          widget.folder.id));
-                      _pickedFiles.add(null);
+                          Word(
+                              _engController.text,
+                              _krController.text,
+                              DateTime.now().toString(),
+                              null,
+                              null,
+                              widget.folder.id),
+                          false));
                     });
                     Navigator.pop(context, true);
                   },
@@ -344,8 +349,8 @@ class _WordNoteEditState extends State<WordNoteEdit> {
     await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
-        wordInfo[index].pickedFile = FileImage(File(pickedFile.path));
-        _isModifiedImage[index] = true;
+        wordInfos[index].pickedFile = FileImage(File(pickedFile.path));
+        wordInfos[index].isModifiedImage = true;
       });
     } else {
       if (kDebugMode) {
@@ -359,8 +364,8 @@ class _WordNoteEditState extends State<WordNoteEdit> {
     await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        wordInfo[index].pickedFile = FileImage(File(pickedFile.path));
-        _isModifiedImage[index] = true;
+        wordInfos[index].pickedFile = FileImage(File(pickedFile.path));
+        wordInfos[index].isModifiedImage = true;
       });
     } else {
       if (kDebugMode) {
@@ -401,8 +406,8 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
           if (result != null) {
             setState(() {
-              wordInfo[index].pickedFile = result; // 새로운 값
-              _isModifiedImage[index] = true;
+              wordInfos[index].pickedFile = result; // 새로운 값
+              wordInfos[index].isModifiedImage = true;
             });
           }
         },
@@ -525,21 +530,21 @@ class _WordNoteEditState extends State<WordNoteEdit> {
   }
 
   Future<void> updateWords() async {
-    for (int i = 0; i < widget.words.length; i++) {
-      if (widget.words[i].id == null) {
+    for (int i = 0; i < wordInfos.length; i++) {
+      if (wordInfos[i].word.id == null) {
         await _firestore.collection('words').doc().set({
-          'english': widget.words[i].english,
+          'english': wordInfos[i].word.english,
           'image': null,
-          'korean': widget.words[i].korean,
+          'korean': wordInfos[i].word.korean,
           'time': DateTime.now().toString(),
           'folderId': widget.folder.id
         });
-      } else if (widget.words[i].id != null) {
-        await _firestore.collection('words').doc(widget.words[i].id).set({
-          'english': widget.words[i].english,
-          'image': widget.words[i].imagePath,
-          'korean': widget.words[i].korean,
-          'time': widget.words[i].time,
+      } else if (wordInfos[i].word.id != null) {
+        await _firestore.collection('words').doc(wordInfos[i].word.id).set({
+          'english': wordInfos[i].word.english,
+          'image': wordInfos[i].word.imagePath,
+          'korean': wordInfos[i].word.korean,
+          'time': wordInfos[i].word.time,
           'folderId': widget.folder.id
         });
       }
@@ -547,31 +552,32 @@ class _WordNoteEditState extends State<WordNoteEdit> {
     await _firestore
         .collection('folder')
         .doc(widget.folder.id)
-        .set({'name': widget.folder.name, 'wordCount': widget.words.length});
+        .set({'name': widget.folder.name, 'wordCount': wordInfos.length});
+
   }
 
   Future<void> uploadImages() async {
-    for (int i = 0; i < _pickedFiles.length; i++) {
-      if (_pickedFiles[i] != null && _isModifiedImage[i]) {
+    for (int i = 0; i < wordInfos.length; i++) {
+      if (wordInfos[i].pickedFile != null && wordInfos[i].isModifiedImage) {
         var dateTime = DateTime.now().toString().replaceAll(' ', '_');
         var ref = _firebaseStorage.ref().child("wordImages/$dateTime.jpg");
 
-        if (_pickedFiles[i] is FileImage) {
-          var image = _pickedFiles[i] as FileImage;
+        if (wordInfos[i].pickedFile is FileImage) {
+          var image = wordInfos[i].pickedFile as FileImage;
           var putFile = ref.putFile(File(image.file.path),
               SettableMetadata(contentType: "image/jpeg"));
           var complete = await putFile.whenComplete(() => {});
           var url = await complete.ref.getDownloadURL();
 
-          widget.words[i].imagePath = url;
-        } else if (_pickedFiles[i] is MemoryImage) {
-          var image = _pickedFiles[i] as MemoryImage;
+          wordInfos[i].word.imagePath = url;
+        } else if (wordInfos[i].pickedFile is MemoryImage) {
+          var image = wordInfos[i].pickedFile as MemoryImage;
           var putFile = ref.putData(
               image.bytes, SettableMetadata(contentType: "image/jpeg"));
           var complete = await putFile.whenComplete(() => {});
           var url = await complete.ref.getDownloadURL();
 
-          widget.words[i].imagePath = url;
+          wordInfos[i].word.imagePath = url;
         }
       }
     }
@@ -614,9 +620,9 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                 child: ElevatedButton(
                   onPressed: () async {
                     await _firestore.collection('words').doc(word.id).delete();
-                    wordInfo.removeAt(index);
+                    wordInfos.removeAt(index);
                     setState(() {
-                      widget.words.remove(word);
+                      wordInfos.remove(word);
                     });
                     Navigator.pop(context);
                   },
@@ -699,29 +705,41 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                             ElevatedButton(
                               onPressed: () async {
                                 List<Word> moveWords = [];
-                                for (int i = 0; i < wordInfo.length; i++) {
-                                  if (wordInfo[i].isChecked == true) {
+                                for (int i = 0; i < wordInfos.length; i++) {
+                                  if (wordInfos[i].isChecked == true) {
                                     await _firestore
                                         .collection('words')
-                                        .doc(widget.words[i].id)
+                                        .doc(wordInfos[i].word.id)
                                         .set({
-                                      'english': widget.words[i].english,
+                                      'english': wordInfos[i].word.english,
                                       'folderId': folder[index].id,
-                                      'image': widget.words[i].imagePath,
-                                      'korean': widget.words[i].korean,
-                                      'time': widget.words[i].time
+                                      'image': wordInfos[i].word.imagePath,
+                                      'korean': wordInfos[i].word.korean,
+                                      'time': wordInfos[i].word.time
                                     });
 
-                                    moveWords.add(widget.words[i]);
+                                    moveWords.add(wordInfos[i].word);
                                   }
                                 }
 
+                                await _firestore.collection('folder').doc(folder[index].id).set({
+                                  'name' : folder[index].name,
+                                  'wordCount' : folder[index].wordCount + moveWords.length
+                                });
+                                await _firestore.collection('folder').doc(widget.folder.id).set({
+                                  'name' : widget.folder.name,
+                                  'wordCount' : widget.folder.wordCount - moveWords.length
+                                });
+
+
                                 while (moveWords.isNotEmpty) {
-                                  widget.words.remove(moveWords[0]);
+                                  wordInfos.removeWhere((e) => e.word == moveWords[0]);
+                                  // ??Where: 특정 조건에 맞는 ??을 실행하게끔 하는 것
+                                  // 리스트가 대상이기에 그 리스트들을 순회하면서 그 조건에 맞는 것을 ?? 해주겠다.
                                   moveWords.removeAt(0);
                                 }
-
                                 setState(() {});
+
                                 Navigator.pop(context);
                                 Navigator.pop(context);
                               },
