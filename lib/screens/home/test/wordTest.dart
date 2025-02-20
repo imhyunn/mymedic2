@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mymedic1/screens/myapp.dart';
@@ -16,8 +19,9 @@ class WordTest extends StatefulWidget {
 
 class _WordTestState extends State<WordTest> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  PageController _pageController = PageController();
+  PageController _pageController = PageController(initialPage: 0);
   int _currentIndex = 0;
+  final random = Random();
 
   Future<List<Word>> getWord() async {
     var snapshot = await _firestore
@@ -33,12 +37,19 @@ class _WordTestState extends State<WordTest> {
   }
 
   void _nextQuestion(List<Word> words) {
-    if (_currentIndex < words.length) {
-      setState(() {
-        _currentIndex++;
+    if (_currentIndex < words.length - 1) {
+      _currentIndex++;
+
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _pageController.animateToPage(
+          _currentIndex,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+        print(_currentIndex);
       });
-      _pageController.animateToPage(_currentIndex,
-          duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+
+
     }
   }
 
@@ -72,27 +83,57 @@ class _WordTestState extends State<WordTest> {
     );
   }
 
-  Widget _NormalUI(List<Word> words, int index) {
-    return Column(
-      children: [
-        Card(
-          child: Text(words[index].english),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        ListView.builder(
-          itemCount: 4,
-          itemBuilder: (context, index) => Card(
-            child: Text(words[index].korean),
+  Widget _NormalUI(List<Word> words, int id) {
+
+    return Container(
+      key: ValueKey<int>(id),
+      height: 500,
+      width: 300,
+      child: Column(
+        children: [
+          Container(
+            height: 100,
+            width: 300,
+            child: Card(
+              child: Center(
+                child: Text(
+                  words[id].english,
+                  style: TextStyle(fontSize: 24),
+                ),
+              ),
+            ),
           ),
-        )
-      ],
+          SizedBox(
+            height: 50,
+          ),
+          Container(
+            height: 300,
+            width: 300,
+            child: ListView.builder(
+              itemCount: 4,
+              itemBuilder: (context, index) => ElevatedButton(
+                onPressed: () {
+                  if (words[id].korean == words[index].korean){
+                    print('o');
+                  } else {
+                    print('x');
+                  }
+                  _nextQuestion(words);
+                },
+                child: Text(
+                  words[index].korean,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(),
       body: FutureBuilder(
@@ -116,36 +157,22 @@ class _WordTestState extends State<WordTest> {
           return Center(
             child: PageView.builder(
               controller: _pageController,
-              itemCount: words.length,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: words.length ,
               itemBuilder: (context, index) {
-                if (index == 0) {
-                  return AnimatedSwitcher(
-                    duration: Duration(milliseconds: 350),
-                    transitionBuilder: (child, animation) {
-                      return SlideTransition(
-                        position: Tween<Offset>(
-                          begin: Offset(1, 0),
-                          end: Offset(1, 0),
-                        ).animate(animation),
-                      );
-                    },
-                    child: _StartUI(),
-                  );
-                } else {
-                  return AnimatedSwitcher(
-                    duration: Duration(milliseconds: 350),
-                    transitionBuilder: (child, animation) {
-                      return SlideTransition(
-                        position: Tween<Offset>(
-                          begin: Offset(1, 0),
-                          end: Offset(0, 0),
-                        ).animate(animation),
-                        child: child,
-                      );
-                    },
-                    child: _NormalUI(words, index),
-                  );
-                }
+                return AnimatedSwitcher(
+                  duration: Duration(milliseconds: 350),
+                  transitionBuilder: (child, animation) {
+                    return SlideTransition(
+                      position: Tween<Offset>(
+                        begin: Offset(1, 0),
+                        end: Offset(0, 0),
+                      ).animate(animation),
+                      child: child,
+                    );
+                  },
+                  child: _NormalUI(words, index),
+                );
               },
             ),
           );
