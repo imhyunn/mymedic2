@@ -101,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                           child: Text(
                             'word',
-                            style: TextStyle(fontSize: 26, color: Colors.black),
+                            style: TextStyle(fontSize: 28, color: Colors.black,fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -134,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                           child: Text(
                             'test',
-                            style: TextStyle(fontSize: 26, color: Colors.black),
+                            style: TextStyle(fontSize: 28, color: Colors.black,fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                           child: Text(
                             'game',
-                            style: TextStyle(fontSize: 26, color: Colors.black),
+                            style: TextStyle(fontSize: 28, color: Colors.black,fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),

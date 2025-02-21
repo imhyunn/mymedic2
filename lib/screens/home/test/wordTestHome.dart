@@ -66,7 +66,7 @@ class _WordTestHomeState extends State<WordTestHome> {
                             child: Center(
                                 child: Text(
                               folders[index].name,
-                              style: TextStyle(fontSize: 20),
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                             ))),
                       ),
                     ),

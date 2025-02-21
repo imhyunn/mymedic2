@@ -143,7 +143,7 @@ class _WordNoteState extends State<WordNote> {
                                   height: 35,
                                   child: Text(
                                     words[index].english,
-                                    style: TextStyle(fontSize: 19),
+                                    style: TextStyle(fontSize: 20),
                                   ),
                                 ),
                                 Container(

@@ -84,6 +84,10 @@ class _WordTestState extends State<WordTest> {
   }
 
   Widget _NormalUI(List<Word> words, int id) {
+    Timer.periodic(Duration(seconds: 3), (Timer timer) {
+      _pageController.animateToPage(_currentIndex, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+      _currentIndex++;
+    });
 
     return Container(
       key: ValueKey<int>(id),
@@ -114,8 +118,10 @@ class _WordTestState extends State<WordTest> {
               itemBuilder: (context, index) => ElevatedButton(
                 onPressed: () {
                   if (words[id].korean == words[index].korean){
+
                     print('o');
                   } else {
+
                     print('x');
                   }
                   _nextQuestion(words);
