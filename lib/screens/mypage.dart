@@ -18,11 +18,22 @@ class MyPage extends StatefulWidget {
   State<MyPage> createState() => _MyPageState();
 }
 
+class User {
+  String email;
+  String level;
+  String password;
+  String userName;
+  String id;
+
+  User(this.email, this.level, this.password, this.userName, this.id);
+}
+
 class _MyPageState extends State<MyPage> {
   XFile? _pickedFile;
   Map<String, dynamic> _userData = {};
   String _username = "";
   FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   void _getUserProfile() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -38,7 +49,20 @@ class _MyPageState extends State<MyPage> {
       });
     }
     print(_userData);
+
+
   }
+
+  Future<List<User>> _getUser() async {
+    var snapshot = await _firestore.collection('user').get();
+    List<User> user = snapshot.docs.map((element) {
+      Map<String, dynamic> map = element.data();
+      return User(map['email'], map['level'], map['password'], map['userName'], element.id);
+    }).toList();
+    return user;
+  }
+
+
 
   Future<void> saveImage(XFile image) async {
     var dateTime = DateTime.now().toString().replaceAll(' ', '_');
@@ -111,7 +135,12 @@ class _MyPageState extends State<MyPage> {
                   width: 20,
                 ),
                 Container(
-                  child: Text(_username),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                    Text(_username, style: TextStyle(fontSize: 19),),
+                    Text('초등학교3학년'),
+                  ],),
                 ),
               ],
             ),
@@ -119,6 +148,10 @@ class _MyPageState extends State<MyPage> {
         ),
       ),
     );
+  }
+
+  level() {
+
   }
 
   _showBottomSheet() {
