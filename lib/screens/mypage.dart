@@ -18,15 +18,15 @@ class MyPage extends StatefulWidget {
   State<MyPage> createState() => _MyPageState();
 }
 
-class User {
-  String email;
-  String level;
-  String password;
-  String userName;
-  String id;
-
-  User(this.email, this.level, this.password, this.userName, this.id);
-}
+// class User {
+//   String email;
+//   String level;
+//   String password;
+//   String userName;
+//   String id;
+//
+//   User(this.email, this.level, this.password, this.userName, this.id);
+// }
 
 class _MyPageState extends State<MyPage> {
   XFile? _pickedFile;
@@ -34,9 +34,11 @@ class _MyPageState extends State<MyPage> {
   String _username = "";
   FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final _firebaseAuth = FirebaseAuth.instance;
+  User? loggedUser;
 
   void _getUserProfile() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _firebaseAuth.currentUser;
     final userData = await FirebaseFirestore.instance
         .collection('user')
         .doc(user!.uid)
@@ -52,15 +54,15 @@ class _MyPageState extends State<MyPage> {
 
 
   }
-
-  Future<List<User>> _getUser() async {
-    var snapshot = await _firestore.collection('user').get();
-    List<User> user = snapshot.docs.map((element) {
-      Map<String, dynamic> map = element.data();
-      return User(map['email'], map['level'], map['password'], map['userName'], element.id);
-    }).toList();
-    return user;
-  }
+  //
+  // Future<List<User>> _getUserLevel() async {
+  //   var snapshot = await _firestore.collection('user').get();
+  //   List<User> user = snapshot.docs.map((element) {
+  //     Map<String, dynamic> map = element.data();
+  //     return User(map['email'], map['level'], map['password'], map['userName'], element.id);
+  //   }).toList();
+  //   return user;
+  // }
 
 
 
@@ -139,7 +141,7 @@ class _MyPageState extends State<MyPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                     Text(_username, style: TextStyle(fontSize: 19),),
-                    Text('초등학교3학년'),
+                    Text('${_userData['userLevel']}'),
                   ],),
                 ),
               ],
@@ -150,9 +152,6 @@ class _MyPageState extends State<MyPage> {
     );
   }
 
-  level() {
-
-  }
 
   _showBottomSheet() {
     return showModalBottomSheet(

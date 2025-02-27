@@ -18,11 +18,11 @@ class _WordFolderState extends State<WordFolder> {
 
   Future<List<Folder>> _getFolder() async {
     var snapshot = await _firestore
-        .collection('folder')
+        .collection('folder').orderBy('time',descending: true)
         .get();
     List<Folder> folders = snapshot.docs.map((element) {
       Map<String, dynamic> map = element.data();
-      return Folder(map['name'], map['wordCount'], element.id);
+      return Folder(map['name'], map['wordCount'], element.id, map['time']);
     }).toList();
     return folders;
   }
