@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mymedic1/data/folder.dart';
+import 'package:mymedic1/data/levelWord.dart';
+import 'package:mymedic1/screens/home/words/recWordNote.dart';
 import 'package:mymedic1/screens/home/words/wordNote.dart';
 
 import '../../../config/palette.dart';
@@ -18,7 +20,8 @@ class _WordFolderState extends State<WordFolder> {
 
   Future<List<Folder>> _getFolder() async {
     var snapshot = await _firestore
-        .collection('folder').orderBy('time',descending: true)
+        .collection('folder')
+        .orderBy('time', descending: true)
         .get();
     List<Folder> folders = snapshot.docs.map((element) {
       Map<String, dynamic> map = element.data();
@@ -36,7 +39,6 @@ class _WordFolderState extends State<WordFolder> {
               onPressed: () async {
                 _folderController.clear();
                 await _addFolder(context);
-
               },
               icon: Icon(Icons.add))
         ],
@@ -62,67 +64,85 @@ class _WordFolderState extends State<WordFolder> {
             // 스냅샷의 상태에 따라 화면을 그려주는 부분
             return ListView.separated(
                 itemBuilder: (BuildContext context, int index) {
-                  return Card(
-                    child: ListTile(
-                      title: Padding(
-                        padding: EdgeInsets.only(left: 20, top: 14, bottom: 14),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              child: Text(
-                                folders[index].name,
-                                style: TextStyle(fontSize: 23),
-                              ),
+                  return Column(
+                    children: [
+                      Card(
+                        child: ListTile(
+                          title: Padding(
+                            padding:
+                                EdgeInsets.only(left: 20, top: 14, bottom: 14),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  child: Text(
+                                    folders[index].name,
+                                    style: TextStyle(fontSize: 23),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Container(
+                                  child: Text(
+                                    '단어 수 : ${folders[index].wordCount}',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                )
+                              ],
                             ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Container(
-                              child: Text(
-                                '단어 수 : ${folders[index].wordCount}',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      trailing: PopupMenuButton<String>(
-                        color: Colors.white,
-                        onSelected: handleClick,
-                        itemBuilder: (BuildContext context) {
-                          return ['수정', '삭제'].map((String choice) {
-                            return PopupMenuItem<String>(
-                              value: choice,
-                              child: Text(choice),
-                              onTap: () {
-                                switch (choice) {
-                                  case "수정":
-                                    _edit(folders[index]);
-                                    break;
-                                  case "삭제":
-                                    _folderDelete(folders[index].id);
-                                    break;
-                                }
-                              },
-                            );
-                          }).toList();
-                        },
-                      ),
-                      onTap: () async {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (BuildContext) =>
-                                WordNote(folder: folders[index]),
                           ),
-                        );
-                        setState(() {});
-                      },
-                    ),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        side: BorderSide(width: 1)),
+                          trailing: PopupMenuButton<String>(
+                            color: Colors.white,
+                            onSelected: handleClick,
+                            itemBuilder: (BuildContext context) {
+                              return ['수정', '삭제'].map((String choice) {
+                                return PopupMenuItem<String>(
+                                  value: choice,
+                                  child: Text(choice),
+                                  onTap: () {
+                                    switch (choice) {
+                                      case "수정":
+                                        _edit(folders[index]);
+                                        break;
+                                      case "삭제":
+                                        _folderDelete(folders[index].id);
+                                        break;
+                                    }
+                                  },
+                                );
+                              }).toList();
+                            },
+                          ),
+                          onTap: () async {
+                            folders[index].name == '추천 단어'
+                                ? await Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (BuildContext) =>
+                                          RecWordNote(folder: folders[index]),
+                                    ),
+                                  )
+                                : await Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (BuildContext) =>
+                                          WordNote(folder: folders[index]),
+                                    ),
+                                  );
+                            // await Navigator.of(context).push(
+                            //   MaterialPageRoute(
+                            //     builder: (BuildContext) =>
+                            //         WordNote(folder: folders[index]),
+                            //   ),
+                            // );
+                            setState(() {});
+                          },
+                        ),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                            side: BorderSide(width: 1)),
+                      ),
+                    ],
                   );
                 },
                 itemCount: folders.length,
