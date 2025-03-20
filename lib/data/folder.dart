@@ -3,6 +3,7 @@ class Folder{
   int wordCount;
   String id;
   String time;
+  String userId;
 
-  Folder(this.name, this.wordCount, this.id, this.time);
+  Folder(this.name, this.wordCount, this.id, this.time, this.userId);
 }

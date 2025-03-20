@@ -4,6 +4,8 @@ import 'package:mymedic1/screens/home/home_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mymedic1/config/palette.dart';
 
+import '../../data/user.dart';
+
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
@@ -16,15 +18,28 @@ class _SignupScreenState extends State<SignupScreen> {
 
   bool showSpinner = false;
   final _formKey = GlobalKey<FormState>();
+  List<AppUser> users = [];
+
   String userName = '';
   String userEmail = '';
   String userPassword = '';
+  String userBirthDate = '';
+  String userPhoneNumber = '';
 
-  void _tryValidation() {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _birthDateController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+
+
+  Future<void> _tryValidation() async {
     final isValid = _formKey.currentState!.validate();
     if (isValid) {
       _formKey.currentState!.save();
     }
+
   }
 
   @override
@@ -48,7 +63,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 height: 135,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('images/logo_black.png'),
+                    image: AssetImage('assets/images/logo_black.png'),
                   ),
                 ),
               ),
@@ -71,6 +86,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               width: 335,
                               height: 55,
                               child: TextFormField(
+                                controller: _nameController,
                                 keyboardType: TextInputType.emailAddress,
                                 key: ValueKey(3),
                                 validator: (value) {
@@ -117,15 +133,157 @@ class _SignupScreenState extends State<SignupScreen> {
                               width: 335,
                               height: 55,
                               child: TextFormField(
+                                controller: _emailController,
+                                keyboardType: TextInputType.emailAddress,
+                                key: ValueKey(7),
+                                validator: (value) {
+                                  if (value!.isEmpty || !value.contains('@')) {
+                                    return 'Please enter a valid email address.';
+                                  }
+                                  return null;
+                                },
+                                onSaved: (value) {
+                                  userEmail = value!;
+                                },
+                                onChanged: (value) {
+                                  userEmail = value;
+                                },
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderSide:
+                                    BorderSide(color: Palette.textColor1),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5.0),
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                    BorderSide(color: Palette.textColor1),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5.0),
+                                    ),
+                                  ),
+                                  labelText: 'Email',
+                                  labelStyle: TextStyle(
+                                      fontSize: 14, color: Palette.textColor1),
+                                  hintText: '이메일을 입력해주세요.',
+                                  hintStyle: TextStyle(
+                                      fontSize: 14, color: Palette.textColor1),
+                                ),
+                              ),
+                            ), //email
+                            SizedBox(
+                              height: 10,
+                            ),
+
+                            SizedBox(
+                              width: 335,
+                              height: 55,
+                              child: TextFormField(
+                                controller: _passwordController,
+                                obscureText: true,
+                                key: ValueKey(8),
+                                validator: (value) {
+                                  if (value!.isEmpty || value.length < 6) {
+                                    return 'Password must be at least 7 characters long.';
+                                  }
+                                  return null;
+                                },
+                                onSaved: (value) {
+                                  userPassword = value!;
+                                },
+                                onChanged: (value) {
+                                  userPassword = value;
+                                },
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderSide:
+                                    BorderSide(color: Palette.textColor1),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5.0),
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                    BorderSide(color: Palette.textColor1),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5.0),
+                                    ),
+                                  ),
+                                  labelText: 'Password',
+                                  labelStyle: TextStyle(
+                                      fontSize: 14, color: Palette.textColor1),
+                                  hintText: '비밀번호를 입력해주세요.',
+                                  hintStyle: TextStyle(
+                                      fontSize: 14, color: Palette.textColor1),
+                                ),
+                              ),
+                            ), //password
+                            SizedBox(
+                              height: 10,
+                            ),
+
+                            SizedBox(
+                              width: 335,
+                              height: 55,
+                              child: TextFormField(
+                                controller: _confirmPasswordController,
+                                obscureText: true,
+                                key: ValueKey(8),
+                                validator: (value) {
+                                  if (value!.isEmpty || _confirmPasswordController.text != _passwordController.text) {
+                                    return 'confirm password.';
+                                  }
+                                  return null;
+                                },
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderSide:
+                                    BorderSide(color: Palette.textColor1),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5.0),
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                    BorderSide(color: Palette.textColor1),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5.0),
+                                    ),
+                                  ),
+                                  labelText: 'ConfirmPassword',
+                                  labelStyle: TextStyle(
+                                      fontSize: 14, color: Palette.textColor1),
+                                  hintText: '비밀번호를 입력해주세요.',
+                                  hintStyle: TextStyle(
+                                      fontSize: 14, color: Palette.textColor1),
+                                ),
+                              ),
+                            ), //password
+                            SizedBox(
+                              height: 10,
+                            ),
+
+                            SizedBox(
+                              width: 335,
+                              height: 55,
+                              child: TextFormField(
+                                controller: _birthDateController,
                                 keyboardType: TextInputType.emailAddress,
                                 key: ValueKey(4),
                                 validator: (value) {
                                   if (value!.isEmpty ||
                                       value.length > 8 ||
                                       value.length < 8) {
-                                    return 'Password must be at least 11 characters long.';
+                                    return 'birth date.';
                                   }
                                   return null;
+                                },
+                                onSaved: (value) {
+                                  userBirthDate = value!;
+                                },
+                                onChanged: (value) {
+                                  userBirthDate = value;
                                 },
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
@@ -159,6 +317,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               width: 335,
                               height: 55,
                               child: TextFormField(
+                                controller: _phoneNumberController,
                                 key: ValueKey(5),
                                 validator: (value) {
                                   if (value!.isEmpty ||
@@ -167,6 +326,12 @@ class _SignupScreenState extends State<SignupScreen> {
                                     return 'Phone number must be at least 11 characters long.';
                                   }
                                   return null;
+                                },
+                                onSaved: (value) {
+                                  userPhoneNumber = value!;
+                                },
+                                onChanged: (value) {
+                                  userPhoneNumber = value;
                                 },
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
@@ -196,138 +361,48 @@ class _SignupScreenState extends State<SignupScreen> {
                               height: 10,
                             ),
 
-                            SizedBox(
-                              width: 335,
-                              height: 55,
-                              child: TextFormField(
-                                key: ValueKey(6),
-                                validator: (value) {
-                                  if (value!.isEmpty ||
-                                      value.length < 11 ||
-                                      value.length > 11) {
-                                    return 'Phone number must be at least 11 characters long.';
-                                  }
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Palette.textColor1),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(5.0),
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Palette.textColor1),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(5.0),
-                                    ),
-                                  ),
-                                  labelText: 'phone number',
-                                  labelStyle: TextStyle(
-                                      fontSize: 14, color: Palette.textColor1),
-                                  hintText: '전화번호를 입력해주세요.',
-                                  hintStyle: TextStyle(
-                                      fontSize: 14, color: Palette.textColor1),
-                                ),
-                              ),
-                            ), //phone number(mom)
-                            SizedBox(
-                              height: 10,
-                            ),
+                            // SizedBox(
+                            //   width: 335,
+                            //   height: 55,
+                            //   child: TextFormField(
+                            //     key: ValueKey(6),
+                            //     validator: (value) {
+                            //       if (value!.isEmpty ||
+                            //           value.length < 11 ||
+                            //           value.length > 11) {
+                            //         return 'Phone number must be at least 11 characters long.';
+                            //       }
+                            //       return null;
+                            //     },
+                            //     decoration: InputDecoration(
+                            //       border: OutlineInputBorder(
+                            //         borderSide:
+                            //             BorderSide(color: Palette.textColor1),
+                            //         borderRadius: BorderRadius.all(
+                            //           Radius.circular(5.0),
+                            //         ),
+                            //       ),
+                            //       focusedBorder: OutlineInputBorder(
+                            //         borderSide:
+                            //             BorderSide(color: Palette.textColor1),
+                            //         borderRadius: BorderRadius.all(
+                            //           Radius.circular(5.0),
+                            //         ),
+                            //       ),
+                            //       labelText: 'phone number',
+                            //       labelStyle: TextStyle(
+                            //           fontSize: 14, color: Palette.textColor1),
+                            //       hintText: '전화번호를 입력해주세요.',
+                            //       hintStyle: TextStyle(
+                            //           fontSize: 14, color: Palette.textColor1),
+                            //     ),
+                            //   ),
+                            // ), //phone number(mom)
+                            // SizedBox(
+                            //   height: 10,
+                            // ),
 
-                            SizedBox(
-                              width: 335,
-                              height: 55,
-                              child: TextFormField(
-                                keyboardType: TextInputType.emailAddress,
-                                key: ValueKey(7),
-                                validator: (value) {
-                                  if (value!.isEmpty || !value.contains('@')) {
-                                    return 'Please enter a valid email address.';
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  userEmail = value!;
-                                },
-                                onChanged: (value) {
-                                  userEmail = value;
-                                },
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Palette.textColor1),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(5.0),
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Palette.textColor1),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(5.0),
-                                    ),
-                                  ),
-                                  labelText: 'Email',
-                                  labelStyle: TextStyle(
-                                      fontSize: 14, color: Palette.textColor1),
-                                  hintText: '이메일을 입력해주세요.',
-                                  hintStyle: TextStyle(
-                                      fontSize: 14, color: Palette.textColor1),
-                                ),
-                              ),
-                            ), //email
-                            SizedBox(
-                              height: 10,
-                            ),
 
-                            SizedBox(
-                              width: 335,
-                              height: 55,
-                              child: TextFormField(
-                                obscureText: true,
-                                key: ValueKey(8),
-                                validator: (value) {
-                                  if (value!.isEmpty || value.length < 6) {
-                                    return 'Password must be at least 7 characters long.';
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  userPassword = value!;
-                                },
-                                onChanged: (value) {
-                                  userPassword = value;
-                                },
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Palette.textColor1),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(5.0),
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Palette.textColor1),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(5.0),
-                                    ),
-                                  ),
-                                  labelText: 'Password',
-                                  labelStyle: TextStyle(
-                                      fontSize: 14, color: Palette.textColor1),
-                                  hintText: '비밀번호를 입력해주세요.',
-                                  hintStyle: TextStyle(
-                                      fontSize: 14, color: Palette.textColor1),
-                                ),
-                              ),
-                            ), //password
-                            SizedBox(
-                              height: 10,
-                            ),
 
                             /*SizedBox(
                               width: 335,
@@ -382,6 +457,7 @@ class _SignupScreenState extends State<SignupScreen> {
               GestureDetector(
                 onTap: () async {
                   _tryValidation();
+
                   try {
                     final newUser = await _authentication
                         .createUserWithEmailAndPassword(
@@ -389,11 +465,14 @@ class _SignupScreenState extends State<SignupScreen> {
                       password: userPassword,
                     );
 
+
                     await FirebaseFirestore.instance.collection('user').doc(newUser.user!.uid)
                         .set({
                       'userName' : userName,
                       'email' : userEmail,
-                      'password' : userPassword
+                      'password' : userPassword,
+                      'birthDate' : userBirthDate,
+                      'phoneNumber' : userPhoneNumber,
                     });
 
                     if (newUser.user != null) {
@@ -409,18 +488,20 @@ class _SignupScreenState extends State<SignupScreen> {
                         showSpinner = false;
                       });
                     }
+                  } on FirebaseAuthException catch (e) {
+                    Navigator.pop(context);
                   } catch (e) {
                     setState(() {
                       showSpinner = false;
                     });
                     print(e);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content:
-                        Text('Please check your email and password'),
-                        backgroundColor: Colors.blue,
-                      ),
-                    );
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   SnackBar(
+                    //     content:
+                    //     Text('Please check your email and password'),
+                    //     backgroundColor: Colors.blue,
+                    //   ),
+                    // );
                   }
                 },
                 child: Container(
@@ -444,81 +525,81 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 50,
-              ),
+              // SizedBox(
+              //   height: 50,
+              // ),
               //선
-              Container(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(
-                          'Or continue with',
-                          style: TextStyle(color: Colors.grey[700]),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 35,
-              ),
+              // Container(
+              //   child: Padding(
+              //     padding: const EdgeInsets.symmetric(horizontal: 25.0),
+              //     child: Row(
+              //       children: [
+              //         Expanded(
+              //           child: Divider(
+              //             thickness: 0.5,
+              //             color: Colors.grey[400],
+              //           ),
+              //         ),
+              //         Padding(
+              //           padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              //           child: Text(
+              //             'Or continue with',
+              //             style: TextStyle(color: Colors.grey[700]),
+              //           ),
+              //         ),
+              //         Expanded(
+              //           child: Divider(
+              //             thickness: 0.5,
+              //             color: Colors.grey[400],
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+              // SizedBox(
+              //   height: 35,
+              // ),
               //구글애플
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      child: InkWell(
-                        onTap: () {},
-                        child: Padding(
-                          padding: EdgeInsets.all(6),
-                          child: Image.asset(
-                            "images/google.png",
-                            width: 40,
-                            height: 40,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 50,
-                    ),
-                    Container(
-                      child: InkWell(
-                        onTap: () {},
-                        child: Padding(
-                          padding: EdgeInsets.all(6),
-                          child: Image.asset(
-                            "images/apple.png",
-                            width: 40,
-                            height: 40,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
+              // Container(
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       Container(
+              //         child: InkWell(
+              //           onTap: () {},
+              //           child: Padding(
+              //             padding: EdgeInsets.all(6),
+              //             child: Image.asset(
+              //               "assets/images/google.png",
+              //               width: 40,
+              //               height: 40,
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //       SizedBox(
+              //         width: 50,
+              //       ),
+              //       Container(
+              //         child: InkWell(
+              //           onTap: () {},
+              //           child: Padding(
+              //             padding: EdgeInsets.all(6),
+              //             child: Image.asset(
+              //               "assets/images/apple.png",
+              //               width: 40,
+              //               height: 40,
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(
+              //   height: 30,
+              // ),
               //회원가입버튼
               SizedBox(
                 height: 25,

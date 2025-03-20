@@ -651,7 +651,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
     return snapshot.docs.map((element) {
       var data = element.data();
-      return Folder(data['name'], data['wordCount'], element.id, data['time']);
+      return Folder(data['name'], data['wordCount'], element.id, data['time'], data['userId']);
     }).toList();
   }
 

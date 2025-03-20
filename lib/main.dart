@@ -9,12 +9,17 @@ import 'package:mymedic1/screens/sign/login_screen.dart';
 import 'package:mymedic1/screens/myapp.dart';
 import 'package:mymedic1/test.dart';
 import 'package:mymedic1/test2.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 
 import 'data/board.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await FirebaseAppCheck.instance.activate(
+    androidProvider: AndroidProvider.debug,
+    appleProvider: AppleProvider.appAttest,
+  );
   runApp(MyApp());
 }
 

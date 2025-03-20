@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 130,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('images/logo_black.png'),
+                  image: AssetImage('assets/images/logo_black.png'),
                 ),
               ),
             ),
@@ -206,80 +206,80 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             SizedBox(
-              height: 40,
+              height: 20,
             ),
             //선
-            Container(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text(
-                        'Or continue with',
-                        style: TextStyle(color: Colors.grey[700]),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            //구글애플
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    child: InkWell(
-                      onTap: () {},
-                      child: Padding(
-                        padding: EdgeInsets.all(6),
-                        child: Image.asset(
-                          "images/google.png",
-                          width: 40,
-                          height: 40,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 50,
-                  ),
-                  Container(
-                    child: InkWell(
-                      onTap: () {},
-                      child: Padding(
-                        padding: EdgeInsets.all(6),
-                        child: Image.asset(
-                          "images/apple.png",
-                          width: 40,
-                          height: 40,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
+            // Container(
+            //   child: Padding(
+            //     padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            //     child: Row(
+            //       children: [
+            //         Expanded(
+            //           child: Divider(
+            //             thickness: 0.5,
+            //             color: Colors.grey[400],
+            //           ),
+            //         ),
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    //   child: Text(
+                    //     'Or continue with',
+                    //     style: TextStyle(color: Colors.grey[700]),
+                    //   ),
+                    // ),
+                    // Expanded(
+                    //   child: Divider(
+                    //     thickness: 0.5,
+                    //     color: Colors.grey[400],
+                    //   ),
+                    // ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
+            // SizedBox(
+            //   height: 30,
+            // ),
+            // //구글애플
+            // Container(
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: [
+            //       Container(
+            //         child: InkWell(
+            //           onTap: () {},
+            //           child: Padding(
+            //             padding: EdgeInsets.all(6),
+            //             child: Image.asset(
+            //               "assets/images/google.png",
+            //               width: 40,
+            //               height: 40,
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //       SizedBox(
+            //         width: 50,
+            //       ),
+            //       Container(
+            //         child: InkWell(
+            //           onTap: () {},
+            //           child: Padding(
+            //             padding: EdgeInsets.all(6),
+            //             child: Image.asset(
+            //               "assets/images/apple.png",
+            //               width: 40,
+            //               height: 40,
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            // const SizedBox(
+            //   height: 30,
+            // ),
             //회원가입버튼
             Container(
               child: Row(
