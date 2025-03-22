@@ -458,51 +458,58 @@ class _SignupScreenState extends State<SignupScreen> {
                 onTap: () async {
                   _tryValidation();
 
-                  try {
-                    final newUser = await _authentication
-                        .createUserWithEmailAndPassword(
-                      email: userEmail,
-                      password: userPassword,
-                    );
+                  if (_formKey.currentState?.validate() ?? false) {
 
-
-                    await FirebaseFirestore.instance.collection('user').doc(newUser.user!.uid)
-                        .set({
-                      'userName' : userName,
-                      'email' : userEmail,
-                      'password' : userPassword,
-                      'birthDate' : userBirthDate,
-                      'phoneNumber' : userPhoneNumber,
-                    });
-
-                    if (newUser.user != null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return HomeScreen();
-                          },
-                        ),
+                    try {
+                      final newUser = await _authentication
+                          .createUserWithEmailAndPassword(
+                        email: userEmail,
+                        password: userPassword,
                       );
+
+
+                      await FirebaseFirestore.instance.collection('user').doc(newUser.user!.uid)
+                          .set({
+                        'userName' : userName,
+                        'email' : userEmail,
+                        'password' : userPassword,
+                        'birthDate' : userBirthDate,
+                        'phoneNumber' : userPhoneNumber,
+                      });
+
+                      if (_formKey.currentState?.validate() ?? false) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return HomeScreen();
+                            },
+                          ),
+                        );
+                        // setState(() {
+                        //   showSpinner = false;
+                        // });
+                      }
+                    }
+                    // on FirebaseAuthException catch (e) {
+                    //   Navigator.pop(context);
+                    // }
+                    catch (e) {
                       setState(() {
                         showSpinner = false;
                       });
+                      print(e);
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   SnackBar(
+                      //     content:
+                      //     Text('Please check your email and password'),
+                      //     backgroundColor: Colors.blue,
+                      //   ),
+                      // );
                     }
-                  } on FirebaseAuthException catch (e) {
-                    Navigator.pop(context);
-                  } catch (e) {
-                    setState(() {
-                      showSpinner = false;
-                    });
-                    print(e);
-                    // ScaffoldMessenger.of(context).showSnackBar(
-                    //   SnackBar(
-                    //     content:
-                    //     Text('Please check your email and password'),
-                    //     backgroundColor: Colors.blue,
-                    //   ),
-                    // );
                   }
+
+
                 },
                 child: Container(
                   padding: EdgeInsets.all(15),

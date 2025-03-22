@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mymedic1/data/folder.dart';
 import 'package:mymedic1/data/levelWord.dart';
+import 'package:mymedic1/data/user.dart';
 import 'package:mymedic1/screens/home/words/recWordNote.dart';
 import 'package:mymedic1/screens/home/words/wordNote.dart';
 
@@ -20,14 +21,21 @@ class _WordFolderState extends State<WordFolder> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   User? loggedUser;
+  List<AppUser> appUser = [];
 
-  Future<void> _getUser() async {
-    final userInfo = _firebaseAuth.currentUser;
-    final userData = await FirebaseFirestore.instance
-        .collection('user')
-        .doc(userInfo!.uid)
-        .get();
-  }
+
+  // Future<List<AppUser>> _getUser() async {
+  //   var userInfo = _firebaseAuth.currentUser;
+  //   var userData = await FirebaseFirestore.instance
+  //       .collection('user')
+  //       .get();
+  //
+  //   List<AppUser> appUsers = userData.docs.map((element) {
+  //     Map<String, dynamic> map = element.data();
+  //     return AppUser(map['userName'], map['email'], map['password'], map['birthDate'], map['phoneNumber'], element.id);
+  //   }).toList();
+  //   return appUsers;
+  // }
 
   Future<List<Folder>> _getFolder() async {
     final userInfo = _firebaseAuth.currentUser;
