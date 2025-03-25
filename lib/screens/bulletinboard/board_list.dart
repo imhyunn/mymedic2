@@ -21,9 +21,11 @@ class _BoardListState extends State<BoardList> {
   String _username = '';
   Map<String, dynamic> _userData = {};
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final user = FirebaseAuth.instance.currentUser;
+
 
   void _getUserProfile() async {
-    final user = FirebaseAuth.instance.currentUser;
+
     final userData = await FirebaseFirestore.instance
         .collection('user')
         .doc(user!.uid)
@@ -43,16 +45,22 @@ class _BoardListState extends State<BoardList> {
         .collection("boards")
         .orderBy("time", descending: true)
         .get();
+    print('ii');
 
     List<Board> boards = snapshot.docs
         .map((element) {
           return Board(element.data()['title'], element.data()['body'], element.id, element.data()['uid'], element.data()['time']);
     }).toList();
+    print('dd');
+
 
     for (int i = 0; i < boards.length; ++i) {
       var data = await _firestore.collection('user').doc(boards[i].uid).get();
+      print(data.data());
+      // boards[i].username = data.data()!['userName'];
       boards[i].username = data.data()!['userName'];
     }
+    print('nn');
     return boards;
   }
 

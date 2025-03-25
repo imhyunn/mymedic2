@@ -37,16 +37,18 @@ class _WordFolderState extends State<WordFolder> {
   //   return appUsers;
   // }
 
+  final userInfo = FirebaseAuth.instance.currentUser;
+
+
   Future<List<Folder>> _getFolder() async {
-    final userInfo = _firebaseAuth.currentUser;
-    final userData = await FirebaseFirestore.instance
-        .collection('user')
-        .doc(userInfo!.uid)
-        .get();
+    // final userData = await FirebaseFirestore.instance
+    //     .collection('user')
+    //     .doc(userInfo!.uid)
+    //     .get();
 
     var snapshot = await _firestore
         .collection('folder')
-        .where('userId', isEqualTo: userData.id)
+        .where('userId', isEqualTo: userInfo!.uid)
         .orderBy('time', descending: true)
         .get();
     List<Folder> folders = snapshot.docs.map((element) {
@@ -224,6 +226,8 @@ class _WordFolderState extends State<WordFolder> {
                   onPressed: () async {
                     await _firestore.collection('folder').add({
                       'name': _folderController.text,
+                      'time': DateTime.now().toString(),
+                      'userId': userInfo!.uid,
                       'wordCount': 0,
                     });
                     setState(() {});
@@ -305,8 +309,8 @@ class _WordFolderState extends State<WordFolder> {
                   onPressed: () async {
                     await _firestore.collection('folder').doc(folder.id).set({
                       'name': _folderController.text,
-                      'time': DateTime.now().toString(),
-                      // 'userId': userData.id,
+                      'time': folder.time,
+                      'userId': userInfo!.uid,
                       'wordCount': folder.wordCount,
                     });
                     setState(() {});
