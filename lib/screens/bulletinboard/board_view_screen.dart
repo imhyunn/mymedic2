@@ -25,6 +25,7 @@ class BoardViewScreen extends StatefulWidget {
 class _BoardViewScreenState extends State<BoardViewScreen> {
   XFile? _pickedFile;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -33,31 +34,37 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final _imageSize = MediaQuery.of(context).size.width / 10;
+    final _imageSize = MediaQuery
+        .of(context)
+        .size
+        .width / 10;
     return Scaffold(
       appBar: AppBar(
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            color: Colors.white,
-            onSelected: handleClick,
-            itemBuilder: (BuildContext context) {
-              return {'편집', '삭제'}.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                  onTap: () {
-                    switch (choice) {
-                      case "편집":
-                        _edit(widget.board.id!);
-                        break;
-                      case "삭제":
-                        _confirmDelete(widget.board.id!);
-                        break;
-                    }
-                  },
-                );
-              }).toList();
-            },
+        actions: [
+          Visibility(
+            visible: widget.board.uid == currentUser!.uid,
+            child: PopupMenuButton<String>(
+              color: Colors.white,
+              onSelected: handleClick,
+              itemBuilder: (BuildContext context) {
+                return {'편집', '삭제'}.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                    onTap: () {
+                      switch (choice) {
+                        case "편집":
+                          _edit(widget.board.id!);
+                          break;
+                        case "삭제":
+                          _confirmDelete(widget.board.id!);
+                          break;
+                      }
+                    },
+                  );
+                }).toList();
+              },
+            ),
           ),
         ],
       ),
@@ -88,26 +95,26 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
                       Container(
                         child: _pickedFile == null
                             ? Center(
-                                child: Icon(
-                                  Icons.account_circle,
-                                  size: _imageSize,
-                                ),
-                              )
+                          child: Icon(
+                            Icons.account_circle,
+                            size: _imageSize,
+                          ),
+                        )
                             : Center(
-                                child: Container(
-                                  width: _imageSize,
-                                  height: _imageSize,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                        width: 2, color: Colors.white),
-                                    image: DecorationImage(
-                                        image:
-                                            FileImage(File(_pickedFile!.path)),
-                                        fit: BoxFit.cover),
-                                  ),
-                                ),
-                              ),
+                          child: Container(
+                            width: _imageSize,
+                            height: _imageSize,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  width: 2, color: Colors.white),
+                              image: DecorationImage(
+                                  image:
+                                  FileImage(File(_pickedFile!.path)),
+                                  fit: BoxFit.cover),
+                            ),
+                          ),
+                        ),
                       ),
                       SizedBox(
                         width: 2,
@@ -186,7 +193,7 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '노트 삭제',
           ),

@@ -36,6 +36,42 @@ class _BoardNewScreenState extends State<BoardNewScreen> {
               padding: EdgeInsets.all(8.0),
               child: ElevatedButton(
                 onPressed: () async {
+                  if (titleController.text.isEmpty ||
+                      bodyController.text.isEmpty) {
+                    return showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(7.0)),
+                            contentPadding: EdgeInsets.zero,
+                            content: Padding(
+                                padding: EdgeInsets.only(top: 18, left: 18),
+                                child: Text(
+                                  '내용을 입력해주세요.',
+                                  style: TextStyle(fontSize: 16),
+                                )),
+                            actions: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context, false);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Palette.buttonColor2,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                  ),
+                                ),
+                                child: const Text(
+                                  '확인',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              )
+                            ]);
+                      },
+                    );
+                  }
+
                   await _firestore.collection('boards').doc().set({
                     'title': titleController.text,
                     'body': bodyController.text,

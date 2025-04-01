@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mymedic1/screens/sign/signup_screen.dart';
 
 import '../config/palette.dart';
+import '../data/user.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -18,15 +19,6 @@ class MyPage extends StatefulWidget {
   State<MyPage> createState() => _MyPageState();
 }
 
-// class User {
-//   String email;
-//   String level;
-//   String password;
-//   String userName;
-//   String id;
-//
-//   User(this.email, this.level, this.password, this.userName, this.id);
-// }
 
 class _MyPageState extends State<MyPage> {
   XFile? _pickedFile;
@@ -54,16 +46,17 @@ class _MyPageState extends State<MyPage> {
 
 
   }
-  //
-  // Future<List<User>> _getUserLevel() async {
-  //   var snapshot = await _firestore.collection('user').get();
-  //   List<User> user = snapshot.docs.map((element) {
-  //     Map<String, dynamic> map = element.data();
-  //     return User(map['email'], map['level'], map['password'], map['userName'], element.id);
-  //   }).toList();
-  //   return user;
-  // }
 
+
+  Future<List<AppUser>> _getAppUser() async {
+    var querySnapshot = await _firestore.collection('user').get();
+
+    List<AppUser> appUsers = querySnapshot.docs.map((e) {
+      return AppUser(e.data()['userName'], e.data()['email'], e.data()['password'], e.data()['birthDate'], e.data()['phoneNumber'], e.id, e.data()['profileImage']);
+    },).toList();
+
+    return appUsers;
+  }
 
 
   Future<void> saveImage(XFile image) async {
@@ -87,68 +80,74 @@ class _MyPageState extends State<MyPage> {
   Widget build(BuildContext context) {
     final _imageSize = MediaQuery.of(context).size.width / 4;
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('my page'),
-        ),
-        body: Column(
-          children: [
-            Row(
+    return FutureBuilder(
+      future: _getAppUser(),
+      builder:(context, snapshot) {
+        return SafeArea(
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text('my page'),
+            ),
+            body: Column(
               children: [
-                const SizedBox(
-                  width: 15,
-                ),
-                Container(
-                  constraints: BoxConstraints(
-                    minHeight: _imageSize,
-                    minWidth: _imageSize,
-                  ),
-                  child: GestureDetector(
-                    onTap: () {
-                      _showBottomSheet();
-                    },
-                    child: _pickedFile == null
-                        ? Center(
-                            child: Icon(
-                              Icons.account_circle,
-                              size: _imageSize,
-                            ),
-                          )
-                        : Center(
-                            child: Container(
-                              width: _imageSize,
-                              height: _imageSize,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                    width: 2,
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
-                                image: DecorationImage(
-                                    image: FileImage(File(_pickedFile!.path)),
-                                    fit: BoxFit.cover),
-                              ),
+                SizedBox(height: 13,),
+                Row(
+                  children: [
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Container(
+                      constraints: BoxConstraints(
+                        minHeight: _imageSize,
+                        minWidth: _imageSize,
+                      ),
+                      child: GestureDetector(
+                        onTap: () {
+                          _showBottomSheet();
+                        },
+                        child: _pickedFile == null
+                            ? Center(
+                          child: Icon(
+                            Icons.account_circle,
+                            size: _imageSize,
+                          ),
+                        )
+                            : Center(
+                          child: Container(
+                            width: _imageSize,
+                            height: _imageSize,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  width: 1,
+                                  color:
+                                  Colors.grey),
+                              image: DecorationImage(
+                                  image: FileImage(File(_pickedFile!.path)),
+                                  fit: BoxFit.cover),
                             ),
                           ),
-                  ),
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-                Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                    Text(_username, style: TextStyle(fontSize: 19),),
-                    Text('${_userData['userLevel']}'),
-                  ],),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 20,
+                    ),
+                    Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(_username, style: TextStyle(fontSize: 19),),
+                          // Text('${_userData['userLevel']}'),
+                        ],),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      }
     );
   }
 

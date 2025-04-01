@@ -475,6 +475,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         'password' : userPassword,
                         'birthDate' : userBirthDate,
                         'phoneNumber' : userPhoneNumber,
+                        'profileImage' : null,
                       });
 
                       if (_formKey.currentState?.validate() ?? false) {

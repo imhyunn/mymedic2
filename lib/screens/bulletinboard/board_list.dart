@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mymedic1/data/board.dart';
 import 'package:mymedic1/data/board_manager.dart';
+import 'package:mymedic1/data/user.dart';
 import 'package:mymedic1/providers.dart';
 import 'package:mymedic1/screens/bulletinboard/board_edit.dart';
 import 'package:mymedic1/screens/bulletinboard/board_view_screen.dart';
@@ -22,6 +23,7 @@ class _BoardListState extends State<BoardList> {
   Map<String, dynamic> _userData = {};
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final user = FirebaseAuth.instance.currentUser;
+  List<AppUser> appUser = [];
 
 
   void _getUserProfile() async {
@@ -38,29 +40,48 @@ class _BoardListState extends State<BoardList> {
       });
     }
     print(_userData);
+
   }
+
 
   Future<List<Board>> _getBoards() async {
     var snapshot = await _firestore
         .collection("boards")
         .orderBy("time", descending: true)
         .get();
-    print('ii');
 
     List<Board> boards = snapshot.docs
         .map((element) {
           return Board(element.data()['title'], element.data()['body'], element.id, element.data()['uid'], element.data()['time']);
     }).toList();
-    print('dd');
+
+
 
 
     for (int i = 0; i < boards.length; ++i) {
-      var data = await _firestore.collection('user').doc(boards[i].uid).get();
-      print(data.data());
-      // boards[i].username = data.data()!['userName'];
-      boards[i].username = data.data()!['userName'];
+      var userdata = await _firestore.collection('user').doc(boards[i].uid).get();
+      boards[i].username = userdata.data()!['userName'];
+
+
+
+      // var userData = await FirebaseFirestore.instance
+      //     .collection('user')
+      //     .doc(boards[i].uid)
+      //     .get();
+      // _userData = userData.data()!;
+      // boards[i].username = _userData['userName'];
+      // print(boards[i].username);
+      //
+      // // if (userData.exists) {
+      //   setState(() {
+      //     _userData = userData.data()!;
+      //     boards[i].username = _userData['userName'];
+      //     print(_username);
+      //   });
+      // }
+      // print(_userData);
     }
-    print('nn');
+
     return boards;
   }
 
@@ -68,6 +89,7 @@ class _BoardListState extends State<BoardList> {
   void initState() {
     _getUserProfile();
     super.initState();
+
   }
 
   @override
@@ -92,6 +114,7 @@ class _BoardListState extends State<BoardList> {
               child: Text('오류가 발생했습니다.'),
             );
           }
+
 
           final boards = snap.requireData;
 
