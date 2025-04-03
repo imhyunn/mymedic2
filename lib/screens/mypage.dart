@@ -7,10 +7,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mymedic1/screens/myapp.dart';
 import 'package:mymedic1/screens/sign/signup_screen.dart';
+import 'package:provider/provider.dart';
 
 import '../config/palette.dart';
 import '../data/user.dart';
+import '../data/user_provider.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -28,62 +31,79 @@ class _MyPageState extends State<MyPage> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final _firebaseAuth = FirebaseAuth.instance;
   User? loggedUser;
+  final currentUser = FirebaseAuth.instance.currentUser;
 
-  void _getUserProfile() async {
-    final user = _firebaseAuth.currentUser;
-    final userData = await FirebaseFirestore.instance
-        .collection('user')
-        .doc(user!.uid)
-        .get();
-    if (userData.exists) {
-      setState(() {
-        _userData = userData.data()!;
-        _username = _userData['userName'];
-        print(_username);
-      });
-    }
-    print(_userData);
+  //
+  // void _getUserProfile() async {
+  //   final userData = await FirebaseFirestore.instance
+  //       .collection('user')
+  //       .doc(currentUser!.uid)
+  //       .get();
+  //   if (userData.exists) {
+  //     setState(() {
+  //       _userData = userData.data()!;
+  //       _username = _userData['userName'];
+  //     });
+  //   }
+  //   print(_userData);
+  //
+  //
+  // }
 
 
-  }
-
-
-  Future<List<AppUser>> _getAppUser() async {
-    var querySnapshot = await _firestore.collection('user').get();
-
-    List<AppUser> appUsers = querySnapshot.docs.map((e) {
-      return AppUser(e.data()['userName'], e.data()['email'], e.data()['password'], e.data()['birthDate'], e.data()['phoneNumber'], e.id, e.data()['profileImage']);
-    },).toList();
-
-    return appUsers;
-  }
+  // Future<AppUser> _getAppUser() async {
+  //   var querySnapshot = await _firestore.collection('user').get();
+  //
+  //   List<AppUser> appUsers = querySnapshot.docs.map((e) {
+  //     return AppUser(e.data()['userName'], e.data()['email'], e.data()['password'], e.data()['birthDate'], e.data()['phoneNumber'], e.id, e.data()['profileImage']);
+  //   },).toList();
+  //
+  //
+  //   var snap = await _firestore.collection('user').doc(currentUser!.uid).get();
+  //
+  //   AppUser appUser =  AppUser(snap['userName'], snap['email'], snap['password'], snap['birthDate'], snap['phoneNumber'], snap.id, snap['profileImagePath']);
+  //
+  //
+  //   return appUser;
+  // }
 
 
   Future<void> saveImage(XFile image) async {
+    final userProvider = context.read<UserProvider>();
+
     var dateTime = DateTime.now().toString().replaceAll(' ', '_');
-     var ref = _firebaseStorage.ref().child("images/$dateTime.jpg");
+    var ref = _firebaseStorage.ref().child("images/$dateTime.jpg");
      // 해결했다 ^^... 2024-08-30 20:51 - 원인은 라이브러리 버전... App Check token 뭐시기 그거는 에러가 아니래..
     var putFile = ref.putFile(File(image.path), SettableMetadata(contentType: "image/jpeg"));
 
+
     var complete = await putFile.whenComplete(() => {});
-    var s = await complete.ref.getDownloadURL();
-    print(s);
+
+
+    await _firestore.collection('user').doc(currentUser!.uid).set({
+      'birthDate' : userProvider.appUser!.birthDate,
+      'email' : userProvider.appUser!.email,
+      'password' : userProvider.appUser!.password,
+      'phoneNumber' : userProvider.appUser!.phoneNumber,
+      'profileImagePath' : await complete.ref.getDownloadURL(),
+      'userName' : userProvider.appUser!.userName
+    });
+
   }
 
   @override
   void initState() {
-    _getUserProfile();
+    // _getUserProfile();
     super.initState();
   }
 
+
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     final _imageSize = MediaQuery.of(context).size.width / 4;
 
-    return FutureBuilder(
-      future: _getAppUser(),
-      builder:(context, snapshot) {
-        return SafeArea(
+    return SafeArea(
           child: Scaffold(
             appBar: AppBar(
               title: Text('my page'),
@@ -137,7 +157,7 @@ class _MyPageState extends State<MyPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(_username, style: TextStyle(fontSize: 19),),
+                          Text(userProvider.appUser!.userName, style: TextStyle(fontSize: 19),),
                           // Text('${_userData['userLevel']}'),
                         ],),
                     ),
@@ -147,9 +167,9 @@ class _MyPageState extends State<MyPage> {
             ),
           ),
         );
-      }
-    );
+
   }
+
 
 
   _showBottomSheet() {

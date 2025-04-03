@@ -3,8 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mymedic1/screens/home/home_screen.dart';
 import 'package:mymedic1/screens/myapp.dart';
 import 'package:mymedic1/screens/sign/signup_screen.dart';
+import 'package:provider/provider.dart';
 import '../../config/palette.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../data/user_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -163,6 +166,9 @@ class _LoginScreenState extends State<LoginScreen> {
             GestureDetector(
               onTap: () async {
                 _tryValidation();
+
+                final userProvider = Provider.of<UserProvider>(context, listen: false);
+                await userProvider.fetchUserData(_authentication.currentUser!.uid);
 
                 try {
                   final newUser =

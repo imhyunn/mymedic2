@@ -10,6 +10,8 @@ import 'package:mymedic1/screens/myapp.dart';
 import 'package:mymedic1/test.dart';
 import 'package:mymedic1/test2.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:provider/provider.dart';
+import 'package:mymedic1/data/user_provider.dart';
 
 import 'data/board.dart';
 
@@ -20,7 +22,12 @@ Future<void> main() async {
     androidProvider: AndroidProvider.debug,
     appleProvider: AppleProvider.appAttest,
   );
-  runApp(MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => UserProvider()),
+    ],
+    child: MyApp(),
+  ),);
 }
 
 class MyApp extends StatelessWidget {

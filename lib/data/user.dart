@@ -4,11 +4,11 @@ class AppUser {
   String userName;
   String email;
   String password;
-  int birthDate;
-  int phoneNumber;
+  String birthDate;
+  String phoneNumber;
   String id;
-  XFile profileImage;
+  String profileImagePath;
 
   AppUser(this.userName, this.email, this.password, this.birthDate,
-      this.phoneNumber, this.id, this.profileImage);
+      this.phoneNumber, this.id, this.profileImagePath);
 }
