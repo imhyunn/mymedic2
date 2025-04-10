@@ -61,7 +61,6 @@ class _WordNoteState extends State<WordNote> {
     // for (int i = 0; i < wordlist.length; ++i) {
     //   _pickedFiles.add(null);
     // }
-    _getWord();
     super.initState();
 
     tts.setLanguage("en-US");

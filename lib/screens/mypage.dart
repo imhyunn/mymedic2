@@ -25,13 +25,17 @@ class MyPage extends StatefulWidget {
 
 class _MyPageState extends State<MyPage> {
   XFile? _pickedFile;
-  Map<String, dynamic> _userData = {};
-  String _username = "";
+  ImageProvider? ImageFile;
+
   FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final _firebaseAuth = FirebaseAuth.instance;
   User? loggedUser;
   final currentUser = FirebaseAuth.instance.currentUser;
+  AppUser? _appUser;
+  AppUser? get appUser => _appUser;
+
+
 
   //
   // void _getUserProfile() async {
@@ -51,21 +55,32 @@ class _MyPageState extends State<MyPage> {
   // }
 
 
-  // Future<AppUser> _getAppUser() async {
-  //   var querySnapshot = await _firestore.collection('user').get();
-  //
-  //   List<AppUser> appUsers = querySnapshot.docs.map((e) {
-  //     return AppUser(e.data()['userName'], e.data()['email'], e.data()['password'], e.data()['birthDate'], e.data()['phoneNumber'], e.id, e.data()['profileImage']);
-  //   },).toList();
-  //
-  //
-  //   var snap = await _firestore.collection('user').doc(currentUser!.uid).get();
-  //
-  //   AppUser appUser =  AppUser(snap['userName'], snap['email'], snap['password'], snap['birthDate'], snap['phoneNumber'], snap.id, snap['profileImagePath']);
-  //
-  //
-  //   return appUser;
-  // }
+  Future<void> _getAppUser() async {
+    var snap = await _firestore.collection('user').doc(currentUser!.uid).get();
+
+    if (snap.exists) {
+      _appUser = AppUser(
+        snap['userName'],
+        snap['email'],
+        snap['password'],
+        snap['birthDate'],
+        snap['phoneNumber'],
+        snap.id,
+        snap['profileImagePath'],
+      );// UI 업데이트
+    }
+
+
+    
+    // List<AppUser> appUser = querySnapshot.docs.map((e) {
+    //   return AppUser(e.data()['userName'], e.data()['email'], e.data()['password'], e.data()['birthDate'], e.data()['phoneNumber'], e.id, e.data()['profileImage']);
+    // },).toList();
+    //
+    // return appUser;
+
+
+
+  }
 
 
   Future<void> saveImage(XFile image) async {
@@ -80,20 +95,22 @@ class _MyPageState extends State<MyPage> {
     var complete = await putFile.whenComplete(() => {});
 
 
-    await _firestore.collection('user').doc(currentUser!.uid).set({
-      'birthDate' : userProvider.appUser!.birthDate,
-      'email' : userProvider.appUser!.email,
-      'password' : userProvider.appUser!.password,
-      'phoneNumber' : userProvider.appUser!.phoneNumber,
-      'profileImagePath' : await complete.ref.getDownloadURL(),
-      'userName' : userProvider.appUser!.userName
-    });
+    // await _firestore.collection('user').doc(currentUser!.uid).set({
+    //   'birthDate' : _appUser!.birthDate,
+    //   'email' : appUser!.email,
+    //   'password' : appUser!.password,
+    //   'phoneNumber' : appUser!.phoneNumber,
+    //   'profileImagePath' : await complete.ref.getDownloadURL(),
+    //   'userName' : appUser!.userName
+    // });
+
 
   }
 
   @override
   void initState() {
     // _getUserProfile();
+
     super.initState();
   }
 
@@ -143,9 +160,11 @@ class _MyPageState extends State<MyPage> {
                                   color:
                                   Colors.grey),
                               image: DecorationImage(
-                                  image: FileImage(File(_pickedFile!.path)),
+                                  image: NetworkImage(_appUser!.profileImagePath),
+                                  // image: FileImage(File(_pickedFile!.path)),
                                   fit: BoxFit.cover),
                             ),
+                            // child: Image.network(userProvider.appUser!.profileImagePath, fit: BoxFit.cover,),
                           ),
                         ),
                       ),
@@ -157,7 +176,7 @@ class _MyPageState extends State<MyPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(userProvider.appUser!.userName, style: TextStyle(fontSize: 19),),
+                          Text('', style: TextStyle(fontSize: 19),),
                           // Text('${_userData['userLevel']}'),
                         ],),
                     ),
@@ -166,7 +185,10 @@ class _MyPageState extends State<MyPage> {
               ],
             ),
           ),
-        );
+
+
+
+    );
 
   }
 
@@ -262,7 +284,7 @@ class _MyPageState extends State<MyPage> {
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _pickedFile = _pickedFile;
+        _pickedFile = pickedFile;
       });
     } else {
       if (kDebugMode) {
