@@ -35,8 +35,13 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void check() async {
+    await FirebaseAuth.instance.signOut();
+    print(FirebaseAuth.instance.currentUser);
+  }
   @override
   Widget build(BuildContext context) {
+    check();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
@@ -168,8 +173,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 _tryValidation();
 
                 final userProvider = Provider.of<UserProvider>(context, listen: false);
-                await userProvider.fetchUserData(_authentication.currentUser!.uid);
-
+                // await userProvider.fetchUserData(_authentication.currentUser!.uid);
+                final user = _authentication.currentUser;
+                if (user != null) {
+                  await userProvider.fetchUserData(user.uid);
+                } else {
+                  print("사용자가 로그인되지 않았습니다.");
+                  // 로그인 화면으로 리다이렉트 등 추가 동작을 넣을 수 있음
+                }
                 try {
                   final newUser =
                       await _authentication.signInWithEmailAndPassword(
