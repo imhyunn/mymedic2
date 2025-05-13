@@ -74,6 +74,7 @@ class _MyPageState extends State<MyPage> {
 
     if (userImagePath != 'null') {
       _pickedFile = XFile(userImagePath);
+      final file = File.fromUri(Uri.parse(uriPath));
     }
   }
 
