@@ -27,6 +27,7 @@ class _MyPageState extends State<MyPage> {
   XFile? _pickedFile;
   ImageProvider? ImageFile;
   Map<String, dynamic> _userData = {};
+  Map<String, dynamic> appUsers = Map();
   String _username = "";
   FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -54,13 +55,22 @@ class _MyPageState extends State<MyPage> {
         });
       }
     }
+
+    // appUsers['birthDate'] = _userData['birthDate'];
+    // appUsers['email'] = _userData['email'];
+    // appUsers['password'] = _userData['password'];
+    // appUsers['phoneNumber'] = _userData['phoneNumber'];
+    // appUsers['profileImage'] = _userData['profileImage'];
+    // appUsers['userName'] = _username;
     // print(_userData);
+    // print('ss');
   }
 
   void _getProfileImage() async {
     var userImage =
         await _firestore.collection('user').doc(currentUser!.uid).get();
     userImagePath = userImage.data()!['profileImagePath'];
+
 
     if (userImagePath != 'null') {
       _pickedFile = XFile(userImagePath);
@@ -105,15 +115,17 @@ class _MyPageState extends State<MyPage> {
         File(image.path), SettableMetadata(contentType: "image/jpeg"));
 
     var complete = await putFile.whenComplete(() => {});
+    var s = await complete.ref.getDownloadURL();
+    print(s);
 
-    // await _firestore.collection('user').doc(currentUser!.uid).set({
-    //   'birthDate' : _appUser!.birthDate,
-    //   'email' : appUser!.email,
-    //   'password' : appUser!.password,
-    //   'phoneNumber' : appUser!.phoneNumber,
-    //   'profileImagePath' : await complete.ref.getDownloadURL(),
-    //   'userName' : appUser!.userName
-    // });
+    await _firestore.collection('user').doc(currentUser!.uid).set({
+      'birthDate' : _userData['birthDate'],
+      'email' : _userData['email'],
+      'password' : _userData['password'],
+      'phoneNumber' : _userData['phoneNumber'],
+      'profileImagePath' : await complete.ref.getDownloadURL(),
+      'userName' : _username
+    });
   }
 
   @override
@@ -169,8 +181,8 @@ class _MyPageState extends State<MyPage> {
                                 border:
                                     Border.all(width: 1, color: Colors.grey),
                                 image: DecorationImage(
-                                    image: NetworkImage('${_pickedFile!.path}'),
-                                    // image: FileImage(File(_pickedFile!.path)),
+                                    // image: NetworkImage(_pickedFile!.path),
+                                    image: FileImage(File(_pickedFile!.path)),
                                     fit: BoxFit.cover),
                               ),
                               // child: Image.network(userProvider.appUser!.profileImagePath, fit: BoxFit.cover,),
