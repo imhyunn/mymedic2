@@ -18,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _authentication = FirebaseAuth.instance;
+  final _fireAuth = FirebaseAuth.instance;
   User? loggedUser;
 
   @override
@@ -30,13 +30,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void getCurrentUser() {
     try {
-      final user = _authentication.currentUser;
+      final user = _fireAuth.currentUser;
       if (user != null) {
-        loggedUser = user;
-        print(loggedUser!.email);
+        print("현재 로그인 유저 이메일: ${user.email}");
+      } else {
+        print("로그인된 유저가 없습니다.");
       }
-    } catch (e) {
-      print(e);
+    }catch (e) {
+      print("유저 정보 불러오기 실패: $e");
+      // if (user != null) {
+      //   loggedUser = user;
+      //   print(loggedUser!.email);
+      // }
+
     }
   }
 

@@ -22,24 +22,33 @@ class _BoardListState extends State<BoardList> {
   String _username = '';
   Map<String, dynamic> _userData = {};
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final user = FirebaseAuth.instance.currentUser;
   List<AppUser> appUser = [];
 
 
   void _getUserProfile() async {
 
-    final userData = await FirebaseFirestore.instance
-        .collection('user')
-        .doc(user!.uid)
-        .get();
-    if (userData.exists) {
-      setState(() {
-        _userData = userData.data()!;
-        _username = _userData['userName'];
-        print(_username);
-      });
+
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      final userData = await FirebaseFirestore.instance
+          .collection('user')
+          .doc(user.uid)
+          .get();
+      if (userData.exists) {
+        setState(() {
+          _userData = userData.data()!;
+          _username = _userData['userName'];
+          print(_username);
+        });
+      }
+      print(_userData);
+    } else {
+      // 로그인되어 있지 않음
+      print("❗ 유저가 로그인되어 있지 않습니다.");
     }
-    print(_userData);
+
 
   }
 

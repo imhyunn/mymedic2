@@ -11,15 +11,15 @@ import '../../data/user_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
   static const routeName = '/';
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class Test{
+class Test {}
 
-}
 class _LoginScreenState extends State<LoginScreen> {
   final _authentication = FirebaseAuth.instance;
 
@@ -39,6 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
     await FirebaseAuth.instance.signOut();
     print(FirebaseAuth.instance.currentUser);
   }
+
   @override
   Widget build(BuildContext context) {
     check();
@@ -172,33 +173,23 @@ class _LoginScreenState extends State<LoginScreen> {
               onTap: () async {
                 _tryValidation();
 
-                final userProvider = Provider.of<UserProvider>(context, listen: false);
-                // await userProvider.fetchUserData(_authentication.currentUser!.uid);
-                final user = _authentication.currentUser;
-                if (user != null) {
-                  await userProvider.fetchUserData(user.uid);
-                } else {
-                  print("사용자가 로그인되지 않았습니다.");
-                  // 로그인 화면으로 리다이렉트 등 추가 동작을 넣을 수 있음
-                }
                 try {
-                  final newUser =
-                      await _authentication.signInWithEmailAndPassword(
-                    email: userEmail,
-                    password: userPassword,
-                  );
-                  if (newUser.user != null) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return App();
-                        },
-                      ),
-                    );
+                  // 먼저 로그인 시도
+                  final userCredential = await FirebaseAuth.instance
+                      .signInWithEmailAndPassword(
+                          email: userEmail, password: userPassword);
+                  print(userEmail);
+                  print(userPassword);
+                  // 로그인 성공 시에만 처리
+                  if (userCredential.user != null) {
+                    // 로그인 성공 → 홈으로 이동
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (context) => const App()));
+                  } else {
+                    print("로그인 실패: 사용자 정보 없음");
                   }
                 } catch (e) {
-                  print(e);
+                  print("로그인 중 예외 발생: $e");
                 }
               },
               child: Container(
@@ -237,19 +228,19 @@ class _LoginScreenState extends State<LoginScreen> {
             //             color: Colors.grey[400],
             //           ),
             //         ),
-                    // Padding(
-                    //   padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    //   child: Text(
-                    //     'Or continue with',
-                    //     style: TextStyle(color: Colors.grey[700]),
-                    //   ),
-                    // ),
-                    // Expanded(
-                    //   child: Divider(
-                    //     thickness: 0.5,
-                    //     color: Colors.grey[400],
-                    //   ),
-                    // ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            //   child: Text(
+            //     'Or continue with',
+            //     style: TextStyle(color: Colors.grey[700]),
+            //   ),
+            // ),
+            // Expanded(
+            //   child: Divider(
+            //     thickness: 0.5,
+            //     color: Colors.grey[400],
+            //   ),
+            // ),
             //       ],
             //     ),
             //   ),

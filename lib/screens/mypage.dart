@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mymedic1/screens/home/home_screen.dart';
 import 'package:mymedic1/screens/myapp.dart';
 import 'package:mymedic1/screens/sign/login_screen.dart';
 import 'package:mymedic1/screens/sign/signup_screen.dart';
@@ -67,15 +68,31 @@ class _MyPageState extends State<MyPage> {
   }
 
   void _getProfileImage() async {
-    var userImage =
-        await _firestore.collection('user').doc(currentUser!.uid).get();
-    userImagePath = userImage.data()!['profileImagePath'];
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      var userImage =
+      await _firestore.collection('user').doc(currentUser.uid).get();
+      userImagePath = userImage.data()!['profileImagePath'];
+
+    } else {
+      // 로그인되지 않은 상태 처리
+      print("User is not logged in.");
+    }
+
+    // var userImage =
+    //     await _firestore.collection('user').doc(currentUser!.uid).get();
+    // userImagePath = userImage.data()!['profileImagePath'];
 
 
     if (userImagePath != 'null') {
       _pickedFile = XFile(userImagePath);
-      final file = File.fromUri(Uri.parse(uriPath));
+
+
     }
+
+
+
+
   }
 
   //
@@ -182,8 +199,8 @@ class _MyPageState extends State<MyPage> {
                                 border:
                                     Border.all(width: 1, color: Colors.grey),
                                 image: DecorationImage(
-                                    // image: NetworkImage(_pickedFile!.path),
-                                    image: FileImage(File(_pickedFile!.path)),
+                                    image: NetworkImage(_pickedFile!.path),
+                                    // image: FileImage(File(_pickedFile!.path)),
                                     fit: BoxFit.cover),
                               ),
                               // child: Image.network(userProvider.appUser!.profileImagePath, fit: BoxFit.cover,),
@@ -241,11 +258,25 @@ class _MyPageState extends State<MyPage> {
                       ElevatedButton(
                         onPressed: () async {
                           await _firebaseAuth.signOut();
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (BuildContext) => LoginScreen(),
-                            ),
-                          );
+
+                          try {
+                            await FirebaseAuth.instance.signOut();
+
+                            // 로그아웃이 성공적으로 되었는지 확인
+                            if (FirebaseAuth.instance.currentUser == null) {
+                              // 로그인 화면으로 이동 (예: '/login')
+                              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
+                                  builder: (context) => const LoginScreen()), (route) => false);
+                            }
+                          } catch (e) {
+                            print('로그아웃 실패: $e');
+                          }
+
+                          // Navigator.of(context).push(
+                          //   MaterialPageRoute(
+                          //     builder: (BuildContext) => LoginScreen(),
+                          //   ),
+                          // );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Palette.buttonColor2,
