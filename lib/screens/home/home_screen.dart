@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,32 +19,47 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _fireAuth = FirebaseAuth.instance;
-  User? loggedUser;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  Map<String, dynamic>? userInfo;
+  // User? loggedUser;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getCurrentUser();
+
+    Future.delayed(Duration(milliseconds: 300), () {
+      getCurrentUser();
+    });
+
   }
 
-  void getCurrentUser() {
-    try {
-      final user = _fireAuth.currentUser;
-      if (user != null) {
-        print("현재 로그인 유저 이메일: ${user.email}");
-      } else {
-        print("로그인된 유저가 없습니다.");
-      }
-    }catch (e) {
-      print("유저 정보 불러오기 실패: $e");
-      // if (user != null) {
-      //   loggedUser = user;
-      //   print(loggedUser!.email);
-      // }
+  Future<void> getCurrentUser() async {
+    // final user = FirebaseAuth.instance.currentUser;
+    // final userdata = await _firestore.collection('user').doc(user.uid).get();
+    //
+    // if (userdata.exists) {
+    //   final data = userdata.data();
+    //
+    //   userInfo?['userEmail'] = data?['email'] ?? '';
+    //   userInfo?['userPassword'] = data?['password'] ?? '';
+    // }
 
-    }
+    // try {
+    //
+    //   if (user != null) {
+    //     print("현재 로그인 유저 이메일: ${user.email}");
+    //   } else {
+    //     print("로그인된 유저가 없습니다.");
+    //   }
+    // }catch (e) {
+    //   print("유저 정보 불러오기 실패: $e");
+    //   // if (user != null) {
+    //   //   loggedUser = user;
+    //   //   print(loggedUser!.email);
+    //   // }
+
+
   }
 
   @override
@@ -64,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Container(
             child: Text(
-              'MYMEDIC',
+                '${userInfo?['userEmail']}',
               style: GoogleFonts.archivoBlack(
                 textStyle: TextStyle(
                   fontSize: 32

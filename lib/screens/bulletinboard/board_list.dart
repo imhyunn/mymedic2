@@ -96,8 +96,8 @@ class _BoardListState extends State<BoardList> {
 
   @override
   void initState() {
-    _getUserProfile();
     super.initState();
+    _getUserProfile();
 
   }
 

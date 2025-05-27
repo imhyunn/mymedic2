@@ -198,10 +198,10 @@ class _MyPageState extends State<MyPage> {
                                 shape: BoxShape.circle,
                                 border:
                                     Border.all(width: 1, color: Colors.grey),
-                                image: DecorationImage(
-                                    image: NetworkImage(_pickedFile!.path),
+                                // image: DecorationImage(
+                                //     image: NetworkImage(_pickedFile!.path),
                                     // image: FileImage(File(_pickedFile!.path)),
-                                    fit: BoxFit.cover),
+                                    // fit: BoxFit.cover),
                               ),
                               // child: Image.network(userProvider.appUser!.profileImagePath, fit: BoxFit.cover,),
                             ),
@@ -261,6 +261,7 @@ class _MyPageState extends State<MyPage> {
 
                           try {
                             await FirebaseAuth.instance.signOut();
+                            print('signout');
 
                             // 로그아웃이 성공적으로 되었는지 확인
                             if (FirebaseAuth.instance.currentUser == null) {

@@ -172,22 +172,40 @@ class _LoginScreenState extends State<LoginScreen> {
             GestureDetector(
               onTap: () async {
                 _tryValidation();
-
                 try {
-                  // 먼저 로그인 시도
-                  final userCredential = await FirebaseAuth.instance
-                      .signInWithEmailAndPassword(
-                          email: userEmail, password: userPassword);
-                  print(userEmail);
-                  print(userPassword);
-                  // 로그인 성공 시에만 처리
-                  if (userCredential.user != null) {
-                    // 로그인 성공 → 홈으로 이동
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => const App()));
-                  } else {
-                    print("로그인 실패: 사용자 정보 없음");
+                  final newUser =
+                  await _authentication.signInWithEmailAndPassword(
+                    email: userEmail,
+                    password: userPassword,
+                  );
+                  if (newUser.user != null) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return App();
+                        },
+                      ),
+                    );
                   }
+                  // 먼저 로그인 시도
+                  // final userCredential = await FirebaseAuth.instance
+                  //     .signInWithEmailAndPassword(
+                  //         email: userEmail, password: userPassword);
+
+                  // 로그인 성공 시에만 처리
+                  // if (userCredential.user != null) {
+                    // 로그인 성공 → 홈으로 이동
+                  //   print(userEmail);
+                  //   print(userPassword);
+                  //   Navigator.pushReplacement(
+                  //     context,
+                  //     MaterialPageRoute(builder: (context) => const App()),
+                  //   );
+                  // }
+                  // else {
+                  //   print("로그인 실패: 사용자 정보 없음");
+                  // }
                 } catch (e) {
                   print("로그인 중 예외 발생: $e");
                 }
