@@ -28,21 +28,32 @@ class _LoginScreenState extends State<LoginScreen> {
   String userPassword = '';
   late Test test;
 
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
   void _tryValidation() {
     final isValid = _formKey.currentState!.validate();
     if (isValid) {
       _formKey.currentState!.save();
     }
   }
+  //
+  // void check() async {
+  //   await FirebaseAuth.instance.signOut();
+  //   print(FirebaseAuth.instance.currentUser);
+  // }
 
-  void check() async {
-    await FirebaseAuth.instance.signOut();
-    print(FirebaseAuth.instance.currentUser);
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    check();
+    // check();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
@@ -78,6 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         key: _formKey,
                         child: Column(
                           children: [
+                   //이메일
                             TextFormField(
                               keyboardType: TextInputType.emailAddress,
                               key: ValueKey(1),
@@ -119,6 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             SizedBox(
                               height: 10,
                             ),
+                   //비밀번호
                             TextFormField(
                               obscureText: true,
                               key: ValueKey(2),
