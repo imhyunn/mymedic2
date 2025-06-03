@@ -78,11 +78,14 @@ class _DrawingPageState extends State<DrawingPage> {
           children: [
             Expanded(
               child: Center(
-                  child: Container(
-                width: size.width,
-                // height: size.width,
-                child: Scribble(notifier: notifier),
-                    decoration: BoxDecoration(border: Border.all(color: Colors.grey, width: 1)),
+                  child: ClipRect(
+                child: Container(
+                  width: size.width,
+                  height: size.width,
+                  child: Scribble(notifier: notifier),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey, width: 1)),
+                ),
               )),
             ),
             Card(

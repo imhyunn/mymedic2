@@ -124,7 +124,7 @@ class _MyPageState extends State<MyPage> {
   // }
 
   Future<void> saveImage(XFile image) async {
-    final userProvider = context.read<UserProvider>();
+    // final userProvider = context.read<UserProvider>();
 
     var dateTime = DateTime.now().toString().replaceAll(' ', '_');
     var ref = _firebaseStorage.ref().child("images/$dateTime.jpg");
@@ -144,6 +144,8 @@ class _MyPageState extends State<MyPage> {
       'profileImagePath' : await complete.ref.getDownloadURL(),
       'userName' : _username
     });
+
+    _getProfileImage();
   }
 
   @override
@@ -198,10 +200,11 @@ class _MyPageState extends State<MyPage> {
                                 shape: BoxShape.circle,
                                 border:
                                     Border.all(width: 1, color: Colors.grey),
-                                // image: DecorationImage(
-                                //     image: NetworkImage(_pickedFile!.path),
+                                image: DecorationImage(
+                                  image: _pickedFile!.path.startsWith('https') ? NetworkImage(_pickedFile!.path) : FileImage(File(_pickedFile!.path)) as ImageProvider,
+                                    // image: NetworkImage(_pickedFile!.path),
                                     // image: FileImage(File(_pickedFile!.path)),
-                                    // fit: BoxFit.cover),
+                                    fit: BoxFit.cover),
                               ),
                               // child: Image.network(userProvider.appUser!.profileImagePath, fit: BoxFit.cover,),
                             ),
@@ -326,6 +329,7 @@ class _MyPageState extends State<MyPage> {
                   onPressed: () async {
                     var image = await _getCameraImage();
                     if (image != null) {
+                      Navigator.of(context).pop();
                       await saveImage(image);
                     }
                     // 스토리지에 위에서 가져온 이미지를 저장하는 코드
@@ -381,6 +385,7 @@ class _MyPageState extends State<MyPage> {
       setState(() {
         _pickedFile = pickedFile;
       });
+      print(_pickedFile!.path);
       return pickedFile;
     } else {
       if (kDebugMode) {

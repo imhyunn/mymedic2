@@ -76,17 +76,18 @@ class _HomeScreenState extends State<HomeScreen> {
     final Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
+        // backgroundColor: Color(0xEAAACBE1),
         body: Stack(children: [
-          Container(
+          /*Container(
             height: size.height * 0.43,
             decoration: BoxDecoration(
-              color: Color(0xEA69BB7C),
+              color: Color(0xEA72A9D2),
               borderRadius: BorderRadius.only(
                 bottomRight: Radius.circular(25),
                 bottomLeft: Radius.circular(25),
               ),
             ),
-          ),
+          ),*/
           Container(
             child: Text(
                 '${userInfo?['userEmail']}',
@@ -110,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Card(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10)),
-                      color: Colors.white,
+                      // color: Color(0xEAAACBE1),
                       elevation: 0,
                       child: Container(
                         height: 120,
@@ -118,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: Color(0xEA3F8850),
+                            color: Color(0xEA5180A2),
                             width: 2, // 테두리 두께
                           ),
                         ),
@@ -142,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     Card(
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(10)),
                       color: Colors.white,
                       elevation: 0,
                       child: Container(
@@ -151,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: Color(0xEA3F8850),
+                            color: Color(0xEA5180A2),
                             width: 2, // 테두리 두께
                           ),
                         ),
@@ -175,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     Card(
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(10)),
                       color: Colors.white,
                       elevation: 0,
                       child: Container(
@@ -184,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: Color(0xEA3F8850),
+                            color: Color(0xEA5180A2),
                             width: 2, // 테두리 두께
                           ),
                         ),
