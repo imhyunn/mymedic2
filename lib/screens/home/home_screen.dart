@@ -31,18 +31,18 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
 
-    Future.delayed(Duration(milliseconds: 300), () {
-      getCurrentUser();
-    });
+    // Future.delayed(Duration(milliseconds: 300), () {
+    //   getCurrentUser();
+    // });
 
   }
 
-  Future<void> getCurrentUser() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      await userProvider.fetchUserData(user.uid);
-    }
+  // Future<void> getCurrentUser() async {
+  //   final user = FirebaseAuth.instance.currentUser;
+  //   if (user != null) {
+  //     final userProvider = Provider.of<UserProvider>(context, listen: false);
+  //     await userProvider.fetchUserData(user.uid);
+  //   }
 
 
     // final userdata = await _firestore.collection('user').doc(user.uid).get();
@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
     //   // }
 
 
-  }
+  // }
 
   @override
   Widget build(BuildContext context) {

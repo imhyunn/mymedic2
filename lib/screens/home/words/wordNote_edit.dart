@@ -585,6 +585,10 @@ class _WordNoteEditState extends State<WordNoteEdit> {
       }
     }
   }
+  //
+  // Future<void> deleteOldImage(int index) async {
+  //   if (wordInfos[index].pickedFile != )
+  // }
 
   void _confirmDelete(Word word, int index) {
     showDialog(

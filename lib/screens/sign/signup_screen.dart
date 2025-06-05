@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mymedic1/screens/home/home_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mymedic1/config/palette.dart';
+import 'package:mymedic1/screens/myapp.dart';
 
 import '../../data/user.dart';
 
@@ -475,7 +476,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         'password' : userPassword,
                         'birthDate' : userBirthDate,
                         'phoneNumber' : userPhoneNumber,
-                        'profileImage' : null,
+                        'profileImage' : 'null',
                       });
 
                       if (_formKey.currentState?.validate() ?? false) {
@@ -483,7 +484,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return HomeScreen();
+                              return App();
                             },
                           ),
                         );
