@@ -91,8 +91,25 @@ class _WordNoteEditState extends State<WordNoteEdit> {
           actions: [
             IconButton(
                 onPressed: () async {
-                  var result = await getFolder();
-                  moveWord(result);
+                  if (wordInfos.every((wordInfo) => !wordInfo.isChecked)) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        content: Text('선택된 단어가 없습니다'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // 다이얼로그 닫기
+                            },
+                            child: Text('확인'),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    var result = await getFolder();
+                    moveWord(result);
+                  }
                 },
                 icon: Icon(Icons.drive_file_move_outline)),
             IconButton(
@@ -561,6 +578,8 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
   Future<void> uploadImages() async {
     for (int i = 0; i < wordInfos.length; i++) {
+      // var imagePath = wordInfos[i].word.imagePath;
+
       if (wordInfos[i].pickedFile != null && wordInfos[i].isModifiedImage) {
         var dateTime = DateTime.now().toString().replaceAll(' ', '_');
         var ref = _firebaseStorage.ref().child("wordImages/$dateTime.jpg");
@@ -571,6 +590,11 @@ class _WordNoteEditState extends State<WordNoteEdit> {
               SettableMetadata(contentType: "image/jpeg"));
           var complete = await putFile.whenComplete(() => {});
           var url = await complete.ref.getDownloadURL();
+
+          // if (imagePath != url){
+          //   final oldRef = FirebaseStorage.instance.refFromURL(imagePath!);
+          //   await oldRef.delete();
+          // }
 
           wordInfos[i].word.imagePath = url;
         } else if (wordInfos[i].pickedFile is MemoryImage) {
@@ -585,6 +609,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
       }
     }
   }
+
   //
   // Future<void> deleteOldImage(int index) async {
   //   if (wordInfos[index].pickedFile != )

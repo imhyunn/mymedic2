@@ -136,9 +136,10 @@ class _MyPageState extends State<MyPage> {
     var s = await complete.ref.getDownloadURL();
     print(s);
 
-    final oldRef = FirebaseStorage.instance.refFromURL(userImagePath);
-    await oldRef.delete();
-
+    if (userImagePath != 'null'){
+      final oldRef = FirebaseStorage.instance.refFromURL(userImagePath);
+      await oldRef.delete();
+    }
 
     await _firestore.collection('user').doc(currentUser!.uid).set({
       'birthDate' : _userData['birthDate'],
