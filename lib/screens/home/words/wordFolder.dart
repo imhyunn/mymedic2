@@ -22,7 +22,7 @@ class _WordFolderState extends State<WordFolder> {
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   User? loggedUser;
   List<AppUser> appUser = [];
-
+  final _formKey = GlobalKey<FormState>();
 
   // Future<List<AppUser>> _getUser() async {
   //   var userInfo = _firebaseAuth.currentUser;
@@ -39,7 +39,6 @@ class _WordFolderState extends State<WordFolder> {
 
   final userInfo = FirebaseAuth.instance.currentUser;
 
-
   Future<List<Folder>> _getFolder() async {
     // final userData = await FirebaseFirestore.instance
     //     .collection('user')
@@ -53,7 +52,8 @@ class _WordFolderState extends State<WordFolder> {
         .get();
     List<Folder> folders = snapshot.docs.map((element) {
       Map<String, dynamic> map = element.data();
-      return Folder(map['name'], map['wordCount'], element.id, map['time'], map['userId']);
+      return Folder(map['name'], map['wordCount'], element.id, map['time'],
+          map['userId']);
     }).toList();
     return folders;
   }
@@ -180,27 +180,39 @@ class _WordFolderState extends State<WordFolder> {
           title: Text(
             '폴더 추가',
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                maxLength: 20,
-                controller: _folderController,
-                decoration: InputDecoration(
-                  hintText: '폴더 이름',
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.black54,
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  maxLength: 20,
+                  controller: _folderController,
+                  decoration: InputDecoration(
+                    hintText: '폴더 이름',
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.black54,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.black54,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red, width: 1.5),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red, width: 2),
                     ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.black54,
-                    ),
-                  ),
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? '폴더명을 입력해주세요'
+                      : null,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
             Padding(
@@ -224,14 +236,16 @@ class _WordFolderState extends State<WordFolder> {
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    await _firestore.collection('folder').add({
-                      'name': _folderController.text,
-                      'time': DateTime.now().toString(),
-                      'userId': userInfo!.uid,
-                      'wordCount': 0,
-                    });
-                    setState(() {});
-                    Navigator.pop(context, true);
+                    if (_formKey.currentState!.validate()) {
+                      await _firestore.collection('folder').add({
+                        'name': _folderController.text,
+                        'time': DateTime.now().toString(),
+                        'userId': userInfo!.uid,
+                        'wordCount': 0,
+                      });
+                      setState(() {});
+                      Navigator.pop(context, true);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.buttonColor2,

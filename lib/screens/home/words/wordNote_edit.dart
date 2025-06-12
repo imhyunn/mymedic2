@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +42,8 @@ class _WordNoteEditState extends State<WordNoteEdit> {
   late Offset _tapPosition;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
+  final _formKey = GlobalKey<FormState>();
+
 
   // List<bool> _isChecked = [];
   List<WordInfo> wordInfos = [];
@@ -115,7 +117,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
             IconButton(
                 onPressed: () async {
                   var result = await _addword(context);
-                  if (result!) {
+                  if (result == true) {
                     renew();
                   }
                 },
@@ -223,7 +225,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                                           image: DecorationImage(
                                               image:
                                                   wordInfos[index].pickedFile!,
-                                              fit: BoxFit.contain),
+                                              fit: BoxFit.cover),
                                         ),
                                       ),
                               ),
@@ -259,44 +261,64 @@ class _WordNoteEditState extends State<WordNoteEdit> {
           title: Text(
             '영단어 추가',
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                maxLength: 20,
-                controller: _engController,
-                decoration: InputDecoration(
-                  hintText: '영단어',
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.black54,
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  maxLength: 20,
+                  controller: _engController,
+                  decoration: InputDecoration(
+                    hintText: '영단어',
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.black54,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.black54,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red, width: 1.5),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red, width: 2),
                     ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.black54,
-                    ),
-                  ),
+                  validator: (value) => value == null || value.trim().isEmpty ? '영단어를 입력해주세요' : null,
+
                 ),
-              ),
-              TextField(
-                maxLength: 20,
-                controller: _krController,
-                decoration: InputDecoration(
-                  hintText: '뜻',
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.black54,
+                SizedBox(height: 5,),
+                TextFormField(
+                  maxLength: 20,
+                  controller: _krController,
+                  decoration: InputDecoration(
+                    hintText: '뜻',
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.black54,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.black54,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red, width: 1.5),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red, width: 2),
                     ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.black54,
-                    ),
-                  ),
+                  validator: (value) => value == null || value.trim().isEmpty ? '뜻을 입력해주세요' : null,
+
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
             Padding(
@@ -321,29 +343,33 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                 child: ElevatedButton(
                   onPressed: () {
                     // _isChecked.add(false);
-                    setState(() {
-                      // widget.words.add(Word(
-                      //     _engController.text,
-                      //     _krController.text,
-                      //     DateTime.now().toString(),
-                      //     null,
-                      //     null,
-                      //     widget.folder.id));
-                      // _pickedFiles.add(null);
+                    if (_formKey.currentState!.validate()) {
+                      setState(() {
 
-                      wordInfos.add(WordInfo(
-                          false,
-                          null,
-                          Word(
-                              _engController.text,
-                              _krController.text,
-                              DateTime.now().toString(),
-                              null,
-                              null,
-                              widget.folder.id),
-                          false));
-                    });
-                    Navigator.pop(context, true);
+                        wordInfos.add(WordInfo(
+                            false,
+                            null,
+                            Word(
+                                _engController.text,
+                                _krController.text,
+                                DateTime.now().toString(),
+                                null,
+                                null,
+                                widget.folder.id),
+                            false));
+
+                        // widget.words.add(Word(
+                        //     _engController.text,
+                        //     _krController.text,
+                        //     DateTime.now().toString(),
+                        //     null,
+                        //     null,
+                        //     widget.folder.id));
+                        // _pickedFiles.add(null);
+                      });
+                      Navigator.pop(context, true);
+                    }
+
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.buttonColor2,

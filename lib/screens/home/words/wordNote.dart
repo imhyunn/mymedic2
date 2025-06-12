@@ -162,16 +162,21 @@ class _WordNoteState extends State<WordNote> {
                           child: DottedBorder(
                             radius: Radius.circular(20),
                             color: Colors.grey,
-                            child: Center(
-                                child: words[index].imagePath == null
-                                    ? Text(
-                                  '편집 버튼을 눌러 \n사진을 추가해주세요.',
-                                  style: TextStyle(fontSize: 8),
-                                )
-                                    : Image.network(
-                                  words[index].imagePath!,
-                                  fit: BoxFit.cover,
-                                )),
+                            child: ClipRRect(
+                              // borderRadius: BorderRadius.circular(20),
+                              child: Center(
+                                  child: words[index].imagePath == null
+                                      ? Text(
+                                    '편집 버튼을 눌러 \n사진을 추가해주세요.',
+                                    style: TextStyle(fontSize: 8),
+                                  )
+                                      : Image.network(
+                                    words[index].imagePath!,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  )),
+                            ),
                           ),
                         ),
                       ],
