@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:mymedic1/screens/bulletinboard/board_edit.dart';
 import 'package:mymedic1/screens/bulletinboard/board_list.dart';
 import 'package:mymedic1/screens/bulletinboard/board_new.dart';
@@ -17,6 +18,7 @@ import 'data/board.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   await Firebase.initializeApp();
   await FirebaseAppCheck.instance.activate(
     androidProvider: AndroidProvider.debug,

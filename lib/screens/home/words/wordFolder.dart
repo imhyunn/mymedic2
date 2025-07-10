@@ -23,6 +23,7 @@ class _WordFolderState extends State<WordFolder> {
   User? loggedUser;
   List<AppUser> appUser = [];
   final _formKey = GlobalKey<FormState>();
+  bool _isButtonDisabled = false;
 
   // Future<List<AppUser>> _getUser() async {
   //   var userInfo = _firebaseAuth.currentUser;
@@ -67,10 +68,15 @@ class _WordFolderState extends State<WordFolder> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         actions: [
           IconButton(
               onPressed: () async {
+                setState(() {
+                  _isButtonDisabled = true;
+                });
+
                 _folderController.clear();
                 await _addFolder(context);
               },
@@ -96,75 +102,77 @@ class _WordFolderState extends State<WordFolder> {
             final folders = snapshot.requireData;
             // 스냅샷 -> 현재 불러온 날것의 데이터
             // 스냅샷의 상태에 따라 화면을 그려주는 부분
-            return ListView.separated(
-                itemBuilder: (BuildContext context, int index) {
-                  return Card(
-                    child: ListTile(
-                      title: Padding(
-                        padding: EdgeInsets.only(left: 20, top: 14, bottom: 14),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              child: Text(
-                                folders[index].name,
-                                style: TextStyle(fontSize: 23),
-                              ),
+            return ListView.builder(
+              itemBuilder: (BuildContext context, int index) {
+                return Card(
+                  child: ListTile(
+                    tileColor: Colors.white,
+                    title: Padding(
+                      padding: EdgeInsets.only(left: 20, top: 14, bottom: 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            child: Text(
+                              folders[index].name,
+                              style: TextStyle(fontSize: 23),
                             ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Container(
-                              child: Text(
-                                '단어 수 : ${folders[index].wordCount}',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      trailing: PopupMenuButton<String>(
-                        color: Colors.white,
-                        onSelected: handleClick,
-                        itemBuilder: (BuildContext context) {
-                          return ['수정', '삭제'].map((String choice) {
-                            return PopupMenuItem<String>(
-                              value: choice,
-                              child: Text(choice),
-                              onTap: () {
-                                switch (choice) {
-                                  case "수정":
-                                    _edit(folders[index]);
-                                    break;
-                                  case "삭제":
-                                    _folderDelete(folders[index].id);
-                                    break;
-                                }
-                              },
-                            );
-                          }).toList();
-                        },
-                      ),
-                      onTap: () async {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (BuildContext) =>
-                                WordNote(folder: folders[index]),
                           ),
-                        );
-                        setState(() {});
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Container(
+                            child: Text(
+                              '단어 수 : ${folders[index].wordCount}',
+                              style: TextStyle(fontSize: 15),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    trailing: PopupMenuButton<String>(
+                      color: Colors.white,
+                      onSelected: handleClick,
+                      itemBuilder: (BuildContext context) {
+                        return ['수정', '삭제'].map((String choice) {
+                          return PopupMenuItem<String>(
+                            value: choice,
+                            child: Text(choice),
+                            onTap: () {
+                              switch (choice) {
+                                case "수정":
+                                  _edit(folders[index]);
+                                  break;
+                                case "삭제":
+                                  _folderDelete(folders[index].id);
+                                  break;
+                              }
+                            },
+                          );
+                        }).toList();
                       },
                     ),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        side: BorderSide(width: 1)),
-                  );
-                },
-                itemCount: folders.length,
-                separatorBuilder: (context, index) {
-                  return Divider(height: 0.9);
-                });
+                    onTap: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext) =>
+                              WordNote(folder: folders[index]),
+                        ),
+                      );
+                      setState(() {});
+                    },
+                  ),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      side: BorderSide(width: 1)),
+                );
+              },
+              itemCount: folders.length,
+              // separatorBuilder: (context, index) {
+              //   return Divider(height: 0.9);
+              // }
+            );
           }),
     );
   }

@@ -2,16 +2,20 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
+
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mymedic1/data/folder.dart';
 import 'package:mymedic1/data/word.dart';
 import 'package:mymedic1/screens/home/drawing.dart';
 
 import 'package:mymedic1/config/palette.dart';
+
+import '../../../data/AdHelper.dart';
 
 enum Menu { camera, gallery, drawing }
 
@@ -43,7 +47,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
   final _formKey = GlobalKey<FormState>();
-
+  bool _isButtonDisabled = false;
 
   // List<bool> _isChecked = [];
   List<WordInfo> wordInfos = [];
@@ -93,6 +97,12 @@ class _WordNoteEditState extends State<WordNoteEdit> {
           actions: [
             IconButton(
                 onPressed: () async {
+                  if (_isButtonDisabled) return;
+
+                  setState(() {
+                    _isButtonDisabled = true;
+                  });
+
                   if (wordInfos.every((wordInfo) => !wordInfo.isChecked)) {
                     showDialog(
                       context: context,
@@ -112,21 +122,41 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                     var result = await getFolder();
                     moveWord(result);
                   }
+                  setState(() {
+                    _isButtonDisabled = false;
+                  });
                 },
                 icon: Icon(Icons.drive_file_move_outline)),
             IconButton(
                 onPressed: () async {
+                  if (_isButtonDisabled) return;
+
+                  setState(() {
+                    _isButtonDisabled = true;
+                  });
                   var result = await _addword(context);
                   if (result == true) {
                     renew();
                   }
+                  setState(() {
+                    _isButtonDisabled = false;
+                  });
                 },
                 icon: Icon(Icons.add)),
             IconButton(
                 onPressed: () async {
+                  if (_isButtonDisabled) return;
+
+                  setState(() {
+                    _isButtonDisabled = true;
+                  });
                   await uploadImages();
                   await updateWords();
+
                   Navigator.pop(context);
+                  setState(() {
+                    _isButtonDisabled = false;
+                  });
                 },
                 icon: Icon(Icons.check))
           ],
@@ -288,10 +318,13 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                       borderSide: BorderSide(color: Colors.red, width: 2),
                     ),
                   ),
-                  validator: (value) => value == null || value.trim().isEmpty ? '영단어를 입력해주세요' : null,
-
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? '영단어를 입력해주세요'
+                      : null,
                 ),
-                SizedBox(height: 5,),
+                SizedBox(
+                  height: 5,
+                ),
                 TextFormField(
                   maxLength: 20,
                   controller: _krController,
@@ -314,8 +347,9 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                       borderSide: BorderSide(color: Colors.red, width: 2),
                     ),
                   ),
-                  validator: (value) => value == null || value.trim().isEmpty ? '뜻을 입력해주세요' : null,
-
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? '뜻을 입력해주세요'
+                      : null,
                 ),
               ],
             ),
@@ -345,7 +379,6 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                     // _isChecked.add(false);
                     if (_formKey.currentState!.validate()) {
                       setState(() {
-
                         wordInfos.add(WordInfo(
                             false,
                             null,
@@ -369,7 +402,6 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                       });
                       Navigator.pop(context, true);
                     }
-
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.buttonColor2,

@@ -6,7 +6,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mymedic1/data/AdHelper.dart';
 import 'package:mymedic1/data/folder.dart';
 import 'package:mymedic1/data/word.dart';
 import 'package:mymedic1/screens/home/drawing.dart';
@@ -31,6 +33,8 @@ class _WordNoteState extends State<WordNote> {
   TextEditingController _krController = TextEditingController();
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Word> words = [];
+  InterstitialAd? _interstitialAd;
+  bool _isButtonDisabled = false;
 
   final FlutterTts tts = FlutterTts();
 
@@ -56,12 +60,34 @@ class _WordNoteState extends State<WordNote> {
     return words;
   }
 
+  void _createInterstitialAd() {
+    InterstitialAd.load(
+        adUnitId: AdHelper.interstitialAdUnitId!,
+        request: const AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+            onAdLoaded: (ad) => _interstitialAd = ad,
+            onAdFailedToLoad: (error) => _interstitialAd = null));
+  }
+
+  void _showInterstitialAd() {
+    if (_interstitialAd != null) {
+      _interstitialAd!.fullScreenContentCallback =
+          FullScreenContentCallback(onAdDismissedFullScreenContent: (ad) {
+        ad.dispose();
+      }, onAdFailedToShowFullScreenContent: (ad, error) {
+        ad.dispose();
+        _createInterstitialAd();
+      });
+      _interstitialAd!.show();
+      _interstitialAd = null;
+    }
+  }
+
   @override
   void initState() {
-    // for (int i = 0; i < wordlist.length; ++i) {
-    //   _pickedFiles.add(null);
-    // }
     super.initState();
+
+    _createInterstitialAd();
 
     tts.setLanguage("en-US");
     tts.setSpeechRate(0.5);
@@ -76,15 +102,26 @@ class _WordNoteState extends State<WordNote> {
         actions: [
           IconButton(
               onPressed: () async {
-                // A
+                if (_isButtonDisabled) return;
+
+                setState(() {
+                  _isButtonDisabled = true;
+                });
+
                 await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (BuildContext) =>
                         WordNoteEdit(words, folder: widget.folder),
                   ),
                 );
+
                 // 갱신 코드
                 setState(() {});
+                _showInterstitialAd();
+
+                setState(() {
+                  _isButtonDisabled = false;
+                });
               },
               icon: Icon(Icons.mode_edit_outline))
         ],
@@ -167,15 +204,15 @@ class _WordNoteState extends State<WordNote> {
                               child: Center(
                                   child: words[index].imagePath == null
                                       ? Text(
-                                    '편집 버튼을 눌러 \n사진을 추가해주세요.',
-                                    style: TextStyle(fontSize: 8),
-                                  )
+                                          '편집 버튼을 눌러 \n사진을 추가해주세요.',
+                                          style: TextStyle(fontSize: 8),
+                                        )
                                       : Image.network(
-                                    words[index].imagePath!,
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                  )),
+                                          words[index].imagePath!,
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                        )),
                             ),
                           ),
                         ),
