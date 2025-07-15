@@ -43,7 +43,7 @@ class _MyPageState extends State<MyPage> {
   void _getUserProfile() async {
     final user = _firebaseAuth.currentUser;
 
-    if(user != null) {
+    if (user != null) {
       final userData = await FirebaseFirestore.instance
           .collection('user')
           .doc(user.uid)
@@ -71,9 +71,8 @@ class _MyPageState extends State<MyPage> {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       var userImage =
-      await _firestore.collection('user').doc(currentUser.uid).get();
+          await _firestore.collection('user').doc(currentUser.uid).get();
       userImagePath = userImage.data()!['profileImagePath'];
-
     } else {
       // 로그인되지 않은 상태 처리
       print("User is not logged in.");
@@ -83,16 +82,9 @@ class _MyPageState extends State<MyPage> {
     //     await _firestore.collection('user').doc(currentUser!.uid).get();
     // userImagePath = userImage.data()!['profileImagePath'];
 
-
     if (userImagePath != 'null') {
       _pickedFile = XFile(userImagePath);
-
-
     }
-
-
-
-
   }
 
   //
@@ -136,22 +128,21 @@ class _MyPageState extends State<MyPage> {
     var s = await complete.ref.getDownloadURL();
     print(s);
 
-    if (userImagePath != 'null'){
+    if (userImagePath != 'null') {
       final oldRef = FirebaseStorage.instance.refFromURL(userImagePath);
       await oldRef.delete();
     }
 
     await _firestore.collection('user').doc(currentUser!.uid).set({
-      'birthDate' : _userData['birthDate'],
-      'email' : _userData['email'],
-      'password' : _userData['password'],
-      'phoneNumber' : _userData['phoneNumber'],
-      'profileImagePath' : await complete.ref.getDownloadURL(),
-      'userName' : _username
+      'birthDate': _userData['birthDate'],
+      'email': _userData['email'],
+      'password': _userData['password'],
+      'phoneNumber': _userData['phoneNumber'],
+      'profileImagePath': await complete.ref.getDownloadURL(),
+      'userName': _username
     });
 
     _getProfileImage();
-
   }
 
   @override
@@ -170,7 +161,7 @@ class _MyPageState extends State<MyPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('my page'),
+          title: Text('my page', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23),),
         ),
         body: Column(
           children: [
@@ -203,11 +194,14 @@ class _MyPageState extends State<MyPage> {
                               width: _imageSize,
                               height: _imageSize,
                               decoration: BoxDecoration(
-                                shape: BoxShape.circle,
+                                borderRadius: BorderRadius.circular(37),
                                 border:
                                     Border.all(width: 1, color: Colors.grey),
                                 image: DecorationImage(
-                                  image: _pickedFile!.path.startsWith('https') ? NetworkImage(_pickedFile!.path) : FileImage(File(_pickedFile!.path)) as ImageProvider,
+                                    image: _pickedFile!.path.startsWith('https')
+                                        ? NetworkImage(_pickedFile!.path)
+                                        : FileImage(File(_pickedFile!.path))
+                                            as ImageProvider,
                                     // image: NetworkImage(_pickedFile!.path),
                                     // image: FileImage(File(_pickedFile!.path)),
                                     fit: BoxFit.cover),
@@ -218,12 +212,13 @@ class _MyPageState extends State<MyPage> {
                   ),
                 ),
                 SizedBox(
-                  width: 20,
+                  width: 25,
                 ),
                 Container(
+                  height: 60,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+
                       Text(
                         _username,
                         style: TextStyle(fontSize: 19),
@@ -234,79 +229,91 @@ class _MyPageState extends State<MyPage> {
                 ),
               ],
             ),
-            SizedBox(
-              height: 10,
-            ),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('logout'),
-              onTap: () {
-
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(7.0)),
-                    title: Text('로그아웃하시겠습니까?'),
-                    actions: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.buttonColor2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0),
+            Expanded(child: Text("")),
+            // SizedBox(
+            //   height: 10,
+            // ),
+            Padding(
+              padding: EdgeInsets.only(bottom: 8),
+              child: ListTile(
+                leading: Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Icon(
+                      Icons.logout,
+                      color: Colors.grey,
+                    )),
+                title: Text(
+                  'logout',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7.0)),
+                      title: Text('로그아웃하시겠습니까?'),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Palette.buttonColor2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                          ),
+                          child: const Text(
+                            '아니오',
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
-                        child: const Text(
-                          '아니오',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          await _firebaseAuth.signOut();
+                        ElevatedButton(
+                          onPressed: () async {
+                            await _firebaseAuth.signOut();
 
-                          try {
-                            await FirebaseAuth.instance.signOut();
-                            print('signout');
+                            try {
+                              await FirebaseAuth.instance.signOut();
+                              print('signout');
 
-                            // 로그아웃이 성공적으로 되었는지 확인
-                            if (FirebaseAuth.instance.currentUser == null) {
-                              // 로그인 화면으로 이동 (예: '/login')
-                              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-                                  builder: (context) => const LoginScreen()), (route) => false);
+                              // 로그아웃이 성공적으로 되었는지 확인
+                              if (FirebaseAuth.instance.currentUser == null) {
+                                // 로그인 화면으로 이동 (예: '/login')
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LoginScreen()),
+                                    (route) => false);
+                              }
+                            } catch (e) {
+                              print('로그아웃 실패: $e');
                             }
-                          } catch (e) {
-                            print('로그아웃 실패: $e');
-                          }
 
-                          // Navigator.of(context).push(
-                          //   MaterialPageRoute(
-                          //     builder: (BuildContext) => LoginScreen(),
-                          //   ),
-                          // );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.buttonColor2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0),
+                            // Navigator.of(context).push(
+                            //   MaterialPageRoute(
+                            //     builder: (BuildContext) => LoginScreen(),
+                            //   ),
+                            // );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Palette.buttonColor2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
                           ),
-                        ),
-                        child: const Text(
-                          '예',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      )
-                    ],
-                    // content:
-                    // Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
-                  ),
-                );
-
-
-              },
+                          child: const Text(
+                            '예',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        )
+                      ],
+                      // content:
+                      // Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
+                    ),
+                  );
+                },
+              ),
             )
           ],
         ),

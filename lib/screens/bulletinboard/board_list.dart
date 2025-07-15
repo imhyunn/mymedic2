@@ -106,7 +106,7 @@ class _BoardListState extends State<BoardList> {
     return Scaffold(
       backgroundColor: Color(0xFFF5F5F5),
       appBar: AppBar(
-        title: Text('게시판'),
+        title: Text('게시판', style: TextStyle(fontWeight: FontWeight.bold),),
       ),
       body: FutureBuilder<List<Board>>(
         future: _getBoards(),

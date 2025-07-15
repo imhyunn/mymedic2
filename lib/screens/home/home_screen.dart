@@ -76,6 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(title: Text('mydedic',style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),),),
         // backgroundColor: Color(0xEAAACBE1),
         body: Stack(children: [
           /*Container(
@@ -89,14 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),*/
           Container(
-            child: Text(
-                '${userInfo?['userEmail']}',
-              style: GoogleFonts.archivoBlack(
-                textStyle: TextStyle(
-                  fontSize: 32
-                ),
-              )
-            ),
+
           ),
           Container(
             width: size.width,

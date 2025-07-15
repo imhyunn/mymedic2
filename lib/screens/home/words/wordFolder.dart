@@ -59,6 +59,8 @@ class _WordFolderState extends State<WordFolder> {
     return folders;
   }
 
+
+
   @override
   void initState() {
     // TODO: implement initState
@@ -355,7 +357,8 @@ class _WordFolderState extends State<WordFolder> {
     );
   }
 
-  void _folderDelete(String id) {
+  Future<void> _folderDelete(String id) async {
+    final wordSnap = await _firestore.collection('words').where('folderId', isEqualTo: id).get();
     showDialog(
       context: context,
       builder: (context) {
@@ -391,7 +394,15 @@ class _WordFolderState extends State<WordFolder> {
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () async {
+                    print('wordSnap length: ${wordSnap.docs.length}');
+                    for (final doc in wordSnap.docs) {
+                      await doc.reference.delete();
+                    }
+
                     await _firestore.collection('folder').doc(id).delete();
+
+
+
                     setState(() {});
                     Navigator.pop(context);
                   },
