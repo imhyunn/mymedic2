@@ -47,6 +47,24 @@ class _HomeScreenState extends State<HomeScreen> {
     if (querySnap.docs.isNotEmpty) {
       return querySnap.docs.first;
     }
+
+    querySnap = await _firestore.collection('words').where('randomKey', isLessThanOrEqualTo: randomKey).orderBy('randomKey', descending: true).limit(1).get();
+
+    if (querySnap.docs.isNotEmpty) {
+      return querySnap.docs.first;
+    }
+
+    return null;
+  }
+
+  void showRandomWord() async {
+    final word = await getRondomWord();
+    if (word != null) {
+      final data = word.data() as Map<String, dynamic>;
+      print('“${data['text']}” — ${data['author']}');
+    } else {
+      print('단어를 찾을 수 없습니다');
+    }
   }
 
   // Future<void> getCurrentUser() async {
@@ -102,7 +120,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),*/
           Container(
-
+            child: Column(
+              children: [
+              ],
+            ),
           ),
           Container(
             width: size.width,
