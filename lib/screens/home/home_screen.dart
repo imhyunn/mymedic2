@@ -37,6 +37,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   }
 
+  Future<DocumentSnapshot?> getRondomWord() async {
+    final random = Random();
+    final double randomKey = random.nextDouble();
+
+
+    var querySnap = await _firestore.collection('words').where('randomKey', isGreaterThanOrEqualTo: randomKey).orderBy('randomKey').limit(1).get();
+
+    if (querySnap.docs.isNotEmpty) {
+      return querySnap.docs.first;
+    }
+  }
+
   // Future<void> getCurrentUser() async {
   //   final user = FirebaseAuth.instance.currentUser;
   //   if (user != null) {
