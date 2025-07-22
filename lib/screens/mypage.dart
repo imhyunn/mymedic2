@@ -194,7 +194,7 @@ class _MyPageState extends State<MyPage> {
                               width: _imageSize,
                               height: _imageSize,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(37),
+                                borderRadius: BorderRadius.circular(45),
                                 border:
                                     Border.all(width: 1, color: Colors.grey),
                                 image: DecorationImage(
@@ -252,7 +252,7 @@ class _MyPageState extends State<MyPage> {
                     builder: (context) => AlertDialog(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(7.0)),
-                      title: Text('로그아웃하시겠습니까?'),
+                      title: Text('로그아웃하시겠습니까?', style: TextStyle(fontSize: 18),),
                       actions: [
                         ElevatedButton(
                           onPressed: () {

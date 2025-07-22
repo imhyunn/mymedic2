@@ -148,13 +148,14 @@ class _WordNoteState extends State<WordNote> {
             itemCount: words.length,
             itemBuilder: (BuildContext context, int index) {
               return Card(
+                color: Colors.white,
                 child: ListTile(
                   onTap: null,
                   title: IntrinsicHeight(
                     child: Row(
                       children: [
                         Container(
-                          alignment: Alignment.topCenter,
+                          alignment: Alignment.topLeft,
                           child: IconButton(
                             onPressed: () {
                               tts.speak(words[index].english);
@@ -166,7 +167,7 @@ class _WordNoteState extends State<WordNote> {
                           ),
                         ),
                         SizedBox(
-                          width: 10,
+                          width: 4,
                         ),
                         Expanded(
                           child: Container(
@@ -179,7 +180,7 @@ class _WordNoteState extends State<WordNote> {
                                   height: 35,
                                   child: Text(
                                     words[index].english,
-                                    style: TextStyle(fontSize: 20),
+                                    style: TextStyle(fontSize: words[index].english.length > 17 ? 17 : 20),
                                   ),
                                 ),
                                 Container(

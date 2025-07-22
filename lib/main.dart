@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.white), fontFamily: 'Pretendard'),
+      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.white), fontFamily: 'Pretendard'), //colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
       // home: Test2(),
       initialRoute: LoginScreen.routeName,
       routes: {

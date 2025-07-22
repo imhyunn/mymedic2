@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mymedic1/config/palette.dart';
 import 'package:mymedic1/data/user_provider.dart';
 import 'package:mymedic1/screens/home/test/test_screen.dart';
 import 'package:mymedic1/screens/home/words/wordFolder.dart';
@@ -146,8 +147,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: Color(0xEA5180A2),
-                            width: 2, // 테두리 두께
+                            color: Palette.buttonColor,
+                            width: 3, // 테두리 두께
                           ),
                         ),
                         child: TextButton(
