@@ -36,7 +36,7 @@ class _BoardListState extends State<BoardList> {
           .collection('user')
           .doc(user.uid)
           .get();
-      if (userData.exists) {
+      if (userData.exists && mounted) {
         setState(() {
           _userData = userData.data()!;
           _username = _userData['userName'];
