@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -90,7 +91,9 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
+    final Size size = MediaQuery
+        .of(context)
+        .size;
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.folder.name),
@@ -106,17 +109,18 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                   if (wordInfos.every((wordInfo) => !wordInfo.isChecked)) {
                     showDialog(
                       context: context,
-                      builder: (context) => AlertDialog(
-                        content: Text('선택된 단어가 없습니다'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(); // 다이얼로그 닫기
-                            },
-                            child: Text('확인'),
+                      builder: (context) =>
+                          AlertDialog(
+                            content: Text('선택된 단어가 없습니다'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // 다이얼로그 닫기
+                                },
+                                child: Text('확인'),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
                     );
                   } else {
                     var result = await getFolder();
@@ -194,7 +198,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                     child: Row(
                       children: [
                         Container(
-                            // alignment: Alignment.topCenter,
+                          // alignment: Alignment.topCenter,
                             child: Checkbox(
                                 value: wordInfos[index].isChecked,
                                 activeColor: Color(0xff2a5fa9),
@@ -252,13 +256,13 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                                 child: wordInfos[index].pickedFile == null
                                     ? Icon(Icons.add)
                                     : Container(
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                              image:
-                                                  wordInfos[index].pickedFile!,
-                                              fit: BoxFit.cover),
-                                        ),
-                                      ),
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image:
+                                        wordInfos[index].pickedFile!,
+                                        fit: BoxFit.cover),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -276,7 +280,10 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
   RelativeRect buttonMenuPosition(BuildContext context) {
     final RenderBox overlay =
-        Overlay.of(context).context.findRenderObject() as RenderBox;
+    Overlay
+        .of(context)
+        .context
+        .findRenderObject() as RenderBox;
     return RelativeRect.fromRect(
         _tapPosition & Size(40, 40), Offset.zero & overlay.size);
   }
@@ -288,7 +295,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '영단어 추가',
           ),
@@ -319,7 +326,10 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                       borderSide: BorderSide(color: Colors.red, width: 2),
                     ),
                   ),
-                  validator: (value) => value == null || value.trim().isEmpty
+                  validator: (value) =>
+                  value == null || value
+                      .trim()
+                      .isEmpty
                       ? '영단어를 입력해주세요'
                       : null,
                 ),
@@ -348,7 +358,10 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                       borderSide: BorderSide(color: Colors.red, width: 2),
                     ),
                   ),
-                  validator: (value) => value == null || value.trim().isEmpty
+                  validator: (value) =>
+                  value == null || value
+                      .trim()
+                      .isEmpty
                       ? '뜻을 입력해주세요'
                       : null,
                 ),
@@ -389,7 +402,9 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                                 DateTime.now().toString(),
                                 null,
                                 null,
-                                widget.folder.id),
+                                widget.folder.id,
+                                widget.folder.userId,
+                                Random().nextDouble(),),
                             false));
 
                         // widget.words.add(Word(
@@ -423,7 +438,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
   _getCameraImage(int index) async {
     final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.camera);
+    await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
         wordInfos[index].pickedFile = FileImage(File(pickedFile.path));
@@ -438,7 +453,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
   _getPhotoLibraryImage(int index) async {
     final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         wordInfos[index].pickedFile = FileImage(File(pickedFile.path));
@@ -478,8 +493,8 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         value: Menu.drawing,
         onTap: () async {
           var result = await Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => DrawingPage()))
-              as MemoryImage?;
+              MaterialPageRoute(builder: (context) => DrawingPage()))
+          as MemoryImage?;
 
           if (result != null) {
             setState(() {
@@ -507,7 +522,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '영단어 수정',
           ),
@@ -615,7 +630,9 @@ class _WordNoteEditState extends State<WordNoteEdit> {
           'image': wordInfos[i].word.imagePath,
           'korean': wordInfos[i].word.korean,
           'time': DateTime.now().toString(),
-          'folderId': widget.folder.id
+          'folderId': widget.folder.id,
+          'uid': widget.folder.userId,
+          'randomIndex': Random().nextDouble()
         });
       } else if (wordInfos[i].word.id != null) {
         await _firestore.collection('words').doc(wordInfos[i].word.id).set({
@@ -623,7 +640,9 @@ class _WordNoteEditState extends State<WordNoteEdit> {
           'image': wordInfos[i].word.imagePath,
           'korean': wordInfos[i].word.korean,
           'time': wordInfos[i].word.time,
-          'folderId': widget.folder.id
+          'folderId': widget.folder.id,
+          'uid': widget.folder.userId,
+          'randomIndex': wordInfos[i].word.randomIndex
         });
       }
     }
@@ -631,7 +650,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
       'name': widget.folder.name,
       'time': widget.folder.time,
       'userId': widget.folder.userId,
-      'wordCount': wordInfos.length
+      'wordCount': wordInfos.length,
     });
   }
 
@@ -681,7 +700,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '단어 삭제',
           ),
@@ -739,7 +758,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         .collection('folder')
         .where('userId', isEqualTo: widget.folder.userId)
         .orderBy('time', descending: true)
-        // .where('name', isNotEqualTo: widget.folder.name)
+    // .where('name', isNotEqualTo: widget.folder.name)
         .get();
 
     return snapshot.docs.map((element) {
@@ -755,7 +774,10 @@ class _WordNoteEditState extends State<WordNoteEdit> {
         isScrollControlled: true,
         builder: (BuildContext context) {
           return SizedBox(
-            height: MediaQuery.of(context).size.height * 0.75,
+            height: MediaQuery
+                .of(context)
+                .size
+                .height * 0.75,
             child: Column(children: [
               Container(
                 child: Padding(
@@ -769,104 +791,117 @@ class _WordNoteEditState extends State<WordNoteEdit> {
               Expanded(
                 child: ListView.separated(
                   itemCount: folder.length,
-                  itemBuilder: (context, index) => ListTile(
-                    title: Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: Text(folder[index].name)),
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(7.0)),
-                          title: Text('단어 이동'),
-                          actions: [
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Palette.buttonColor2,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0),
+                  itemBuilder: (context, index) =>
+                      ListTile(
+                        title: Padding(
+                            padding: EdgeInsets.only(left: 10),
+                            child: Text(folder[index].name)),
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) =>
+                                AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(7.0)),
+                                  title: Text('단어 이동'),
+                                  actions: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Palette.buttonColor2,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              5.0),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        '아니오',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        List<Word> moveWords = [];
+                                        for (int i = 0; i <
+                                            wordInfos.length; i++) {
+                                          if (wordInfos[i].isChecked == true) {
+                                            await _firestore
+                                                .collection('words')
+                                                .doc(wordInfos[i].word.id)
+                                                .set({
+                                              'english': wordInfos[i].word
+                                                  .english,
+                                              'folderId': folder[index].id,
+                                              'image': wordInfos[i].word
+                                                  .imagePath,
+                                              'korean': wordInfos[i].word
+                                                  .korean,
+                                              'time': wordInfos[i].word.time,
+                                              'uid': widget.folder.userId,
+                                              'randomIndex': wordInfos[i].word.randomIndex
+                                            });
+
+                                            moveWords.add(wordInfos[i].word);
+                                          }
+                                        }
+
+                                        await _firestore
+                                            .collection('folder')
+                                            .doc(folder[index].id)
+                                            .set({
+                                          'name': folder[index].name,
+                                          'time': widget.folder.time,
+                                          'userId': widget.folder.userId,
+                                          'wordCount':
+                                          folder[index].wordCount +
+                                              moveWords.length
+                                        });
+                                        await _firestore
+                                            .collection('folder')
+                                            .doc(widget.folder.id)
+                                            .set({
+                                          'name': widget.folder.name,
+                                          'time': widget.folder.time,
+                                          'userId': widget.folder.userId,
+                                          'wordCount':
+                                          widget.folder.wordCount -
+                                              moveWords.length
+                                        });
+
+                                        while (moveWords.isNotEmpty) {
+                                          wordInfos.removeWhere(
+                                                  (e) =>
+                                              e.word == moveWords[0]);
+                                          // ??Where: 특정 조건에 맞는 ??을 실행하게끔 하는 것
+                                          // 리스트가 대상이기에 그 리스트들을 순회하면서 그 조건에 맞는 것을 ?? 해주겠다.
+                                          moveWords.removeAt(0);
+                                        }
+                                        setState(() {});
+
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Palette.buttonColor2,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              5.0),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        '예',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    )
+                                  ],
+                                  content:
+                                  Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
                                 ),
-                              ),
-                              child: const Text(
-                                '아니오',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                List<Word> moveWords = [];
-                                for (int i = 0; i < wordInfos.length; i++) {
-                                  if (wordInfos[i].isChecked == true) {
-                                    await _firestore
-                                        .collection('words')
-                                        .doc(wordInfos[i].word.id)
-                                        .set({
-                                      'english': wordInfos[i].word.english,
-                                      'folderId': folder[index].id,
-                                      'image': wordInfos[i].word.imagePath,
-                                      'korean': wordInfos[i].word.korean,
-                                      'time': wordInfos[i].word.time
-                                    });
-
-                                    moveWords.add(wordInfos[i].word);
-                                  }
-                                }
-
-                                await _firestore
-                                    .collection('folder')
-                                    .doc(folder[index].id)
-                                    .set({
-                                  'name': folder[index].name,
-                                  'time': widget.folder.time,
-                                  'userId': widget.folder.userId,
-                                  'wordCount':
-                                      folder[index].wordCount + moveWords.length
-                                });
-                                await _firestore
-                                    .collection('folder')
-                                    .doc(widget.folder.id)
-                                    .set({
-                                  'name': widget.folder.name,
-                                  'time': widget.folder.time,
-                                  'userId': widget.folder.userId,
-                                  'wordCount':
-                                      widget.folder.wordCount - moveWords.length
-                                });
-
-                                while (moveWords.isNotEmpty) {
-                                  wordInfos.removeWhere(
-                                      (e) => e.word == moveWords[0]);
-                                  // ??Where: 특정 조건에 맞는 ??을 실행하게끔 하는 것
-                                  // 리스트가 대상이기에 그 리스트들을 순회하면서 그 조건에 맞는 것을 ?? 해주겠다.
-                                  moveWords.removeAt(0);
-                                }
-                                setState(() {});
-
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Palette.buttonColor2,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                ),
-                              ),
-                              child: const Text(
-                                '예',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            )
-                          ],
-                          content:
-                              Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
-                        ),
-                      );
-                    },
-                  ),
+                          );
+                        },
+                      ),
                   separatorBuilder: (BuildContext context, int index) {
                     return Divider(thickness: 1);
                   },

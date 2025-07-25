@@ -54,7 +54,7 @@ class _WordNoteState extends State<WordNote> {
     List<Word> words = snapshot.docs.map((element) {
       Map<String, dynamic> map = element.data();
       return Word(map['english'], map['korean'], map['time'], map['image'],
-          element.id, map['folderId']);
+          element.id, map['folderId'], map['uid'], map['randomIndex']);
     }).toList();
     // for (int i = 0; i < words.length; ++i) _pickedFiles.add(null);
     return words;

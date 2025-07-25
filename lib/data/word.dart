@@ -5,7 +5,12 @@ class Word {
   String? imagePath;
   String? id;
   String folderId;
+  String uid;
+  double randomIndex;
 
-  Word(this.english, this.korean, this.time, this.imagePath, this.id, this.folderId);
+
+  Word(this.english, this.korean, this.time, this.imagePath, this.id,
+      this.folderId, this.uid, this.randomIndex);
+
 
 }

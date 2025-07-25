@@ -12,6 +12,7 @@ import 'package:mymedic1/screens/myapp.dart';
 import 'package:mymedic1/screens/sign/login_screen.dart';
 import 'package:mymedic1/screens/sign/signup_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/palette.dart';
 import '../data/user.dart';
@@ -286,6 +287,11 @@ class _MyPageState extends State<MyPage> {
                                             const LoginScreen()),
                                     (route) => false);
                               }
+                              final prefs = await SharedPreferences.getInstance();
+                              await prefs.remove('lastDate');
+                              await prefs.remove('lastEnglish');
+                              await prefs.remove('lastKorean');
+
                             } catch (e) {
                               print('로그아웃 실패: $e');
                             }

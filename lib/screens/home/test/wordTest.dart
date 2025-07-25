@@ -31,7 +31,7 @@ class _WordTestState extends State<WordTest> {
     List<Word> words = snapshot.docs.map((element) {
       Map<String, dynamic> map = element.data();
       return Word(map['english'], map['korean'], map['time'], map['image'],
-          element.id, map['folderId']);
+          element.id, map['folderId'], map['uid'], map['randomIndex']);
     }).toList();
     return words;
   }

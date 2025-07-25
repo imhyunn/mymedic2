@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'dart:convert';
-
+import 'package:crypto/crypto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mymedic1/screens/home/words/wordFolder.dart';
@@ -21,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // User? loggedUser;
   Map<String, dynamic>? wordData;
   bool isLoading = true;
+  bool _isRevealed = false;
 
   final currentUser = FirebaseAuth.instance.currentUser;
 
@@ -32,6 +33,13 @@ class _HomeScreenState extends State<HomeScreen> {
     // Future.delayed(Duration(milliseconds: 300), () {
     //   getCurrentUser();
     // });
+  }
+
+  double generateDeterministicRandom(String uid, DateTime date) {
+    final input = '$uid-${date.year}-${date.month}-${date.day}';
+    final hash = input.hashCode;
+    final normalized = (hash % 1000000) / 1000000;
+    return normalized < 0 ? -normalized : normalized;
   }
 
   Future<void> _loadDailyWord() async {
@@ -56,23 +64,22 @@ class _HomeScreenState extends State<HomeScreen> {
     final uid = currentUser?.uid;
     if (uid == null) return;
 
-    final rand = Random().nextDouble();
+    final rand = generateDeterministicRandom(uid, DateTime.now());
 
     QuerySnapshot snap = await _firestore
         .collection('words')
         .where('uid', isEqualTo: uid)
         .where('randomIndex', isGreaterThanOrEqualTo: rand)
-        .orderBy('randomIndex', descending: true)
+        .orderBy('randomIndex')
         .limit(1)
         .get();
-
 
     if (snap.docs.isEmpty) {
       snap = await _firestore
           .collection('words')
           .where('uid', isEqualTo: uid)
           .where('randomIndex', isLessThanOrEqualTo: rand)
-          .orderBy('randomIndex', descending: true)
+          .orderBy('randomIndex')
           .limit(1)
           .get();
     }
@@ -89,6 +96,9 @@ class _HomeScreenState extends State<HomeScreen> {
         isLoading = false;
       });
     } else {
+      await prefs.remove('lastDate');
+      await prefs.remove('lastEnglish');
+      await prefs.remove('lastKorean');
       setState(() {
         wordData = {'english': '없음', 'korean': '단어가 없습니다'};
         isLoading = false;
@@ -122,11 +132,31 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),*/
                 Container(
+                  height: size.height * 0.17,
+                  width: size.width,
                   child: Column(
                     children: [
-                      Text(wordData!['english']),
-                      SizedBox(height: 16,),
-                      Text(wordData!['korean'])
+                      Text('', style: TextStyle(fontSize: 20),),
+                      Text(wordData!['english'], style: TextStyle(fontSize: 20),),
+                      SizedBox(
+                        height: 16,
+                      ),
+                      if (_isRevealed)
+                        Text(wordData!['korean'], )
+                      else
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isRevealed = true;
+                            });
+                          },
+                          child: const Text('뜻 보기'),
+                        ),
                     ],
                   ),
                 ),
