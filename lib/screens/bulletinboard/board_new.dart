@@ -30,6 +30,7 @@ class _BoardNewScreenState extends State<BoardNewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         centerTitle: true,
         actions: [
           Padding(

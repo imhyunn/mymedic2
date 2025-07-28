@@ -40,6 +40,7 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
         .width / 10;
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         actions: [
           Visibility(
             visible: widget.board.uid == currentUser!.uid,

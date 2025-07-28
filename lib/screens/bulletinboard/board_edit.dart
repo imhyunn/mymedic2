@@ -38,6 +38,7 @@ class _BoardEditScreenState extends State<BoardEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         centerTitle: true,
         actions: [
           Padding(

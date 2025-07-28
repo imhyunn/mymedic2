@@ -72,6 +72,7 @@ class _WordFolderState extends State<WordFolder> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         actions: [
           IconButton(
               onPressed: () async {
@@ -110,18 +111,18 @@ class _WordFolderState extends State<WordFolder> {
                   child: ListTile(
                     tileColor: Colors.white,
                     title: Padding(
-                      padding: EdgeInsets.only(left: 20, top: 14, bottom: 14),
+                      padding: EdgeInsets.only(left: 20, top: 20, bottom: 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
                             child: Text(
                               folders[index].name,
-                              style: TextStyle(fontSize: 23),
+                              style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
                             ),
                           ),
                           SizedBox(
-                            width: 10,
+                            height: 5,
                           ),
                           Container(
                             child: Text(
@@ -196,7 +197,7 @@ class _WordFolderState extends State<WordFolder> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
-                  maxLength: 20,
+                  maxLength: 40,
                   controller: _folderController,
                   decoration: InputDecoration(
                     hintText: '폴더 이름',
@@ -291,7 +292,7 @@ class _WordFolderState extends State<WordFolder> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                maxLength: 20,
+                maxLength: 40,
                 controller: _folderController,
                 decoration: InputDecoration(
                   hintText: '폴더 이름',

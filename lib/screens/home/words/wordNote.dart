@@ -98,6 +98,7 @@ class _WordNoteState extends State<WordNote> {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text(widget.folder.name),
         actions: [
           IconButton(
@@ -123,7 +124,10 @@ class _WordNoteState extends State<WordNote> {
                   _isButtonDisabled = false;
                 });
               },
-              icon: Icon(Icons.mode_edit_outline))
+              icon: Icon(
+                Icons.mode_edit_outline,
+                // color: Colors.grey.shade800,
+              ))
         ],
       ),
       body: FutureBuilder(
@@ -155,19 +159,26 @@ class _WordNoteState extends State<WordNote> {
                     child: Row(
                       children: [
                         Container(
-                          alignment: Alignment.topLeft,
-                          child: IconButton(
-                            onPressed: () {
-                              tts.speak(words[index].english);
-                            },
-                            icon: Icon(
-                              Icons.volume_up_rounded,
-                              size: size.width * 0.055,
-                            ),
+                          width: size.width * 0.28,
+                          height: size.width * 0.28,
+                          child: ClipRRect(
+                            // borderRadius: BorderRadius.circular(20),
+                            child: Center(
+                                child: words[index].imagePath == null
+                                    ? Text(
+                                        '편집 버튼을 눌러 \n사진을 추가해주세요.',
+                                        style: TextStyle(fontSize: 10),
+                                      )
+                                    : Image.network(
+                                        words[index].imagePath!,
+                                        fit: BoxFit.cover,
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                      )),
                           ),
                         ),
                         SizedBox(
-                          width: 4,
+                          width: 24,
                         ),
                         Expanded(
                           child: Container(
@@ -180,14 +191,23 @@ class _WordNoteState extends State<WordNote> {
                                   height: 35,
                                   child: Text(
                                     words[index].english,
-                                    style: TextStyle(fontSize: words[index].english.length > 17 ? 17 : 20),
+                                    style: TextStyle(
+                                        fontSize:
+                                            words[index].english.length > 17
+                                                ? 17
+                                                : 20,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                                 Container(
                                   height: 35,
                                   child: Text(
                                     words[index].korean,
-                                    style: TextStyle(fontSize: 17),
+                                    style: TextStyle(
+                                      fontSize: words[index].korean.length > 17
+                                          ? 15
+                                          : 17,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -195,31 +215,31 @@ class _WordNoteState extends State<WordNote> {
                           ),
                         ),
                         Container(
-                          width: size.width * 0.28,
-                          height: size.width * 0.28,
-                          child: DottedBorder(
-                            radius: Radius.circular(20),
-                            color: Colors.grey,
-                            child: ClipRRect(
-                              // borderRadius: BorderRadius.circular(20),
-                              child: Center(
-                                  child: words[index].imagePath == null
-                                      ? Text(
-                                          '편집 버튼을 눌러 \n사진을 추가해주세요.',
-                                          style: TextStyle(fontSize: 8),
-                                        )
-                                      : Image.network(
-                                          words[index].imagePath!,
-                                          fit: BoxFit.cover,
-                                          width: double.infinity,
-                                          height: double.infinity,
-                                        )),
+                          alignment: Alignment.topRight,
+                          child: IconButton(
+                            onPressed: () {
+                              tts.speak(words[index].english);
+                            },
+                            icon: Icon(
+                              Icons.volume_up_rounded,
+                              size: size.width * 0.055,
+                              color: Colors.grey.shade700,
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
+                  /*trailing: IconButton(
+                      onPressed: () {
+                        tts.speak(words[index].english);
+                      },
+                      icon: Icon(
+                        Icons.volume_up_rounded,
+                        size: size.width * 0.055,
+                      ),
+                    ),*/
+                  contentPadding: EdgeInsets.only(left: 15, right: 0),
                 ),
                 elevation: 0,
                 shape: RoundedRectangleBorder(

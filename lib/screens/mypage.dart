@@ -162,6 +162,7 @@ class _MyPageState extends State<MyPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.white,
           title: Text('my page', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23),),
         ),
         body: Column(
@@ -358,6 +359,7 @@ class _MyPageState extends State<MyPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
+                    fixedSize: Size(150, 22)
                   ),
                   child: const Text(
                     '사진찍기',
@@ -368,7 +370,7 @@ class _MyPageState extends State<MyPage> {
               height: 10,
             ),
             const Divider(
-              thickness: 3,
+              thickness: 2,
             ),
             const SizedBox(
               height: 10,

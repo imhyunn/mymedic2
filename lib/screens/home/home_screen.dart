@@ -112,6 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.white,
           title: Text(
             'mydedic',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
@@ -132,30 +133,54 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),*/
                 Container(
-                  height: size.height * 0.17,
+                  decoration: BoxDecoration(
+                      // borderRadius: BorderRadius.circular(10),
+                      // border: Border.all(
+                      //   color: Colors.grey,
+                      //   width: 3
+                      // ),
+                      color: Colors.white),
+                  height: size.height * 0.2,
                   width: size.width,
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('', style: TextStyle(fontSize: 20),),
-                      Text(wordData!['english'], style: TextStyle(fontSize: 20),),
+                      Text(
+                        '오늘의 단어!',
+                        style: TextStyle(fontSize: 20),
+                      ),
                       SizedBox(
-                        height: 16,
+                        height: 19,
+                      ),
+                      Text(
+                        wordData!['english'],
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      SizedBox(
+                        height: 23,
                       ),
                       if (_isRevealed)
-                        Text(wordData!['korean'], )
+                        Text(
+                          wordData!['korean'],
+                          style: TextStyle(fontSize: 18),
+                        )
                       else
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
+                            fixedSize: Size(180, 10),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)
-                            ),
+                                borderRadius: BorderRadius.circular(10)),
+                            backgroundColor: Color(0xffFFFFFF)
                           ),
                           onPressed: () {
                             setState(() {
                               _isRevealed = true;
                             });
                           },
-                          child: const Text('뜻 보기'),
+                          child: const Text(
+                            '뜻 보기',
+                            style: TextStyle(color: Colors.black),
+                          ),
                         ),
                     ],
                   ),
