@@ -121,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // backgroundColor: Color(0xEAAACBE1),
         body: isLoading
             ? Center(child: CircularProgressIndicator())
-            : Stack(children: [
+            : Column(children: [
                 /*Container(
             height: size.height * 0.43,
             decoration: BoxDecoration(
@@ -132,171 +132,220 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),*/
+                // SizedBox(
+                //   height: size.height * 0.15,
+                // ),
                 Container(
                   decoration: BoxDecoration(
-                      // borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10),
                       // border: Border.all(
                       //   color: Colors.grey,
                       //   width: 3
                       // ),
-                      color: Colors.white),
+                      color: Color(0xfff8d5d5)),
                   height: size.height * 0.2,
-                  width: size.width,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '오늘의 단어!',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      SizedBox(
-                        height: 19,
-                      ),
-                      Text(
-                        wordData!['english'],
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      SizedBox(
-                        height: 23,
-                      ),
-                      if (_isRevealed)
-                        Text(
-                          wordData!['korean'],
-                          style: TextStyle(fontSize: 18),
-                        )
-                      else
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            fixedSize: Size(180, 10),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            backgroundColor: Color(0xffFFFFFF)
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isRevealed = true;
-                            });
-                          },
-                          child: const Text(
-                            '뜻 보기',
-                            style: TextStyle(color: Colors.black),
+                  width: size.width * 0.95,
+                  child: Stack(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(14),
+                          child: Text(
+                            '오늘의 단어!',
+                            style: TextStyle(fontSize: 18),
                           ),
                         ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: size.width,
-                  height: size.height * 0.82,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            color: Colors.white,
-                            elevation: 0,
-                            child: Container(
-                              height: 120,
-                              width: 340,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Color(0xFF4567BD),
-                                  width: 3, // 테두리 두께
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 19,
+                              ),
+                              Text(
+                                wordData!['english'],
+                                style: TextStyle(fontSize: 22),
+                              ),
+                              SizedBox(
+                                height: 15,
+                              ),
+                              AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 600),
+                                child: _isRevealed
+                                    ? SizedBox(
+                                  height: 40, // 버튼과 동일한 높이 확보
+                                  child: Center(
+                                    child: Text(
+                                      wordData!['korean'],
+                                      key: const ValueKey('text'),
+                                      style: const TextStyle(fontSize: 20),
+                                    ),
+                                  ),
+                                )
+                                    : SizedBox(
+                                  height: 40,
+                                  child: ElevatedButton(
+                                    key: const ValueKey('button'),
+                                    style: ElevatedButton.styleFrom(
+                                      fixedSize: const Size(180, 10),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      backgroundColor: const Color(0xffFFFFFF),
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _isRevealed = true;
+                                      });
+                                    },
+                                    child: const Text(
+                                      '뜻 보기',
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                  ),
                                 ),
                               ),
-                              child: TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (BuildContext) => WordFolder(),
-                                    ),
-                                  );
-                                },
-                                child: Text(
-                                  'word',
-                                  style: TextStyle(
-                                      fontSize: 28,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold),
+                              // if (_isRevealed)
+                              //   Text(
+                              //     wordData!['korean'],
+                              //     style: TextStyle(fontSize: 20),
+                              //   )
+                              // else
+                              //   ElevatedButton(
+                              //     style: ElevatedButton.styleFrom(
+                              //         fixedSize: Size(180, 10),
+                              //         shape: RoundedRectangleBorder(
+                              //             borderRadius:
+                              //                 BorderRadius.circular(10)),
+                              //         backgroundColor: Color(0xffFFFFFF)),
+                              //     onPressed: () {
+                              //       setState(() {
+                              //         _isRevealed = true;
+                              //       });
+                              //     },
+                              //     child: const Text(
+                              //       '뜻 보기',
+                              //       style: TextStyle(color: Colors.black),
+                              //     ),
+                              //   ),
+                            ],
+                          ),
+                        ),
+                      ]),
+                ),
+                Expanded(
+                  child: Container(
+                    width: size.width,
+                    // height: size.height * 0.5,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Card(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              color: Colors.white,
+                              elevation: 0,
+                              child: Container(
+                                height: 120,
+                                width: size.width * 0.5,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Color(0xFF4567BD),
+                                    width: 3, // 테두리 두께
+                                  ),
+                                ),
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (BuildContext) => WordFolder(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    'word',
+                                    style: TextStyle(
+                                        fontSize: 28,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                               ),
                             ),
+                            SizedBox(
+                              height: size.height * 0.02,
+                            ),
+                            /*Card(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        color: Colors.white,
+                        elevation: 0,
+                        child: Container(
+                          height: 120,
+                          width: 340,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Color(0xEA5180A2),
+                              width: 2, // 테두리 두께
+                            ),
                           ),
-                          SizedBox(
-                            height: size.height * 0.02,
-                          ),
-                          /*Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      color: Colors.white,
-                      elevation: 0,
-                      child: Container(
-                        height: 120,
-                        width: 340,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: Color(0xEA5180A2),
-                            width: 2, // 테두리 두께
-                          ),
-                        ),
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (BuildContext) => TestScreen(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            'test',
-                            style: TextStyle(fontSize: 28, color: Colors.black,fontWeight: FontWeight.bold),
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (BuildContext) => TestScreen(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'test',
+                              style: TextStyle(fontSize: 28, color: Colors.black,fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ),
                       ),
+                      SizedBox(
+                        height: size.height * 0.02,
+                      ),
+                      Card(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        color: Colors.white,
+                        elevation: 0,
+                        child: Container(
+                          height: 120,
+                          width: 340,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Color(0xEA5180A2),
+                              width: 2, // 테두리 두께
+                            ),
+                          ),
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (BuildContext) => TestScreen(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'game',
+                              style: TextStyle(fontSize: 28, color: Colors.black,fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),*/
+                          ],
+                        ),
+                      ],
                     ),
-                    SizedBox(
-                      height: size.height * 0.02,
-                    ),
-                    Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      color: Colors.white,
-                      elevation: 0,
-                      child: Container(
-                        height: 120,
-                        width: 340,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: Color(0xEA5180A2),
-                            width: 2, // 테두리 두께
-                          ),
-                        ),
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (BuildContext) => TestScreen(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            'game',
-                            style: TextStyle(fontSize: 28, color: Colors.black,fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                    ),*/
-                        ],
-                      ),
-                    ],
                   ),
                 ),
               ]),

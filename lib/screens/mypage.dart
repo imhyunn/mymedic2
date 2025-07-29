@@ -252,6 +252,7 @@ class _MyPageState extends State<MyPage> {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
+                      backgroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(7.0)),
                       title: Text('로그아웃하시겠습니까?', style: TextStyle(fontSize: 18),),

@@ -109,13 +109,25 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        content: Text('선택된 단어가 없습니다'),
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7)),
+                        content: Padding(
+                            padding: EdgeInsets.only(top: 4),
+                            child: Text('선택된 단어가 없습니다.', style: TextStyle(fontSize: 17),)),
                         actions: [
-                          TextButton(
+                          ElevatedButton(
                             onPressed: () {
                               Navigator.of(context).pop(); // 다이얼로그 닫기
                             },
-                            child: Text('확인'),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Palette.buttonColor2,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5))),
+                            child: Text(
+                              '확인',
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
                         ],
                       ),
@@ -167,6 +179,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
           itemCount: wordInfos.length,
           itemBuilder: (BuildContext context, int index) {
             return Card(
+              color: Colors.white,
               child: ListTile(
                 horizontalTitleGap: 0,
                 contentPadding: EdgeInsets.only(left: 0, right: 0),
@@ -230,12 +243,12 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                               child: wordInfos[index].pickedFile == null
                                   ? Icon(Icons.add)
                                   : Container(
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                      image: wordInfos[index].pickedFile!,
-                                      fit: BoxFit.cover),
-                                ),
-                              ),
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: wordInfos[index].pickedFile!,
+                                            fit: BoxFit.cover),
+                                      ),
+                                    ),
                             ),
                           ),
                         ),
@@ -255,11 +268,11 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                                 child: Text(
                                   wordInfos[index].word.english,
                                   style: TextStyle(
-                                      fontSize:
-                                          wordInfos[index].word.english.length >
-                                                  17
-                                              ? 17
-                                              : 20,
+                                    fontSize:
+                                        wordInfos[index].word.english.length >
+                                                17
+                                            ? 17
+                                            : 20,
                                   ),
                                 ),
                               ),
@@ -770,6 +783,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
 
   moveWord(List<Folder> folder) {
     showModalBottomSheet(
+      backgroundColor: Colors.white,
         context: context,
         isScrollControlled: true,
         builder: (BuildContext context) {
@@ -796,6 +810,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
+                          backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(7.0)),
                           title: Text('단어 이동'),
