@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mymedic1/screens/home/test/test_screen.dart';
 import 'package:mymedic1/screens/home/words/wordFolder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -137,100 +138,117 @@ class _HomeScreenState extends State<HomeScreen> {
                 // ),
                 Container(
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
+                          topRight: Radius.circular(20)),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Color(0xff8291a8),
+                            blurRadius: 3,
+                            spreadRadius: 0,
+                            offset: Offset(0, 7)),
+                      ],
                       // border: Border.all(
                       //   color: Colors.grey,
                       //   width: 3
                       // ),
-                      color: Color(0xfff8d5d5)),
+                      color: Color(0xffd5e5f8)),
                   height: size.height * 0.2,
                   width: size.width * 0.95,
-                  child: Stack(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(14),
-                          child: Text(
-                            '오늘의 단어!',
-                            style: TextStyle(fontSize: 18),
-                          ),
+                  child: Stack(children: [
+                    Padding(
+                      padding: EdgeInsets.all(14),
+                      child: Container(
+                        // decoration: BoxDecoration(
+                        //     color: Color(0xfff8e7e7),
+                        //     borderRadius: BorderRadius.circular(4)),
+                        padding: EdgeInsets.all(7),
+                        child: Text(
+                          '오늘의 단어',
+                          style: TextStyle(fontSize: 16),
                         ),
-                        Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: 19,
-                              ),
-                              Text(
-                                wordData!['english'],
-                                style: TextStyle(fontSize: 22),
-                              ),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 600),
-                                child: _isRevealed
-                                    ? SizedBox(
-                                  height: 40, // 버튼과 동일한 높이 확보
-                                  child: Center(
-                                    child: Text(
-                                      wordData!['korean'],
-                                      key: const ValueKey('text'),
-                                      style: const TextStyle(fontSize: 20),
-                                    ),
-                                  ),
-                                )
-                                    : SizedBox(
-                                  height: 40,
-                                  child: ElevatedButton(
-                                    key: const ValueKey('button'),
-                                    style: ElevatedButton.styleFrom(
-                                      fixedSize: const Size(180, 10),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: 19,
+                          ),
+                          Text(
+                            wordData!['english'],
+                            style: TextStyle(fontSize: 22),
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 600),
+                            child: _isRevealed
+                                ? SizedBox(
+                                    height: 40, // 버튼과 동일한 높이 확보
+                                    child: Center(
+                                      child: Text(
+                                        wordData!['korean'],
+                                        key: const ValueKey('text'),
+                                        style: const TextStyle(fontSize: 20),
                                       ),
-                                      backgroundColor: const Color(0xffFFFFFF),
                                     ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _isRevealed = true;
-                                      });
-                                    },
-                                    child: const Text(
-                                      '뜻 보기',
-                                      style: TextStyle(color: Colors.black),
+                                  )
+                                : SizedBox(
+                                    height: 40,
+                                    child: ElevatedButton(
+                                      key: const ValueKey('button'),
+                                      style: ElevatedButton.styleFrom(
+                                        fixedSize: const Size(180, 10),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        backgroundColor:
+                                            const Color(0xffFFFFFF),
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _isRevealed = true;
+                                        });
+                                      },
+                                      child: const Text(
+                                        '뜻 보기',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              // if (_isRevealed)
-                              //   Text(
-                              //     wordData!['korean'],
-                              //     style: TextStyle(fontSize: 20),
-                              //   )
-                              // else
-                              //   ElevatedButton(
-                              //     style: ElevatedButton.styleFrom(
-                              //         fixedSize: Size(180, 10),
-                              //         shape: RoundedRectangleBorder(
-                              //             borderRadius:
-                              //                 BorderRadius.circular(10)),
-                              //         backgroundColor: Color(0xffFFFFFF)),
-                              //     onPressed: () {
-                              //       setState(() {
-                              //         _isRevealed = true;
-                              //       });
-                              //     },
-                              //     child: const Text(
-                              //       '뜻 보기',
-                              //       style: TextStyle(color: Colors.black),
-                              //     ),
-                              //   ),
-                            ],
                           ),
-                        ),
-                      ]),
+                          // if (_isRevealed)
+                          //   Text(
+                          //     wordData!['korean'],
+                          //     style: TextStyle(fontSize: 20),
+                          //   )
+                          // else
+                          //   ElevatedButton(
+                          //     style: ElevatedButton.styleFrom(
+                          //         fixedSize: Size(180, 10),
+                          //         shape: RoundedRectangleBorder(
+                          //             borderRadius:
+                          //                 BorderRadius.circular(10)),
+                          //         backgroundColor: Color(0xffFFFFFF)),
+                          //     onPressed: () {
+                          //       setState(() {
+                          //         _isRevealed = true;
+                          //       });
+                          //     },
+                          //     child: const Text(
+                          //       '뜻 보기',
+                          //       style: TextStyle(color: Colors.black),
+                          //     ),
+                          //   ),
+                        ],
+                      ),
+                    ),
+                  ]),
                 ),
                 Expanded(
                   child: Container(
@@ -279,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             SizedBox(
                               height: size.height * 0.02,
                             ),
-                            /*Card(
+                            Card(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                         color: Colors.white,
@@ -309,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(
+                      /*SizedBox(
                         height: size.height * 0.02,
                       ),
                       Card(

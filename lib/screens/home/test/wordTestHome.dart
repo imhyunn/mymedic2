@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mymedic1/screens/home/test/wordTest.dart';
 
@@ -13,12 +14,19 @@ class WordTestHome extends StatefulWidget {
 
 class _WordTestHomeState extends State<WordTestHome> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final currentUser = FirebaseAuth.instance.currentUser;
 
   Future<List<Folder>> getFolder() async {
-    var snapshot = await firestore.collection('folder').get();
+    final uid = currentUser?.uid;
+
+    var snapshot = await firestore
+        .collection('folder')
+        .where('userId', isEqualTo: uid)
+        .get();
     List<Folder> folders = snapshot.docs.map((element) {
       Map<String, dynamic> map = element.data();
-      return Folder(map['name'], map['wordCount'], element.id, map['time'], map['userId']);
+      return Folder(map['name'], map['wordCount'], element.id, map['time'],
+          map['userId']);
     }).toList();
     return folders;
   }
@@ -53,24 +61,26 @@ class _WordTestHomeState extends State<WordTestHome> {
                   width: 300,
                   height: 500,
                   child: ListView.builder(
+                    itemCount: folders.length,
                     itemBuilder: (context, index) => Card(
                       child: ListTile(
-                        onTap: () {Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (BuildContext) =>
-                                WordTest(folder: folders[index]),
-                          ),
-                        );},
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (BuildContext) =>
+                                  WordTest(folder: folders[index]),
+                            ),
+                          );
+                        },
                         title: Container(
                             height: 55,
-                            child: Center(
-                                child: Text(
+                            child: Text(
                               folders[index].name,
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                            ))),
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            )),
                       ),
                     ),
-                    itemCount: folders.length,
                   ),
                 ),
               ),
