@@ -25,43 +25,37 @@ class _WordTestState extends State<WordTest> {
   List<Word> _words = [];
   List<List<String>> _shuffledOptions = [];
   Timer? _timer;
-  double _timeLeftRatio = 1.0;
+  double _timeLeftRatio = 1.0; // 0~1 사이
   final int questionDuration = 4;
 
-  void _startTimer() {
-    _timer?.cancel();
-    _timeLeftRatio = 1.0;
-    const tick = Duration(microseconds: 100);
-    int ticks = 0;
-    int totalTicks = (questionDuration * 1000 ~/ tick.inMilliseconds);
-
-    _timer = Timer.periodic(tick, (timer) {
-      setState(() {
-        ticks++;
-        _timeLeftRatio = 1.0 - (ticks / totalTicks);
-      });
-
-      if (ticks >= totalTicks) {
-        _nextQuestion();
-      }
-    });
+  @override
+  void initState() {
+    super.initState();
+    _loadWords();
   }
 
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
 
-
-  Future<List<Word>> getWord() async {
+  Future<void> _loadWords() async {
     var snapshot = await _firestore
         .collection('words')
         .where('folderId', isEqualTo: widget.folder.id)
         .get();
-    List<Word> words = snapshot.docs.map((element) {
-      Map<String, dynamic> map = element.data();
-      return Word(map['english'], map['korean'], map['time'], map['image'],
-          element.id, map['folderId'], map['uid'], map['randomIndex']);
-    }).toList();
-    _generateOptions();
-    _startTimer();
-    return words;
+
+    setState(() {
+      _words = snapshot.docs.map((element) {
+        Map<String, dynamic> map = element.data();
+        return Word(map['english'], map['korean'], map['time'], map['image'],
+            element.id, map['folderId'], map['uid'], map['randomIndex']);
+      }).toList();
+      _generateOptions();
+      _startTimer();
+    });
   }
 
   void _generateOptions() {
@@ -77,132 +71,116 @@ class _WordTestState extends State<WordTest> {
     }).toList();
   }
 
+  void _startTimer() {
+    _timer?.cancel();
+    _timeLeftRatio = 1.0;
+    const tick = Duration(milliseconds: 100);
+    int ticks = 0;
+    int totalTicks = tick.inMicroseconds > 0
+        ? (questionDuration * 1000 ~/ tick.inMicroseconds)
+        : 1;
+
+    _timer = Timer.periodic(tick, (timer) {
+      setState(() {
+        ticks++;
+        if (totalTicks == 0) {
+          _timeLeftRatio = 0.0;
+        } else {
+          _timeLeftRatio = 1.0 - (ticks / totalTicks);
+          _timeLeftRatio = _timeLeftRatio.clamp(0.0, 1.0);
+        }
+      });
+
+      if (ticks >= totalTicks) {
+        _nextQuestion();
+      }
+    });
+  }
+
   void _nextQuestion() {
     _timer?.cancel();
     if (_currentIndex < _words.length - 1) {
       setState(() {
-        _currentIndex;
+        _currentIndex++;
         _startTimer();
       });
       _pageController.nextPage(
-          duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     } else {
-      print('Rmx');
+      // 테스트 끝
+      print('테스트 완료!');
     }
   }
 
-  Widget _StartUI() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Card(
-            child: Container(
-                width: 200,
-                height: 300,
-                child: Column(
-                  children: [Text('test'), Text('<${widget.folder.name}>')],
-                ))),
-        SizedBox(
-          height: 10,
-        ),
-        ElevatedButton(
-          onPressed: () {},
-          child: Text(
-            'start!',
-            style: TextStyle(fontSize: 20),
-          ),
-          style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              minimumSize: Size(200, 50)),
-        ),
-      ],
-    );
-  }
-
-  Widget _NormalUI(int id) {
-    final word = _words[id];
-    final options = _shuffledOptions[id];
+  Widget _buildQuestionCard(int index) {
+    final word = _words[index];
+    final options = _shuffledOptions[index];
 
     return Column(
-      key: ValueKey(id),
+      key: ValueKey(index),
       children: [
-        SizedBox(height: 20,),
+        SizedBox(height: 20),
         LinearProgressIndicator(
           value: _timeLeftRatio,
           backgroundColor: Colors.grey[300],
           color: Colors.blueAccent,
           minHeight: 10,
         ),
-        SizedBox(height: 40,),
+        SizedBox(height: 40),
         Card(
-          child: Text(word.english, style: TextStyle(fontSize: 24),),
-        )
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Text(word.english, style: TextStyle(fontSize: 24)),
+          ),
+        ),
+        SizedBox(height: 30),
+        ...options.map((opt) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  if (opt == word.korean) {
+                    print('정답');
+                  } else {
+                    print('오답');
+                  }
+                  _nextQuestion();
+                },
+                child: Text(opt),
+                style: ElevatedButton.styleFrom(minimumSize: Size(250, 50)),
+              ),
+            )),
       ],
     );
   }
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    getWord();
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    _timer?.cancel();
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    if (_words.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: Text('단어 테스트')),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(),
-      body: FutureBuilder(
-        future: getWord(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          if (snapshot.hasError) {
-            print(snapshot.error.toString());
-            return Center(
-              child: Text('오류가 발생했습니다.'),
-            );
-          }
-
-          final words = snapshot.requireData;
-
-          return Center(
-            child: PageView.builder(
-              controller: _pageController,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: words.length,
-              itemBuilder: (context, index) {
-                return AnimatedSwitcher(
-                  duration: Duration(milliseconds: 350),
-                  transitionBuilder: (child, animation) {
-                    return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: Offset(1, 0),
-                        end: Offset(0, 0),
-                      ).animate(animation),
-                      child: child,
-                    );
-                  },
-                  child: _NormalUI(index),
-                );
-              },
-            ),
-          );
-        },
+      appBar: AppBar(title: Text('단어 테스트')),
+      body: PageView.builder(
+        controller: _pageController,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: _words.length,
+        itemBuilder: (context, index) => AnimatedSwitcher(
+          duration: Duration(milliseconds: 300),
+          transitionBuilder: (child, animation) => SlideTransition(
+            position: Tween<Offset>(
+              begin: Offset(1, 0),
+              end: Offset(0, 0),
+            ).animate(animation),
+            child: child,
+          ),
+          child: _buildQuestionCard(index),
+        ),
       ),
     );
   }
