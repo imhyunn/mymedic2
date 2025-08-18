@@ -15,6 +15,7 @@ import 'package:mymedic1/data/word.dart';
 import 'package:mymedic1/screens/home/drawing.dart';
 
 import 'package:mymedic1/config/palette.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../data/AdHelper.dart';
 
@@ -636,6 +637,8 @@ class _WordNoteEditState extends State<WordNoteEdit> {
   }
 
   Future<void> updateWords() async {
+    final prefs = await SharedPreferences.getInstance();
+
     for (int i = 0; i < wordInfos.length; i++) {
       if (wordInfos[i].word.id == null) {
         await _firestore.collection('words').doc().set({
@@ -657,6 +660,11 @@ class _WordNoteEditState extends State<WordNoteEdit> {
           'uid': widget.folder.userId,
           'randomIndex': wordInfos[i].word.randomIndex
         });
+
+        final savedEnglish = prefs.getString('lastEnglish');
+        if (savedEnglish == wordInfos[i].word.english) {
+          await prefs.setString('lastKorean', wordInfos[i].word.korean);
+        }
       }
     }
     await _firestore.collection('folder').doc(widget.folder.id).set({
@@ -665,6 +673,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
       'userId': widget.folder.userId,
       'wordCount': wordInfos.length,
     });
+
   }
 
   Future<void> uploadImages() async {
