@@ -79,10 +79,6 @@ class _MyPageState extends State<MyPage> {
       print("User is not logged in.");
     }
 
-    // var userImage =
-    //     await _firestore.collection('user').doc(currentUser!.uid).get();
-    // userImagePath = userImage.data()!['profileImagePath'];
-
     if (userImagePath != 'null') {
       _pickedFile = XFile(userImagePath);
     }
@@ -163,168 +159,251 @@ class _MyPageState extends State<MyPage> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
-          title: Text('my page', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23),),
+          title: Text(
+            'my page',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23),
+          ),
         ),
-        body: Column(
-          children: [
-            SizedBox(
-              height: 13,
-            ),
-            Row(
+        body: Column(children: [
+          Card(
+            child: Column(
               children: [
-                const SizedBox(
-                  width: 15,
-                ),
-                Container(
-                  constraints: BoxConstraints(
-                    minHeight: _imageSize,
-                    minWidth: _imageSize,
-                  ),
-                  child: GestureDetector(
-                    onTap: () {
-                      _showBottomSheet();
-                    },
-                    child: _pickedFile == null
-                        ? Center(
-                            child: Icon(
-                              Icons.account_circle,
-                              size: _imageSize,
-                            ),
-                          )
-                        : Center(
-                            child: Container(
-                              width: _imageSize,
-                              height: _imageSize,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(45),
-                                border:
-                                    Border.all(width: 1, color: Colors.grey),
-                                image: DecorationImage(
-                                    image: _pickedFile!.path.startsWith('https')
-                                        ? NetworkImage(_pickedFile!.path)
-                                        : FileImage(File(_pickedFile!.path))
-                                            as ImageProvider,
-                                    // image: NetworkImage(_pickedFile!.path),
-                                    // image: FileImage(File(_pickedFile!.path)),
-                                    fit: BoxFit.cover),
-                              ),
-                              // child: Image.network(userProvider.appUser!.profileImagePath, fit: BoxFit.cover,),
-                            ),
-                          ),
-                  ),
-                ),
                 SizedBox(
-                  width: 25,
+                  height: 13,
                 ),
-                Container(
-                  height: 60,
-                  child: Column(
-                    children: [
-
-                      Text(
-                        _username,
-                        style: TextStyle(fontSize: 19),
+                Row(
+                  children: [
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Container(
+                      constraints: BoxConstraints(
+                        minHeight: _imageSize,
+                        minWidth: _imageSize,
                       ),
-                      // Text('${_userData['userLevel']}'),
-                    ],
-                  ),
+                      child: GestureDetector(
+                        onTap: () {
+                          _showBottomSheet();
+                        },
+                        child: _pickedFile == null
+                            ? Center(
+                                child: Icon(
+                                  Icons.account_circle,
+                                  size: _imageSize,
+                                ),
+                              )
+                            : Center(
+                                child: Container(
+                                  width: _imageSize,
+                                  height: _imageSize,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(45),
+                                    border: Border.all(
+                                        width: 1, color: Colors.grey),
+                                    image: DecorationImage(
+                                        image: _pickedFile!.path
+                                                .startsWith('https')
+                                            ? NetworkImage(_pickedFile!.path)
+                                            : FileImage(File(_pickedFile!.path))
+                                                as ImageProvider,
+                                        // image: NetworkImage(_pickedFile!.path),
+                                        // image: FileImage(File(_pickedFile!.path)),
+                                        fit: BoxFit.cover),
+                                  ),
+                                  // child: Image.network(userProvider.appUser!.profileImagePath, fit: BoxFit.cover,),
+                                ),
+                              ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 25,
+                    ),
+                    Container(
+                      height: 60,
+                      child: Column(
+                        children: [
+                          Text(
+                            _username,
+                            style: TextStyle(fontSize: 19),
+                          ),
+                          // Text('${_userData['userLevel']}'),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            Expanded(child: Text("")),
-            // SizedBox(
-            //   height: 10,
-            // ),
-            Padding(
-              padding: EdgeInsets.only(bottom: 8),
-              child: ListTile(
-                leading: Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Icon(
-                      Icons.logout,
-                      color: Colors.grey,
-                    )),
-                title: Text(
-                  'logout',
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          ListTile(
+            leading: Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: Icon(
+                  Icons.logout,
+                )),
+            title: Text(
+              'logout',
+              // style: TextStyle(color: Colors.grey),
+            ),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7.0)),
+                  title: Text(
+                    '로그아웃하시겠습니까?',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  actions: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Palette.buttonColor2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                      ),
+                      child: const Text(
+                        '아니오',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await _firebaseAuth.signOut();
+
+                        try {
+                          await FirebaseAuth.instance.signOut();
+                          print('signout');
+
+                          // 로그아웃이 성공적으로 되었는지 확인
+                          if (FirebaseAuth.instance.currentUser == null) {
+                            // 로그인 화면으로 이동 (예: '/login')
+                            Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                    const LoginScreen()),
+                                    (route) => false);
+                          }
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.remove('lastDate');
+                          await prefs.remove('lastEnglish');
+                          await prefs.remove('lastKorean');
+                        } catch (e) {
+                          print('로그아웃 실패: $e');
+                        }
+
+                        // Navigator.of(context).push(
+                        //   MaterialPageRoute(
+                        //     builder: (BuildContext) => LoginScreen(),
+                        //   ),
+                        // );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Palette.buttonColor2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                      ),
+                      child: const Text(
+                        '예',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
+                  ],
+                  // content:
+                  // Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
+                ),
+              );
+            },
+          ),
+          Expanded(child: Text("")),
+          // SizedBox(
+          //   height: 10,
+          // ),
+          Padding(
+            padding: EdgeInsets.only(bottom: 8),
+            child: ListTile(
+              title: Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: Text(
+                  '회원 탈퇴',
                   style: TextStyle(color: Colors.grey),
                 ),
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7.0)),
-                      title: Text('로그아웃하시겠습니까?', style: TextStyle(fontSize: 18),),
-                      actions: [
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Palette.buttonColor2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                          ),
-                          child: const Text(
-                            '아니오',
-                            style: TextStyle(color: Colors.white),
+              ),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7.0)),
+                    title: Text(
+                      '탈퇴하시겠습니까?',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Palette.buttonColor2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0),
                           ),
                         ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            await _firebaseAuth.signOut();
+                        child: const Text(
+                          '아니오',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final uid = currentUser?.uid;
+                          if (uid == null) return;
 
-                            try {
-                              await FirebaseAuth.instance.signOut();
-                              print('signout');
+                          await currentUser?.delete();
+                          await _firestore
+                              .collection('user')
+                              .doc(uid)
+                              .delete();
 
-                              // 로그아웃이 성공적으로 되었는지 확인
-                              if (FirebaseAuth.instance.currentUser == null) {
-                                // 로그인 화면으로 이동 (예: '/login')
-                                Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const LoginScreen()),
-                                    (route) => false);
-                              }
-                              final prefs = await SharedPreferences.getInstance();
-                              await prefs.remove('lastDate');
-                              await prefs.remove('lastEnglish');
-                              await prefs.remove('lastKorean');
-
-                            } catch (e) {
-                              print('로그아웃 실패: $e');
-                            }
-
-                            // Navigator.of(context).push(
-                            //   MaterialPageRoute(
-                            //     builder: (BuildContext) => LoginScreen(),
-                            //   ),
-                            // );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Palette.buttonColor2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const LoginScreen()),
+                                  (route) => false);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Palette.buttonColor2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0),
                           ),
-                          child: const Text(
-                            '예',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        )
-                      ],
-                      // content:
-                      // Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
-                    ),
-                  );
-                },
-              ),
-            )
-          ],
-        ),
+                        ),
+                        child: const Text(
+                          '예',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      )
+                    ],
+                    // content:
+                    // Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
+                  ),
+                );
+              },
+            ),
+          ),
+        ]),
       ),
     );
   }
@@ -356,12 +435,11 @@ class _MyPageState extends State<MyPage> {
                     // 스토리지에 위에서 가져온 이미지를 저장하는 코드
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.buttonColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                    fixedSize: Size(150, 22)
-                  ),
+                      backgroundColor: Palette.buttonColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      fixedSize: Size(150, 22)),
                   child: const Text(
                     '사진찍기',
                     style: TextStyle(color: Colors.white),
