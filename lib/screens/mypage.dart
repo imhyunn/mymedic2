@@ -68,7 +68,7 @@ class _MyPageState extends State<MyPage> {
     // print('ss');
   }
 
-  void _getProfileImage() async {
+  Future<void> _getProfileImage() async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       var userImage =
@@ -84,37 +84,7 @@ class _MyPageState extends State<MyPage> {
     }
   }
 
-  //
-  // Future<void> _getAppUser() async {
-  //   var snap = await _firestore.collection('user').doc(currentUser!.uid).get();
-  //
-  //   if (snap.exists) {
-  //     _appUser = AppUser(
-  //       snap['userName'],
-  //       snap['email'],
-  //       snap['password'],
-  //       snap['birthDate'],
-  //       snap['phoneNumber'],
-  //       snap.id,
-  //       snap['profileImagePath'],
-  //     );// UI 업데이트
-  //   }
-  //
-  //
-  //
-  //   // List<AppUser> appUser = querySnapshot.docs.map((e) {
-  //   //   return AppUser(e.data()['userName'], e.data()['email'], e.data()['password'], e.data()['birthDate'], e.data()['phoneNumber'], e.id, e.data()['profileImage']);
-  //   // },).toList();
-  //   //
-  //   // return appUser;
-  //
-  //
-  //
-  // }
-
   Future<void> saveImage(XFile image) async {
-    // final userProvider = context.read<UserProvider>();
-
     var dateTime = DateTime.now().toString().replaceAll(' ', '_');
     var ref = _firebaseStorage.ref().child("images/$dateTime.jpg");
     // 해결했다 ^^... 2024-08-30 20:51 - 원인은 라이브러리 버전... App Check token 뭐시기 그거는 에러가 아니래..
@@ -124,6 +94,7 @@ class _MyPageState extends State<MyPage> {
     var complete = await putFile.whenComplete(() => {});
     var s = await complete.ref.getDownloadURL();
     print(s);
+
 
     if (userImagePath != 'null') {
       final oldRef = FirebaseStorage.instance.refFromURL(userImagePath);
@@ -139,7 +110,7 @@ class _MyPageState extends State<MyPage> {
       'userName': _username
     });
 
-    _getProfileImage();
+    // _getProfileImage();
   }
 
   @override
@@ -164,251 +135,268 @@ class _MyPageState extends State<MyPage> {
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23),
           ),
         ),
-        body: Column(children: [
-          Card(
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 13,
-                ),
-                Row(
-                  children: [
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    Container(
-                      constraints: BoxConstraints(
-                        minHeight: _imageSize,
-                        minWidth: _imageSize,
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          _showBottomSheet();
-                        },
-                        child: _pickedFile == null
-                            ? Center(
-                                child: Icon(
-                                  Icons.account_circle,
-                                  size: _imageSize,
-                                ),
-                              )
-                            : Center(
-                                child: Container(
-                                  width: _imageSize,
-                                  height: _imageSize,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(45),
-                                    border: Border.all(
-                                        width: 1, color: Colors.grey),
-                                    image: DecorationImage(
-                                        image: _pickedFile!.path
-                                                .startsWith('https')
-                                            ? NetworkImage(_pickedFile!.path)
-                                            : FileImage(File(_pickedFile!.path))
-                                                as ImageProvider,
-                                        // image: NetworkImage(_pickedFile!.path),
-                                        // image: FileImage(File(_pickedFile!.path)),
-                                        fit: BoxFit.cover),
-                                  ),
-                                  // child: Image.network(userProvider.appUser!.profileImagePath, fit: BoxFit.cover,),
-                                ),
-                              ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 25,
-                    ),
-                    Container(
-                      height: 60,
-                      child: Column(
-                        children: [
-                          Text(
-                            _username,
-                            style: TextStyle(fontSize: 19),
-                          ),
-                          // Text('${_userData['userLevel']}'),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          ListTile(
-            leading: Padding(
-                padding: EdgeInsets.only(left: 10),
-                child: Icon(
-                  Icons.logout,
-                )),
-            title: Text(
-              'logout',
-              // style: TextStyle(color: Colors.grey),
-            ),
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7.0)),
-                  title: Text(
-                    '로그아웃하시겠습니까?',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  actions: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.buttonColor2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                      ),
-                      child: const Text(
-                        '아니오',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        await _firebaseAuth.signOut();
-
-                        try {
-                          await FirebaseAuth.instance.signOut();
-                          print('signout');
-
-                          // 로그아웃이 성공적으로 되었는지 확인
-                          if (FirebaseAuth.instance.currentUser == null) {
-                            // 로그인 화면으로 이동 (예: '/login')
-                            Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                    const LoginScreen()),
-                                    (route) => false);
-                          }
-                          final prefs = await SharedPreferences.getInstance();
-                          await prefs.remove('lastDate');
-                          await prefs.remove('lastEnglish');
-                          await prefs.remove('lastKorean');
-                        } catch (e) {
-                          print('로그아웃 실패: $e');
-                        }
-
-                        // Navigator.of(context).push(
-                        //   MaterialPageRoute(
-                        //     builder: (BuildContext) => LoginScreen(),
-                        //   ),
-                        // );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.buttonColor2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                      ),
-                      child: const Text(
-                        '예',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    )
-                  ],
-                  // content:
-                  // Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
-                ),
+        body: FutureBuilder(
+          future: _getProfileImage(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
               );
-            },
-          ),
-          Expanded(child: Text("")),
-          // SizedBox(
-          //   height: 10,
-          // ),
-          Padding(
-            padding: EdgeInsets.only(bottom: 8),
-            child: ListTile(
-              title: Padding(
-                padding: EdgeInsets.only(left: 10),
-                child: Text(
-                  '회원 탈퇴',
-                  style: TextStyle(color: Colors.grey),
+            }
+
+            if (snapshot.hasError) {
+              print(snapshot.error.toString());
+              return Center(
+                child: Text('오류가 발생했습니다.'),
+              );
+            }
+
+            return Column(children: [
+              Card(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 13,
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        Container(
+                          constraints: BoxConstraints(
+                            minHeight: _imageSize,
+                            minWidth: _imageSize,
+                          ),
+                          child: GestureDetector(
+                            onTap: ()  {
+                              _showBottomSheet();
+                            },
+                            child: Center(
+                              child: ClipOval(
+                                  child: _pickedFile == null
+                                      ? Container(
+                                          width: _imageSize,
+                                          height: _imageSize,
+                                          child: FittedBox(
+                                            child: Icon(
+                                              Icons.account_circle,
+                                              size: _imageSize,
+                                            ),
+                                          ),
+                                        )
+                                      : Image(
+                                          width: _imageSize,
+                                          height: _imageSize,
+                                          fit: BoxFit.cover,
+                                          image: _pickedFile!.path
+                                                  .startsWith('https')
+                                              ? NetworkImage(_pickedFile!.path)
+                                              : FileImage(
+                                                      File(_pickedFile!.path))
+                                                  as ImageProvider,
+                                        )),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 25,
+                        ),
+                        Container(
+                          height: 60,
+                          child: Column(
+                            children: [
+                              Text(
+                                _username,
+                                style: TextStyle(fontSize: 19),
+                              ),
+                              // Text('${_userData['userLevel']}'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(7.0)),
-                    title: Text(
-                      '탈퇴하시겠습니까?',
-                      style: TextStyle(
-                        fontSize: 18,
+              SizedBox(
+                height: 10,
+              ),
+              ListTile(
+                leading: Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Icon(
+                      Icons.logout,
+                    )),
+                title: Text(
+                  'logout',
+                  // style: TextStyle(color: Colors.grey),
+                ),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7.0)),
+                      title: Text(
+                        '로그아웃하시겠습니까?',
+                        style: TextStyle(fontSize: 18),
                       ),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Palette.buttonColor2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                          ),
+                          child: const Text(
+                            '아니오',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            await _firebaseAuth.signOut();
+
+                            try {
+                              await FirebaseAuth.instance.signOut();
+                              print('signout');
+
+                              // 로그아웃이 성공적으로 되었는지 확인
+                              if (FirebaseAuth.instance.currentUser == null) {
+                                // 로그인 화면으로 이동 (예: '/login')
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LoginScreen()),
+                                    (route) => false);
+                              }
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              await prefs.remove('lastDate');
+                              await prefs.remove('lastEnglish');
+                              await prefs.remove('lastKorean');
+                            } catch (e) {
+                              print('로그아웃 실패: $e');
+                            }
+
+                            // Navigator.of(context).push(
+                            //   MaterialPageRoute(
+                            //   MaterialPageRoute(
+                            //     builder: (BuildContext) => LoginScreen(),
+                            //   ),
+                            // );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Palette.buttonColor2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                          ),
+                          child: const Text(
+                            '예',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        )
+                      ],
+                      // content:
+                      // Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
                     ),
-                    actions: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.buttonColor2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                        ),
-                        child: const Text(
-                          '아니오',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final uid = currentUser?.uid;
-                          if (uid == null) return;
-
-                          await currentUser?.delete();
-                          await _firestore
-                              .collection('user')
-                              .doc(uid)
-                              .delete();
-
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const LoginScreen()),
-                                  (route) => false);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.buttonColor2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                        ),
-                        child: const Text(
-                          '예',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      )
-                    ],
-                    // content:
-                    // Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
+                  );
+                },
+              ),
+              Expanded(child: Text("")),
+              // SizedBox(
+              //   height: 10,
+              // ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: ListTile(
+                  title: Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Text(
+                      '회원 탈퇴',
+                      style: TextStyle(color: Colors.grey),
+                    ),
                   ),
-                );
-              },
-            ),
-          ),
-        ]),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7.0)),
+                        title: Text(
+                          '탈퇴하시겠습니까?',
+                          style: TextStyle(
+                            fontSize: 18,
+                          ),
+                        ),
+                        actions: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Palette.buttonColor2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                            ),
+                            child: const Text(
+                              '아니오',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              final uid = currentUser?.uid;
+                              if (uid == null) return;
+
+                              await currentUser?.delete();
+                              await _firestore
+                                  .collection('user')
+                                  .doc(uid)
+                                  .delete();
+
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const LoginScreen()),
+                                  (route) => false);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Palette.buttonColor2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                            ),
+                            child: const Text(
+                              '예',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          )
+                        ],
+                        // content:
+                        // Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ]);
+          },
+        ),
       ),
     );
   }
 
-  _showBottomSheet() {
+  Future<void> _showBottomSheet() {
     return showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -429,6 +417,10 @@ class _MyPageState extends State<MyPage> {
                   onPressed: () async {
                     var image = await _getCameraImage();
                     if (image != null) {
+                      setState(() {
+                        _pickedFile = image;
+                      });
+                      print(_pickedFile!.path);
                       Navigator.of(context).pop();
                       await saveImage(image);
                     }
