@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mymedic1/screens/home/home_screen.dart';
 import 'package:mymedic1/screens/myapp.dart';
+import 'package:mymedic1/screens/mypage_edit.dart';
 import 'package:mymedic1/screens/sign/login_screen.dart';
 import 'package:mymedic1/screens/sign/signup_screen.dart';
 import 'package:provider/provider.dart';
@@ -155,69 +156,87 @@ class _MyPageState extends State<MyPage> {
               Card(
                 child: Column(
                   children: [
-                    SizedBox(
-                      height: 13,
-                    ),
-                    Row(
-                      children: [
-                        const SizedBox(
-                          width: 15,
-                        ),
-                        Container(
-                          constraints: BoxConstraints(
-                            minHeight: _imageSize,
-                            minWidth: _imageSize,
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      child: Row(
+                        children: [
+                          const SizedBox(
+                            width: 15,
                           ),
-                          child: GestureDetector(
-                            onTap: ()  {
-                              _showBottomSheet();
-                            },
-                            child: Center(
-                              child: ClipOval(
-                                  child: _pickedFile == null
-                                      ? Container(
-                                          width: _imageSize,
-                                          height: _imageSize,
-                                          child: FittedBox(
-                                            child: Icon(
-                                              Icons.account_circle,
-                                              size: _imageSize,
+                          Container(
+                            constraints: BoxConstraints(
+                              minHeight: _imageSize,
+                              minWidth: _imageSize,
+                            ),
+                            child: GestureDetector(
+                              onTap: ()  {
+                                _showBottomSheet();
+                              },
+                              child: Center(
+                                child: ClipOval(
+                                    child: _pickedFile == null
+                                        ? Container(
+                                            width: _imageSize,
+                                            height: _imageSize,
+                                            child: FittedBox(
+                                              child: Icon(
+                                                Icons.account_circle,
+                                                size: _imageSize,
+                                              ),
                                             ),
-                                          ),
-                                        )
-                                      : Image(
-                                          width: _imageSize,
-                                          height: _imageSize,
-                                          fit: BoxFit.cover,
-                                          image: _pickedFile!.path
-                                                  .startsWith('https')
-                                              ? NetworkImage(_pickedFile!.path)
-                                              : FileImage(
-                                                      File(_pickedFile!.path))
-                                                  as ImageProvider,
-                                        )),
+                                          )
+                                        : Image(
+                                            width: _imageSize,
+                                            height: _imageSize,
+                                            fit: BoxFit.cover,
+                                            image: _pickedFile!.path
+                                                    .startsWith('https')
+                                                ? NetworkImage(_pickedFile!.path)
+                                                : FileImage(
+                                                        File(_pickedFile!.path))
+                                                    as ImageProvider,
+                                          )),
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          width: 25,
-                        ),
-                        Container(
-                          height: 60,
-                          child: Column(
-                            children: [
-                              Text(
-                                _username,
-                                style: TextStyle(fontSize: 19),
-                              ),
-                              // Text('${_userData['userLevel']}'),
-                            ],
+                          SizedBox(
+                            width: 25,
                           ),
-                        ),
-                      ],
+                          Container(
+                            height: 60,
+                            child: Column(
+                              children: [
+                                Text(
+                                  _username,
+                                  style: TextStyle(fontSize: 19),
+                                ),
+                                // Text('${_userData['userLevel']}'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
+              ),
+              SizedBox(height: 10,),
+              ListTile(
+                leading: Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Icon(
+                      Icons.edit,
+                    )),
+                title: Text(
+                  '회원정보 수정',
+                ),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (BuildContext) => MyPageEdit(),
+                    ),
+                  );
+                },
               ),
               SizedBox(
                 height: 10,
@@ -229,7 +248,7 @@ class _MyPageState extends State<MyPage> {
                       Icons.logout,
                     )),
                 title: Text(
-                  'logout',
+                  '로그아웃',
                   // style: TextStyle(color: Colors.grey),
                 ),
                 onTap: () {

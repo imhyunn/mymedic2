@@ -27,16 +27,13 @@ class _MyPageEditState extends State<MyPageEdit> {
   final _firebaseAuth = FirebaseAuth.instance;
   User? loggedUser;
   final currentUser = FirebaseAuth.instance.currentUser;
-  final TextEditingController _userNameController = TextEditingController();
 
-  // AppUser? _appUser;
-  // AppUser? get appUser => _appUser;
   String userImagePath = '';
 
   void _getUserProfile() async {
     final user = _firebaseAuth.currentUser;
 
-    if(user != null) {
+    if (user != null) {
       final userData = await FirebaseFirestore.instance
           .collection('user')
           .doc(user.uid)
@@ -49,79 +46,26 @@ class _MyPageEditState extends State<MyPageEdit> {
         });
       }
     }
-
-    // appUsers['birthDate'] = _userData['birthDate'];
-    // appUsers['email'] = _userData['email'];
-    // appUsers['password'] = _userData['password'];
-    // appUsers['phoneNumber'] = _userData['phoneNumber'];
-    // appUsers['profileImage'] = _userData['profileImage'];
-    // appUsers['userName'] = _username;
-    // print(_userData);
-    // print('ss');
   }
 
-  void _getProfileImage() async {
+  Future<void> _getProfileImage() async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       var userImage =
-      await _firestore.collection('user').doc(currentUser.uid).get();
+          await _firestore.collection('user').doc(currentUser.uid).get();
       userImagePath = userImage.data()!['profileImagePath'];
-
     } else {
-      // 로그인되지 않은 상태 처리
       print("User is not logged in.");
     }
 
-    // var userImage =
-    //     await _firestore.collection('user').doc(currentUser!.uid).get();
-    // userImagePath = userImage.data()!['profileImagePath'];
-
-
     if (userImagePath != 'null') {
       _pickedFile = XFile(userImagePath);
-
-
     }
-
-
-
-
   }
 
-  //
-  // Future<void> _getAppUser() async {
-  //   var snap = await _firestore.collection('user').doc(currentUser!.uid).get();
-  //
-  //   if (snap.exists) {
-  //     _appUser = AppUser(
-  //       snap['userName'],
-  //       snap['email'],
-  //       snap['password'],
-  //       snap['birthDate'],
-  //       snap['phoneNumber'],
-  //       snap.id,
-  //       snap['profileImagePath'],
-  //     );// UI 업데이트
-  //   }
-  //
-  //
-  //
-  //   // List<AppUser> appUser = querySnapshot.docs.map((e) {
-  //   //   return AppUser(e.data()['userName'], e.data()['email'], e.data()['password'], e.data()['birthDate'], e.data()['phoneNumber'], e.id, e.data()['profileImage']);
-  //   // },).toList();
-  //   //
-  //   // return appUser;
-  //
-  //
-  //
-  // }
-
   Future<void> saveImage(XFile image) async {
-    // final userProvider = context.read<UserProvider>();
-
     var dateTime = DateTime.now().toString().replaceAll(' ', '_');
     var ref = _firebaseStorage.ref().child("images/$dateTime.jpg");
-    // 해결했다 ^^... 2024-08-30 20:51 - 원인은 라이브러리 버전... App Check token 뭐시기 그거는 에러가 아니래..
     var putFile = ref.putFile(
         File(image.path), SettableMetadata(contentType: "image/jpeg"));
 
@@ -129,22 +73,21 @@ class _MyPageEditState extends State<MyPageEdit> {
     var s = await complete.ref.getDownloadURL();
     print(s);
 
-    if (userImagePath != 'null'){
+    if (userImagePath != 'null') {
       final oldRef = FirebaseStorage.instance.refFromURL(userImagePath);
       await oldRef.delete();
     }
 
     await _firestore.collection('user').doc(currentUser!.uid).set({
-      'birthDate' : _userData['birthDate'],
-      'email' : _userData['email'],
-      'password' : _userData['password'],
-      'phoneNumber' : _userData['phoneNumber'],
-      'profileImagePath' : await complete.ref.getDownloadURL(),
-      'userName' : _username
+      'birthDate': _userData['birthDate'],
+      'email': _userData['email'],
+      'password': _userData['password'],
+      'phoneNumber': _userData['phoneNumber'],
+      'profileImagePath': await complete.ref.getDownloadURL(),
+      'userName': _username
     });
 
-    _getProfileImage();
-
+    // _getProfileImage();
   }
 
   @override
@@ -156,156 +99,110 @@ class _MyPageEditState extends State<MyPageEdit> {
 
   @override
   Widget build(BuildContext context) {
-    // final userProvider = Provider.of<UserProvider>(context);
     final _imageSize = MediaQuery.of(context).size.width / 4;
-    _getProfileImage();
-    _userNameController.text = _username;
 
     return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(''),
-        ),
-        body: Column(
-          children: [
-            SizedBox(
-              height: 13,
+        child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              title: Text(
+                'my page',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23),
+              ),
             ),
-            Row(
-              children: [
-                const SizedBox(
-                  width: 15,
-                ),
-                Container(
-                  constraints: BoxConstraints(
-                    minHeight: _imageSize,
-                    minWidth: _imageSize,
-                  ),
-                  child: GestureDetector(
-                    onTap: () {
-                      _showBottomSheet();
-                    },
-                    child: _pickedFile == null
-                        ? Center(
-                      child: Icon(
-                        Icons.account_circle,
-                        size: _imageSize,
+            body: FutureBuilder(
+              future: _getProfileImage(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  print(snapshot.error.toString());
+                  return Center(
+                    child: Text('오류가 발생했습니다.'),
+                  );
+                }
+
+                return Column(
+                  children: [
+                    Card(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 15,
+                                ),
+                                Container(
+                                  constraints: BoxConstraints(
+                                    minHeight: _imageSize,
+                                    minWidth: _imageSize,
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _showBottomSheet();
+                                    },
+                                    child: Center(
+                                      child: ClipOval(
+                                          child: _pickedFile == null
+                                              ? Container(
+                                                  width: _imageSize,
+                                                  height: _imageSize,
+                                                  child: FittedBox(
+                                                    child: Icon(
+                                                      Icons.account_circle,
+                                                      size: _imageSize,
+                                                    ),
+                                                  ),
+                                                )
+                                              : Image(
+                                                  width: _imageSize,
+                                                  height: _imageSize,
+                                                  fit: BoxFit.cover,
+                                                  image: _pickedFile!.path
+                                                          .startsWith('https')
+                                                      ? NetworkImage(
+                                                          _pickedFile!.path)
+                                                      : FileImage(File(
+                                                              _pickedFile!
+                                                                  .path))
+                                                          as ImageProvider,
+                                                )),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 25,
+                                ),
+                                Container(
+                                  height: 60,
+                                  child: Column(
+                                    children: [
+                                      TextField(
+
+                                      )
+                                      // Text(
+                                      //   _username,
+                                      //   style: TextStyle(fontSize: 19),
+                                      // )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+                        ],
                       ),
                     )
-                        : Center(
-                      child: Container(
-                        width: _imageSize,
-                        height: _imageSize,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border:
-                          Border.all(width: 1, color: Colors.grey),
-                          image: DecorationImage(
-                              image: _pickedFile!.path.startsWith('https') ? NetworkImage(_pickedFile!.path) : FileImage(File(_pickedFile!.path)) as ImageProvider,
-                              // image: NetworkImage(_pickedFile!.path),
-                              // image: FileImage(File(_pickedFile!.path)),
-                              fit: BoxFit.cover),
-                        ),
-                        // child: Image.network(userProvider.appUser!.profileImagePath, fit: BoxFit.cover,),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-                Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextFormField(
-                        controller: _userNameController,
-                        style: TextStyle(fontSize: 19),
-                      ),
-                      // Text('${_userData['userLevel']}'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            ListTile(
-              // leading: Icon(Icons.logout),
-              // title: Text('logout'),
-              // onTap: () {
-              //
-              //   showDialog(
-              //     context: context,
-              //     builder: (context) => AlertDialog(
-              //       shape: RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.circular(7.0)),
-              //       title: Text('로그아웃하시겠습니까?'),
-              //       actions: [
-              //         ElevatedButton(
-              //           onPressed: () {
-              //             Navigator.pop(context);
-              //           },
-              //           style: ElevatedButton.styleFrom(
-              //             backgroundColor: Palette.buttonColor2,
-              //             shape: RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(5.0),
-              //             ),
-              //           ),
-              //           child: const Text(
-              //             '아니오',
-              //             style: TextStyle(color: Colors.white),
-              //           ),
-              //         ),
-              //         ElevatedButton(
-              //           onPressed: () async {
-              //             await _firebaseAuth.signOut();
-              //
-              //             try {
-              //               await FirebaseAuth.instance.signOut();
-              //               print('signout');
-              //
-              //               // 로그아웃이 성공적으로 되었는지 확인
-              //               if (FirebaseAuth.instance.currentUser == null) {
-              //                 // 로그인 화면으로 이동 (예: '/login')
-              //                 Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-              //                     builder: (context) => const LoginScreen()), (route) => false);
-              //               }
-              //             } catch (e) {
-              //               print('로그아웃 실패: $e');
-              //             }
-              //
-              //             // Navigator.of(context).push(
-              //             //   MaterialPageRoute(
-              //             //     builder: (BuildContext) => LoginScreen(),
-              //             //   ),
-              //             // );
-              //           },
-              //           style: ElevatedButton.styleFrom(
-              //             backgroundColor: Palette.buttonColor2,
-              //             shape: RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(5.0),
-              //             ),
-              //           ),
-              //           child: const Text(
-              //             '예',
-              //             style: TextStyle(color: Colors.white),
-              //           ),
-              //         )
-              //       ],
-              //       // content:
-              //       // Text('단어를 ${folder[index].name} 폴더로 이동시킬까요?'),
-              //     ),
-              //   );
-
-
-              // },
-            )
-          ],
-        ),
-      ),
-    );
+                  ],
+                );
+              },
+            )));
   }
 
   _showBottomSheet() {
@@ -380,7 +277,7 @@ class _MyPageEditState extends State<MyPageEdit> {
 
   Future<XFile?> _getCameraImage() async {
     final pickedFile =
-    await ImagePicker().pickImage(source: ImageSource.camera);
+        await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
         _pickedFile = pickedFile;
@@ -397,7 +294,7 @@ class _MyPageEditState extends State<MyPageEdit> {
 
   _getPhotoLibraryImage() async {
     final pickedFile =
-    await ImagePicker().pickImage(source: ImageSource.gallery);
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _pickedFile = pickedFile;

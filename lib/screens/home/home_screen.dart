@@ -251,123 +251,122 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ]),
           ),
-          Expanded(
-            child: Container(
-              width: size.width,
-              // height: size.height * 0.5,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        color: Colors.white,
-                        elevation: 0,
-                        child: Container(
-                          height: 120,
-                          width: size.width * 0.5,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Color(0xFF4567BD),
-                              width: 3, // 테두리 두께
-                            ),
-                          ),
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (BuildContext) => WordFolder(),
-                                ),
-                              );
-                              setState(() {
+          SizedBox(height: size.height * 0.03,),
+          Container(
+            width: size.width,
+            // height: size.height * 0.5,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      color: Color(0xfff0f7ff),
+                      elevation: 0,
+                      child: Container(
+                        height: 120,
+                        width: size.width * 0.95,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          // border: Border.all(
+                          //   color: Color(0xFF4567BD),
+                          //   width: 3, // 테두리 두께
+                          // ),
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (BuildContext) => WordFolder(),
+                              ),
+                            );
+                            setState(() {
 
-                              });
-                            },
-                            child: Text(
-                              'word',
-                              style: TextStyle(
-                                  fontSize: 28,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                            ),
+                            });
+                          },
+                          child: Text(
+                            'word',
+                            style: TextStyle(
+                                fontSize: 28,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
-                      /*SizedBox(
-                        height: size.height * 0.02,
-                      ),
-                      Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        color: Colors.white,
-                        elevation: 0,
-                        child: Container(
-                          height: 120,
-                          width: 340,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Color(0xEA5180A2),
-                              width: 2, // 테두리 두께
-                            ),
-                          ),
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (BuildContext) => WordTestHome(),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              'test',
-                              style: TextStyle(fontSize: 28, color: Colors.black,fontWeight: FontWeight.bold),
-                            ),
+                    ),
+                    /*SizedBox(
+                      height: size.height * 0.02,
+                    ),
+                    Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      color: Colors.white,
+                      elevation: 0,
+                      child: Container(
+                        height: 120,
+                        width: 340,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Color(0xEA5180A2),
+                            width: 2, // 테두리 두께
                           ),
                         ),
-                      ),*/
-                      /*SizedBox(
-                        height: size.height * 0.02,
-                      ),
-                      Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        color: Colors.white,
-                        elevation: 0,
-                        child: Container(
-                          height: 120,
-                          width: 340,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Color(0xEA5180A2),
-                              width: 2, // 테두리 두께
-                            ),
-                          ),
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (BuildContext) => TestScreen(),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              'game',
-                              style: TextStyle(fontSize: 28, color: Colors.black,fontWeight: FontWeight.bold),
-                            ),
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (BuildContext) => WordTestHome(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'test',
+                            style: TextStyle(fontSize: 28, color: Colors.black,fontWeight: FontWeight.bold),
                           ),
                         ),
-                      ),*/
-                    ],
-                  ),
-                ],
-              ),
+                      ),
+                    ),*/
+                    /*SizedBox(
+                      height: size.height * 0.02,
+                    ),
+                    Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      color: Colors.white,
+                      elevation: 0,
+                      child: Container(
+                        height: 120,
+                        width: 340,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Color(0xEA5180A2),
+                            width: 2, // 테두리 두께
+                          ),
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (BuildContext) => TestScreen(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'game',
+                            style: TextStyle(fontSize: 28, color: Colors.black,fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ),*/
+                  ],
+                ),
+              ],
             ),
           ),
         ]),
