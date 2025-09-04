@@ -164,6 +164,7 @@ class _MyPageState extends State<MyPage> {
                             width: 15,
                           ),
                           Container(
+
                             constraints: BoxConstraints(
                               minHeight: _imageSize,
                               minWidth: _imageSize,

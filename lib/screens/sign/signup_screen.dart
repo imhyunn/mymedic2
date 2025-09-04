@@ -30,17 +30,16 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
-
 
   Future<void> _tryValidation() async {
     final isValid = _formKey.currentState!.validate();
     if (isValid) {
       _formKey.currentState!.save();
     }
-
   }
 
   @override
@@ -125,7 +124,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                       fontSize: 14, color: Palette.textColor1),
                                 ),
                               ),
-                            ), //name
+                            ),
+                            //name
                             SizedBox(
                               height: 10,
                             ),
@@ -152,14 +152,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderSide:
-                                    BorderSide(color: Palette.textColor1),
+                                        BorderSide(color: Palette.textColor1),
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(5.0),
                                     ),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide:
-                                    BorderSide(color: Palette.textColor1),
+                                        BorderSide(color: Palette.textColor1),
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(5.0),
                                     ),
@@ -172,7 +172,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                       fontSize: 14, color: Palette.textColor1),
                                 ),
                               ),
-                            ), //email
+                            ),
+                            //email
                             SizedBox(
                               height: 10,
                             ),
@@ -199,14 +200,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderSide:
-                                    BorderSide(color: Palette.textColor1),
+                                        BorderSide(color: Palette.textColor1),
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(5.0),
                                     ),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide:
-                                    BorderSide(color: Palette.textColor1),
+                                        BorderSide(color: Palette.textColor1),
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(5.0),
                                     ),
@@ -219,7 +220,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                       fontSize: 14, color: Palette.textColor1),
                                 ),
                               ),
-                            ), //password
+                            ),
+                            //password
                             SizedBox(
                               height: 10,
                             ),
@@ -232,7 +234,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                 obscureText: true,
                                 key: ValueKey(8),
                                 validator: (value) {
-                                  if (value!.isEmpty || _confirmPasswordController.text != _passwordController.text) {
+                                  if (value!.isEmpty ||
+                                      _confirmPasswordController.text !=
+                                          _passwordController.text) {
                                     return 'confirm password.';
                                   }
                                   return null;
@@ -240,14 +244,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderSide:
-                                    BorderSide(color: Palette.textColor1),
+                                        BorderSide(color: Palette.textColor1),
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(5.0),
                                     ),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide:
-                                    BorderSide(color: Palette.textColor1),
+                                        BorderSide(color: Palette.textColor1),
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(5.0),
                                     ),
@@ -260,7 +264,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                       fontSize: 14, color: Palette.textColor1),
                                 ),
                               ),
-                            ), //password
+                            ),
+                            //password
                             SizedBox(
                               height: 10,
                             ),
@@ -309,7 +314,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                       fontSize: 14, color: Palette.textColor1),
                                 ),
                               ),
-                            ), //birth date
+                            ),
+                            //birth date
                             SizedBox(
                               height: 10,
                             ),
@@ -357,7 +363,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                       fontSize: 14, color: Palette.textColor1),
                                 ),
                               ),
-                            ), //phone number
+                            ),
+                            //phone number
                             SizedBox(
                               height: 10,
                             ),
@@ -402,8 +409,6 @@ class _SignupScreenState extends State<SignupScreen> {
                             // SizedBox(
                             //   height: 10,
                             // ),
-
-
 
                             /*SizedBox(
                               width: 335,
@@ -460,23 +465,23 @@ class _SignupScreenState extends State<SignupScreen> {
                   _tryValidation();
 
                   if (_formKey.currentState?.validate() ?? false) {
-
                     try {
-                      final newUser = await _authentication
-                          .createUserWithEmailAndPassword(
+                      final newUser =
+                          await _authentication.createUserWithEmailAndPassword(
                         email: userEmail,
                         password: userPassword,
                       );
 
-
-                      await FirebaseFirestore.instance.collection('user').doc(newUser.user!.uid)
+                      await FirebaseFirestore.instance
+                          .collection('user')
+                          .doc(newUser.user!.uid)
                           .set({
-                        'userName' : userName,
-                        'email' : userEmail,
-                        'password' : userPassword,
-                        'birthDate' : userBirthDate,
-                        'phoneNumber' : userPhoneNumber,
-                        'profileImage' : 'null',
+                        'userName': userName,
+                        'email': userEmail,
+                        'password': userPassword,
+                        'birthDate': userBirthDate,
+                        'phoneNumber': userPhoneNumber,
+                        'profileImage': 'null',
                       });
 
                       if (_formKey.currentState?.validate() ?? false) {
@@ -510,8 +515,6 @@ class _SignupScreenState extends State<SignupScreen> {
                       // );
                     }
                   }
-
-
                 },
                 child: Container(
                   padding: EdgeInsets.all(15),

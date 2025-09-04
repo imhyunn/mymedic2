@@ -30,6 +30,17 @@ class _MyPageEditState extends State<MyPageEdit> {
 
   String userImagePath = '';
 
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  final TextEditingController _birthDateController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+
+  final _formKey = GlobalKey<FormState>();
+  late Future<void> _profileImageFuture;
+
+
   void _getUserProfile() async {
     final user = _firebaseAuth.currentUser;
 
@@ -90,119 +101,145 @@ class _MyPageEditState extends State<MyPageEdit> {
     // _getProfileImage();
   }
 
+
   @override
   void initState() {
-    _getUserProfile();
-
     super.initState();
+    _getUserProfile();
+    _profileImageFuture = _getProfileImage();
+
   }
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     final _imageSize = MediaQuery.of(context).size.width / 4;
 
-    return SafeArea(
-        child: Scaffold(
-            appBar: AppBar(
-              backgroundColor: Colors.white,
-              title: Text(
-                'my page',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23),
-              ),
-            ),
-            body: FutureBuilder(
-              future: _getProfileImage(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-
-                if (snapshot.hasError) {
-                  print(snapshot.error.toString());
-                  return Center(
-                    child: Text('오류가 발생했습니다.'),
-                  );
-                }
-
-                return Column(
-                  children: [
-                    Card(
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 15,
-                                ),
-                                Container(
-                                  constraints: BoxConstraints(
-                                    minHeight: _imageSize,
-                                    minWidth: _imageSize,
-                                  ),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      _showBottomSheet();
-                                    },
-                                    child: Center(
-                                      child: ClipOval(
-                                          child: _pickedFile == null
-                                              ? Container(
-                                                  width: _imageSize,
-                                                  height: _imageSize,
-                                                  child: FittedBox(
-                                                    child: Icon(
-                                                      Icons.account_circle,
-                                                      size: _imageSize,
-                                                    ),
-                                                  ),
-                                                )
-                                              : Image(
-                                                  width: _imageSize,
-                                                  height: _imageSize,
-                                                  fit: BoxFit.cover,
-                                                  image: _pickedFile!.path
-                                                          .startsWith('https')
-                                                      ? NetworkImage(
-                                                          _pickedFile!.path)
-                                                      : FileImage(File(
-                                                              _pickedFile!
-                                                                  .path))
-                                                          as ImageProvider,
-                                                )),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 25,
-                                ),
-                                Container(
-                                  height: 60,
-                                  child: Column(
-                                    children: [
-                                      TextField(
-
-                                      )
-                                      // Text(
-                                      //   _username,
-                                      //   style: TextStyle(fontSize: 19),
-                                      // )
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
+    return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: Text(
+            'my page',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23),
+          ),
+        ),
+        body: SafeArea(
+          child: FutureBuilder(
+            future: _profileImageFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(),
                 );
-              },
-            )));
+              }
+
+              if (snapshot.hasError) {
+                print(snapshot.error.toString());
+                return Center(
+                  child: Text('오류가 발생했습니다.'),
+                );
+              }
+
+              return SingleChildScrollView(
+                child: Container(
+                  height: size.height,
+                  width: size.width,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(15),
+                          child: Row(
+                            children: [
+                              Container(
+                                constraints: BoxConstraints(
+                                  minHeight: _imageSize,
+                                  minWidth: _imageSize,
+                                ),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _showBottomSheet();
+                                  },
+                                  child: Center(
+                                    child: ClipOval(
+                                        child: _pickedFile == null
+                                            ? Container(
+                                                width: _imageSize,
+                                                height: _imageSize,
+                                                child: FittedBox(
+                                                  child: Icon(
+                                                    Icons.account_circle,
+                                                    size: _imageSize,
+                                                  ),
+                                                ),
+                                              )
+                                            : Image(
+                                                width: _imageSize,
+                                                height: _imageSize,
+                                                fit: BoxFit.cover,
+                                                image: _pickedFile!.path
+                                                        .startsWith('https')
+                                                    ? NetworkImage(
+                                                        _pickedFile!.path)
+                                                    : FileImage(
+                                                            File(_pickedFile!.path))
+                                                        as ImageProvider,
+                                              )),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Container(
+                                width: size.width * 0.5,
+                                margin: EdgeInsets.symmetric(horizontal: 13),
+                                child: TextFormField(
+                                    controller: _nameController,
+                                    keyboardType: TextInputType.emailAddress,
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Palette.textColor1),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(5.0),
+                                          )),
+                                    )),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                        Container(
+                          width: size.width * 0.5,
+                          margin: EdgeInsets.symmetric(horizontal: 13),
+                          child: Column(
+                            children: [
+                              TextFormField(
+                                  controller: _passwordController,
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Palette.textColor1),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0),
+                                        )),
+                                  ))
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ));
   }
 
   _showBottomSheet() {
