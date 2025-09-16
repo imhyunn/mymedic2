@@ -40,7 +40,9 @@ class _MyPageState extends State<MyPage> {
 
   // AppUser? _appUser;
   // AppUser? get appUser => _appUser;
-  String userImagePath = '';
+  String userImagePath = ''; // ✅ CHANGED: 'null' 문자열 대신 빈 문자열 기본값으로
+
+  int _cacheBuster = 0; // ✅ ADDED: 이미지 캐시 무효화를 위한 쿼리 파라미터 값
 
   void _getUserProfile() async {
     final user = _firebaseAuth.currentUser;
@@ -55,6 +57,7 @@ class _MyPageState extends State<MyPage> {
         setState(() {
           _userData = userData.data()!;
           _username = _userData['userName'];
+          userImagePath = _userData['profileImagePath'] ?? ''; // ✅ ADDED: 기존 URL 보관(이전 파일 삭제용)
         });
       }
     }
@@ -69,6 +72,8 @@ class _MyPageState extends State<MyPage> {
     // print('ss');
   }
 
+  // ❌ REMOVED: 화면에서 매 빌드마다 호출되던 비동기 로딩은 제거하고, 아래 StreamBuilder로 대체
+  /*
   Future<void> _getProfileImage() async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
@@ -84,6 +89,7 @@ class _MyPageState extends State<MyPage> {
       _pickedFile = XFile(userImagePath);
     }
   }
+  */
 
   Future<void> saveImage(XFile image) async {
     var dateTime = DateTime.now().toString().replaceAll(' ', '_');
@@ -96,22 +102,30 @@ class _MyPageState extends State<MyPage> {
     var s = await complete.ref.getDownloadURL();
     print(s);
 
-
-    if (userImagePath != 'null') {
-      final oldRef = FirebaseStorage.instance.refFromURL(userImagePath);
-      await oldRef.delete();
-    }
-
-    await _firestore.collection('user').doc(currentUser!.uid).set({
-      'birthDate': _userData['birthDate'],
-      'email': _userData['email'],
-      'password': _userData['password'],
-      'phoneNumber': _userData['phoneNumber'],
-      'profileImagePath': await complete.ref.getDownloadURL(),
-      'userName': _username
+    // ✅ CHANGED: 업로드 직후 즉시 화면 반영(네트워크 URL을 곧바로 _pickedFile에 주입)
+    setState(() {
+      _pickedFile = XFile(s);                 // 바로 NetworkImage로 표시 가능
+      _cacheBuster = DateTime.now().millisecondsSinceEpoch; // 캐시 버스팅 값 갱신
     });
 
-    // _getProfileImage();
+    if (userImagePath.isNotEmpty) { // ✅ CHANGED: 'null' 문자열 비교 대신 비어있지 않을 때만 삭제
+      try {
+        final oldRef = FirebaseStorage.instance.refFromURL(userImagePath);
+        await oldRef.delete();
+      } catch (e) {
+        // 없거나 권한 문제면 무시
+        if (kDebugMode) print('old image delete skip: $e');
+      }
+    }
+
+    // ✅ CHANGED: 전체 필드 set()로 덮어쓰기 대신 필요한 필드만 update()
+    await _firestore.collection('user').doc(currentUser!.uid).update({
+      'profileImagePath': s,
+      // 다른 필드(이메일/생일/패스워드 등)는 덮어쓰지 않음
+    });
+
+    // _getProfileImage(); // ❌ REMOVED: StreamBuilder가 자동 반영
+    userImagePath = s; // ✅ ADDED: 최신 URL 로컬 보관(다음 삭제 대비)
   }
 
   @override
@@ -125,7 +139,7 @@ class _MyPageState extends State<MyPage> {
   Widget build(BuildContext context) {
     // final userProvider = Provider.of<UserProvider>(context);
     final _imageSize = MediaQuery.of(context).size.width / 4;
-    _getProfileImage();
+    // _getProfileImage(); // ❌ REMOVED: build 중 비동기 호출 제거(깜빡임/중복 로딩 방지)
 
     return SafeArea(
       child: Scaffold(
@@ -136,8 +150,9 @@ class _MyPageState extends State<MyPage> {
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23),
           ),
         ),
-        body: FutureBuilder(
-          future: _getProfileImage(),
+        // ✅ CHANGED: FutureBuilder → Firestore StreamBuilder 로 실시간 반영
+        body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          stream: _firestore.collection('user').doc(currentUser!.uid).snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
@@ -151,6 +166,10 @@ class _MyPageState extends State<MyPage> {
                 child: Text('오류가 발생했습니다.'),
               );
             }
+
+            final data = snapshot.data?.data() ?? {};
+            final liveUrl = (data['profileImagePath'] ?? '') as String;
+            final liveName = (data['userName'] ?? _username) as String;
 
             return Column(children: [
               Card(
@@ -176,27 +195,37 @@ class _MyPageState extends State<MyPage> {
                               child: Center(
                                 child: ClipOval(
                                     child: _pickedFile == null
-                                        ? Container(
-                                            width: _imageSize,
-                                            height: _imageSize,
-                                            child: FittedBox(
-                                              child: Icon(
-                                                Icons.account_circle,
-                                                size: _imageSize,
-                                              ),
-                                            ),
-                                          )
+                                        ? (liveUrl.isNotEmpty
+                                    // ✅ ADDED: 캐시 버스팅 쿼리로 즉시 새로고침 유도
+                                        ? Image.network(
+                                      '$liveUrl?v=$_cacheBuster',
+                                      key: ValueKey(liveUrl),
+                                      width: _imageSize,
+                                      height: _imageSize,
+                                      fit: BoxFit.cover,
+                                    )
+                                        : Container(
+                                      width: _imageSize,
+                                      height: _imageSize,
+                                      child: FittedBox(
+                                        child: Icon(
+                                          Icons.account_circle,
+                                          size: _imageSize,
+                                        ),
+                                      ),
+                                    ))
                                         : Image(
-                                            width: _imageSize,
-                                            height: _imageSize,
-                                            fit: BoxFit.cover,
-                                            image: _pickedFile!.path
-                                                    .startsWith('https')
-                                                ? NetworkImage(_pickedFile!.path)
-                                                : FileImage(
-                                                        File(_pickedFile!.path))
-                                                    as ImageProvider,
-                                          )),
+                                      width: _imageSize,
+                                      height: _imageSize,
+                                      fit: BoxFit.cover,
+                                      // ✅ CHANGED: 업로드 직후에는 _pickedFile을 우선 표시(로컬/네트워크 모두 지원)
+                                      image: _pickedFile!.path
+                                          .startsWith('https')
+                                          ? NetworkImage(_pickedFile!.path)
+                                          : FileImage(
+                                          File(_pickedFile!.path))
+                                      as ImageProvider,
+                                    )),
                               ),
                             ),
                           ),
@@ -208,7 +237,7 @@ class _MyPageState extends State<MyPage> {
                             child: Column(
                               children: [
                                 Text(
-                                  _username,
+                                  liveName, // ✅ CHANGED: 스트림의 최신 이름 우선 표시
                                   style: TextStyle(fontSize: 19),
                                 ),
                                 // Text('${_userData['userLevel']}'),
@@ -221,24 +250,24 @@ class _MyPageState extends State<MyPage> {
                   ],
                 ),
               ),
-              SizedBox(height: 10,),
-              ListTile(
-                leading: Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Icon(
-                      Icons.edit,
-                    )),
-                title: Text(
-                  '회원정보 수정',
-                ),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (BuildContext) => MyPageEdit(),
-                    ),
-                  );
-                },
-              ),
+              // SizedBox(height: 10,),
+              // ListTile(
+              //   leading: Padding(
+              //       padding: EdgeInsets.only(left: 10),
+              //       child: Icon(
+              //         Icons.edit,
+              //       )),
+              //   title: Text(
+              //     '회원정보 수정',
+              //   ),
+              //   onTap: () {
+              //     Navigator.of(context).push(
+              //       MaterialPageRoute(
+              //         builder: (BuildContext) => MyPageEdit(),
+              //       ),
+              //     );
+              //   },
+              // ),
               SizedBox(
                 height: 10,
               ),
@@ -293,11 +322,11 @@ class _MyPageState extends State<MyPage> {
                                 Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            const LoginScreen()),
-                                    (route) => false);
+                                        const LoginScreen()),
+                                        (route) => false);
                               }
                               final prefs =
-                                  await SharedPreferences.getInstance();
+                              await SharedPreferences.getInstance();
                               await prefs.remove('lastDate');
                               await prefs.remove('lastEnglish');
                               await prefs.remove('lastKorean');
@@ -388,7 +417,7 @@ class _MyPageState extends State<MyPage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (_) => const LoginScreen()),
-                                  (route) => false);
+                                      (route) => false);
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Palette.buttonColor2,
@@ -442,7 +471,7 @@ class _MyPageState extends State<MyPage> {
                       });
                       print(_pickedFile!.path);
                       Navigator.of(context).pop();
-                      await saveImage(image);
+                      await saveImage(image); // 스토리지에 위에서 가져온 이미지를 저장하는 코드
                     }
                     // 스토리지에 위에서 가져온 이미지를 저장하는 코드
                   },
@@ -469,7 +498,13 @@ class _MyPageState extends State<MyPage> {
             Padding(
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
-                  onPressed: () => _getPhotoLibraryImage(),
+                  onPressed: () async { // ✅ CHANGED: 갤러리도 선택 후 저장까지 이어서 처리
+                    final image = await _getPhotoLibraryImage();
+                    if (image != null) {
+                      Navigator.of(context).pop();
+                      await saveImage(image);
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.buttonColor,
                     shape: RoundedRectangleBorder(
@@ -492,7 +527,7 @@ class _MyPageState extends State<MyPage> {
 
   Future<XFile?> _getCameraImage() async {
     final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.camera);
+    await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
         _pickedFile = pickedFile;
@@ -507,17 +542,20 @@ class _MyPageState extends State<MyPage> {
     }
   }
 
-  _getPhotoLibraryImage() async {
+  // ✅ CHANGED: 반환형을 XFile? 로 통일해서 saveImage에서 공통 처리
+  Future<XFile?> _getPhotoLibraryImage() async {
     final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _pickedFile = pickedFile;
       });
+      return pickedFile; // ✅ ADDED
     } else {
       if (kDebugMode) {
         print('이미지 선택안함');
       }
+      return null; // ✅ ADDED
     }
   }
 }

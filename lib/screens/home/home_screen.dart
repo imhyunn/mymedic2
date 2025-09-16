@@ -110,266 +110,169 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
+          elevation: 2,
           title: Text(
             'mydedic',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 26,
+              color: Colors.black,
+            ),
           ),
+          centerTitle: true,
         ),
-        // backgroundColor: Color(0xEAAACBE1),
         body: isLoading
             ? Center(child: CircularProgressIndicator())
-            : Column(children: [
-          /*Container(
-            height: size.height * 0.43,
-            decoration: BoxDecoration(
-              color: Color(0xEA72A9D2),
-              borderRadius: BorderRadius.only(
-                bottomRight: Radius.circular(25),
-                bottomLeft: Radius.circular(25),
-              ),
-            ),
-          ),*/
-          // SizedBox(
-          //   height: size.height * 0.15,
-          // ),
-          Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                    topRight: Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                      color: Color(0xff8291a8),
-                      blurRadius: 3,
-                      spreadRadius: 0,
-                      offset: Offset(0, 7)),
-                ],
-                // border: Border.all(
-                //   color: Colors.grey,
-                //   width: 3
-                // ),
-                color: Color(0xffd5e5f8)),
-            height: size.height * 0.3,
-            width: size.width * 0.95,
-            child: Stack(children: [
-              Padding(
-                padding: EdgeInsets.all(14),
-                child: Container(
-                  // decoration: BoxDecoration(
-                  //     color: Color(0xfff8e7e7),
-                  //     borderRadius: BorderRadius.circular(4)),
-                  padding: EdgeInsets.all(7),
-                  child: Text(
-                    '오늘의 단어',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-              ),
-              Center(
+            : SingleChildScrollView(
+                padding: EdgeInsets.all(16),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      height: 19,
-                    ),
-                    Text(
-                      wordData!['english'],
-                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 600),
-                      child: _isRevealed
-                          ? SizedBox(
-                        height: 45, // 버튼과 동일한 높이 확보
-                        child: Center(
-                          child: Text(
-                            wordData!['korean'],
-                            key: const ValueKey('text'),
-                            style: const TextStyle(fontSize: 27),
-                          ),
+                    // 오늘의 단어 카드
+                    Container(
+                      height: size.height * 0.25,
+                      width: size.width * 0.95,
+                      child: Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                      )
-                          : SizedBox(
-                        height: 45,
-                        child: ElevatedButton(
-                          key: const ValueKey('button'),
-                          style: ElevatedButton.styleFrom(
-                            fixedSize: const Size(180, 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                              BorderRadius.circular(10),
-                            ),
-                            backgroundColor:
-                            const Color(0xffFFFFFF),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isRevealed = true;
-                            });
-                          },
-                          child: const Text(
-                            '뜻 보기',
-                            style: TextStyle(color: Colors.black),
+                        color: Color(0xffe8f1fb),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 28, horizontal: 20),
+                          child: Column(
+                            children: [
+                              Text(
+                                '📘 오늘의 단어',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                wordData!['english'],
+                                style: TextStyle(
+                                  fontSize: wordData!['english'].length > 17
+                                      ? 31
+                                      : 36,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xff2b4c7e),
+                                ),
+                              ),
+                              SizedBox(height: 18),
+                              AnimatedSwitcher(
+                                duration: Duration(milliseconds: 500),
+                                child: _isRevealed
+                                    ? SizedBox(
+                                        height: 45, // 버튼과 동일한 높이 확보
+                                        child: Center(
+                                          child: Text(
+                                            wordData!['korean'],
+                                            key: ValueKey('text'),
+                                            style: TextStyle(fontSize: 27),
+                                          ),
+                                        ),
+                                      )
+                                    : SizedBox(
+                                        height: 45,
+                                        child: ElevatedButton(
+                                          key: ValueKey('button'),
+                                          style: ElevatedButton.styleFrom(
+                                            fixedSize: Size(180, 10),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            backgroundColor: Color(0xffFFFFFF),
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              _isRevealed = true;
+                                            });
+                                          },
+                                          child: Text(
+                                            '뜻 보기',
+                                            style:
+                                                TextStyle(color: Colors.black),
+                                          ),
+                                        ),
+                                      ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ),
-                    // if (_isRevealed)
-                    //   Text(
-                    //     wordData!['korean'],
-                    //     style: TextStyle(fontSize: 20),
-                    //   )
-                    // else
-                    //   ElevatedButton(
-                    //     style: ElevatedButton.styleFrom(
-                    //         fixedSize: Size(180, 10),
-                    //         shape: RoundedRectangleBorder(
-                    //             borderRadius:
-                    //                 BorderRadius.circular(10)),
-                    //         backgroundColor: Color(0xffFFFFFF)),
-                    //     onPressed: () {
-                    //       setState(() {
-                    //         _isRevealed = true;
-                    //       });
-                    //     },
-                    //     child: const Text(
-                    //       '뜻 보기',
-                    //       style: TextStyle(color: Colors.black),
-                    //     ),
-                    //   ),
+
+                    SizedBox(height: 32),
+
+                    // 버튼 카드들
+                    Column(
+                      children: [
+                        _menuButton(
+                          icon: Icons.folder_open,
+                          label: '단어 폴더',
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => WordFolder()));
+                          },
+                        ),
+                        // 아래 필요시 주석 해제
+                        // _menuButton(
+                        //   icon: Icons.quiz_outlined,
+                        //   label: '단어 테스트',
+                        //   onPressed: () {
+                        //     Navigator.push(context,
+                        //         MaterialPageRoute(builder: (_) => WordTestHome()));
+                        //   },
+                        // ),
+                        // _menuButton(
+                        //   icon: Icons.videogame_asset,
+                        //   label: '게임 모드',
+                        //   onPressed: () {
+                        //     Navigator.push(context,
+                        //         MaterialPageRoute(builder: (_) => TestScreen()));
+                        //   },
+                        // ),
+                      ],
+                    )
                   ],
                 ),
               ),
-            ]),
-          ),
-          SizedBox(height: size.height * 0.03,),
-          Container(
-            width: size.width,
-            // height: size.height * 0.5,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      color: Color(0xfff0f7ff),
-                      elevation: 0,
-                      child: Container(
-                        height: 120,
-                        width: size.width * 0.95,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          // border: Border.all(
-                          //   color: Color(0xFF4567BD),
-                          //   width: 3, // 테두리 두께
-                          // ),
-                        ),
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (BuildContext) => WordFolder(),
-                              ),
-                            );
-                            setState(() {
+      ),
+    );
+  }
 
-                            });
-                          },
-                          child: Text(
-                            'word',
-                            style: TextStyle(
-                                fontSize: 28,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                    ),
-                    /*SizedBox(
-                      height: size.height * 0.02,
-                    ),
-                    Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      color: Colors.white,
-                      elevation: 0,
-                      child: Container(
-                        height: 120,
-                        width: 340,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: Color(0xEA5180A2),
-                            width: 2, // 테두리 두께
-                          ),
-                        ),
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (BuildContext) => WordTestHome(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            'test',
-                            style: TextStyle(fontSize: 28, color: Colors.black,fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                    ),*/
-                    /*SizedBox(
-                      height: size.height * 0.02,
-                    ),
-                    Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      color: Colors.white,
-                      elevation: 0,
-                      child: Container(
-                        height: 120,
-                        width: 340,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: Color(0xEA5180A2),
-                            width: 2, // 테두리 두께
-                          ),
-                        ),
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (BuildContext) => TestScreen(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            'game',
-                            style: TextStyle(fontSize: 28, color: Colors.black,fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                    ),*/
-                  ],
-                ),
-              ],
-            ),
+  Widget _menuButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16.0),
+      child: Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: ListTile(
+          leading: Icon(icon, color: Colors.blueAccent, size: 32),
+          title: Text(
+            label,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),
-        ]),
+          trailing: Icon(Icons.arrow_forward_ios_rounded),
+          onTap: onPressed,
+        ),
       ),
     );
   }
