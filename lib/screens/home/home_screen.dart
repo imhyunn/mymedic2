@@ -117,7 +117,6 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
-          elevation: 2,
           title: Text(
             'mydedic',
             style: TextStyle(

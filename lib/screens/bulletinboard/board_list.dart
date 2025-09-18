@@ -104,7 +104,7 @@ class _BoardListState extends State<BoardList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffe0e9f3),
+      backgroundColor: Color(0x94e0e9f3),
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text('게시판', style: TextStyle(fontWeight: FontWeight.bold),),
