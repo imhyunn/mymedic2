@@ -79,11 +79,10 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
                 Container(
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     child: Text(
-                      widget.board.title.isEmpty
-                          ? '(제목 없음)'
-                          : widget.board.title,
+                          widget.board.title,
                       style: TextStyle(
                         fontSize: 32,
+                        fontWeight: FontWeight.bold
                       ),
                     )),
                 SizedBox(
@@ -196,10 +195,10 @@ class _BoardViewScreenState extends State<BoardViewScreen> {
           shape:
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
-            '노트 삭제',
+            '게시물 삭제',
           ),
           content: Text(
-            '노트를 삭제할까요?',
+            '게시물을 삭제할까요?',
           ),
           actions: [
             Padding(

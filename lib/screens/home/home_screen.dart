@@ -47,47 +47,42 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadDailyWord() async {
     final prefs = await SharedPreferences.getInstance();
     final today = DateTime.now().toIso8601String().substring(0, 10);
-
-    final savedDate = prefs.getString('lastDate');
-    final savedEnglish = prefs.getString('lastEnglish');
-    final saveKorean = prefs.getString('lastKorean');
-
-    if (savedDate == today && savedEnglish != null && saveKorean != null) {
-      setState(() {
-        wordData = {
-          'english': savedEnglish,
-          'korean': saveKorean,
-        };
-        isLoading = false;
-      });
-      return;
-    }
-
     final uid = currentUser?.uid;
     if (uid == null) return;
 
-    final rand = generateDeterministicRandom(uid, DateTime.now());
+    String? savedDate = prefs.getString('lastDate');
+    String? savedEnglish = prefs.getString('lastEnglish');
+    String? saveKorean = prefs.getString('lastKorean');
 
-    QuerySnapshot snap = await _firestore
-        .collection('words')
-        .where('uid', isEqualTo: uid)
-        .where('randomIndex', isGreaterThanOrEqualTo: rand)
-        .orderBy('randomIndex')
-        .limit(1)
-        .get();
-
-    if (snap.docs.isEmpty) {
-      snap = await _firestore
+    if (savedDate == today && savedEnglish != null && saveKorean != null) {
+      final checkSnap = await _firestore
           .collection('words')
           .where('uid', isEqualTo: uid)
-          .where('randomIndex', isLessThanOrEqualTo: rand)
-          .orderBy('randomIndex')
-          .limit(1)
+          .where('english', isEqualTo: savedEnglish)
           .get();
+
+      if (checkSnap.docs.isNotEmpty) {
+        setState(() {
+          wordData = {
+            'english': savedEnglish,
+            'korean': saveKorean,
+          };
+          isLoading = false;
+        });
+        return;
+      } else {
+        await prefs.remove('lastDate');
+        await prefs.remove('lastEnglish');
+        await prefs.remove('lastKorean');
+      }
     }
 
-    if (snap.docs.isNotEmpty) {
-      final data = snap.docs.first.data() as Map<String, dynamic>;
+    final snapshot =
+        await _firestore.collection('words').where('uid', isEqualTo: uid).get();
+
+    if (snapshot.docs.isNotEmpty) {
+      final randIndex = Random().nextInt(snapshot.docs.length);
+      final data = snapshot.docs[randIndex].data() as Map<String, dynamic>;
 
       await prefs.setString('lastDate', today);
       await prefs.setString('lastEnglish', data['english']);
@@ -111,7 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final theme = Theme.of(context);
 
     return SafeArea(
       child: Scaffold(
@@ -220,11 +214,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         _menuButton(
                           icon: Icons.folder_open,
                           label: '단어 폴더',
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {
+                            final result = await Navigator.push<bool>(
                                 context,
                                 MaterialPageRoute(
                                     builder: (_) => WordFolder()));
+                            if (result == true) {
+                              await _handleWordListChanged();
+                            }
                           },
                         ),
                         // 아래 필요시 주석 해제
@@ -251,6 +248,20 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
       ),
     );
+  }
+
+  Future<void> _handleWordListChanged() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('lastDate');
+    await prefs.remove('lastEnglish');
+    await prefs.remove('lastKorean');
+
+    setState(() {
+      isLoading = true;
+      _isRevealed = false;
+    });
+
+    await _loadDailyWord();
   }
 
   Widget _menuButton({

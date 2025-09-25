@@ -168,7 +168,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                   await uploadImages();
                   await updateWords();
 
-                  Navigator.pop(context);
+                  Navigator.pop(context, true);
                   setState(() {
                     _isButtonDisabled = false;
                   });
@@ -673,6 +673,11 @@ class _WordNoteEditState extends State<WordNoteEdit> {
       'userId': widget.folder.userId,
       'wordCount': wordInfos.length,
     });
+
+    final pre = await SharedPreferences.getInstance();
+    await pre.remove('lastDate');
+    await pre.remove('lastEnglish');
+    await pre.remove('lastKorean');
 
   }
 

@@ -1,3 +1,4 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -187,7 +188,7 @@ class _WordFolderState extends State<WordFolder> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '폴더 추가',
           ),
@@ -284,7 +285,7 @@ class _WordFolderState extends State<WordFolder> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '폴더 수정',
           ),
@@ -366,7 +367,7 @@ class _WordFolderState extends State<WordFolder> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '폴더 삭제',
           ),

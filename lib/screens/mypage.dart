@@ -149,7 +149,7 @@ class _MyPageState extends State<MyPage> {
                   height: size.height * 0.17,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
-                      color: Color(0xff000000)),
+                      color: Color(0xffe8f1fb)),
                   child: Row(
                     children: [
                       const SizedBox(
