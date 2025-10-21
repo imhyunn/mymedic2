@@ -213,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         _menuButton(
                           icon: Icons.folder_open,
-                          label: '단어 폴더',
+                          label: '단어장',
                           onPressed: () async {
                             final result = await Navigator.push<bool>(
                                 context,

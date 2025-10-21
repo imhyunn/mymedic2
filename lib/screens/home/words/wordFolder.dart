@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -60,8 +59,6 @@ class _WordFolderState extends State<WordFolder> {
     return folders;
   }
 
-
-
   @override
   void initState() {
     // TODO: implement initState
@@ -109,67 +106,49 @@ class _WordFolderState extends State<WordFolder> {
             return ListView.builder(
               itemBuilder: (BuildContext context, int index) {
                 return Card(
-                  child: ListTile(
-                    tileColor: Colors.white,
-                    title: Padding(
-                      padding: EdgeInsets.only(left: 20, top: 20, bottom: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            child: Text(
-                              folders[index].name,
-                              style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Container(
-                            child: Text(
-                              '단어 수 : ${folders[index].wordCount}',
-                              style: TextStyle(fontSize: 15),
-                            ),
-                          )
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: ListTile(
+                      // tileColor: Colors.white,
+                      leading: Icon(Icons.folder),
+                      title: Text(folders[index].name,
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                      subtitle: Text(
+                          '단어 수 : ${folders[index].wordCount} • ${_formatYmd(folders[index].time)}',
+                          style: TextStyle(fontSize: 15)),
+                      trailing: PopupMenuButton<String>(
+                        color: Colors.white,
+                        onSelected: (choice) {
+                          switch (choice) {
+                            case '수정':
+                              _edit(folders[index]);
+                              break;
+                            case '삭제':
+                              _folderDelete(folders[index].id);
+                              break;
+                          }
+                        },
+                        itemBuilder: (choice) => [
+                          PopupMenuItem(value: '수정', child: Text('수정')),
+                          PopupMenuItem(value: '삭제', child: Text('삭제')),
                         ],
                       ),
-                    ),
-                    trailing: PopupMenuButton<String>(
-                      color: Colors.white,
-                      onSelected: handleClick,
-                      itemBuilder: (BuildContext context) {
-                        return ['수정', '삭제'].map((String choice) {
-                          return PopupMenuItem<String>(
-                            value: choice,
-                            child: Text(choice),
-                            onTap: () {
-                              switch (choice) {
-                                case "수정":
-                                  _edit(folders[index]);
-                                  break;
-                                case "삭제":
-                                  _folderDelete(folders[index].id);
-                                  break;
-                              }
-                            },
-                          );
-                        }).toList();
+                      onTap: () async {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (BuildContext) =>
+                                WordNote(folder: folders[index]),
+                          ),
+                        );
+                        setState(() {});
                       },
                     ),
-                    onTap: () async {
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (BuildContext) =>
-                              WordNote(folder: folders[index]),
-                        ),
-                      );
-                      setState(() {});
-                    },
                   ),
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                      side: BorderSide(width: 1)),
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(width: 1, color: Color(0x14000000))),
                 );
               },
               itemCount: folders.length,
@@ -188,7 +167,7 @@ class _WordFolderState extends State<WordFolder> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '폴더 추가',
           ),
@@ -285,7 +264,7 @@ class _WordFolderState extends State<WordFolder> {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '폴더 수정',
           ),
@@ -360,14 +339,17 @@ class _WordFolderState extends State<WordFolder> {
   }
 
   Future<void> _folderDelete(String id) async {
-    final wordSnap = await _firestore.collection('words').where('folderId', isEqualTo: id).get();
+    final wordSnap = await _firestore
+        .collection('words')
+        .where('folderId', isEqualTo: id)
+        .get();
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: Palette.backColor,
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
           title: Text(
             '폴더 삭제',
           ),
@@ -403,8 +385,6 @@ class _WordFolderState extends State<WordFolder> {
 
                     await _firestore.collection('folder').doc(id).delete();
 
-
-
                     setState(() {});
                     Navigator.pop(context);
                   },
@@ -432,5 +412,22 @@ class _WordFolderState extends State<WordFolder> {
       case '삭제':
         break;
     }
+  }
+
+  DateTime? _toDateTime(dynamic t) {
+    if (t == null) return null;
+    if (t is Timestamp) return t.toDate();
+    if (t is DateTime) return t;
+    if (t is String) return DateTime.tryParse(t);
+    return null;
+  }
+
+  String _formatYmd(dynamic t) {
+    final dt = _toDateTime(t);
+    if (dt == null) return '-';
+    final y = dt.year.toString();
+    final m = dt.month.toString().padLeft(2, '0');
+    final d = dt.day.toString().padLeft(2, '0');
+    return '$y.$m.$d';
   }
 }
