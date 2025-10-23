@@ -61,8 +61,21 @@ class _WordNoteState extends State<WordNote> {
   }
 
   void _createInterstitialAd() {
+    // InterstitialAd.load(
+    //     adUnitId: AdHelper.interstitialAdUnitId!,
+    //     request: const AdRequest(),
+    //     adLoadCallback: InterstitialAdLoadCallback(
+    //         onAdLoaded: (ad) => _interstitialAd = ad,
+    //         onAdFailedToLoad: (error) => _interstitialAd = null));
+
+    final unitId = AdHelper.interstitialAdUnitId;
+    if (unitId == null || unitId.isEmpty) {
+      _interstitialAd = null;
+      return;
+    }
+
     InterstitialAd.load(
-        adUnitId: AdHelper.interstitialAdUnitId!,
+        adUnitId: unitId,
         request: const AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
             onAdLoaded: (ad) => _interstitialAd = ad,
@@ -130,7 +143,7 @@ class _WordNoteState extends State<WordNote> {
               ))
         ],
       ),
-      body: FutureBuilder(
+      body: FutureBuilder<List<Word>>(
         future: _getWord(),
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.waiting) {
@@ -146,105 +159,115 @@ class _WordNoteState extends State<WordNote> {
             );
           }
 
-          final words = snap.requireData;
+          final words = snap.data ?? const <Word>[];
           this.words = words;
-          return ListView.builder(
+
+          if (words.isEmpty) {
+            return _EmptyState();
+          }
+
+          return ListView.separated(
+            padding: EdgeInsets.fromLTRB(12, 12, 12, 24),
             itemCount: words.length,
+            separatorBuilder: (_, __) => SizedBox(
+              height: 10,
+            ),
             itemBuilder: (BuildContext context, int index) {
               return Card(
-                color: Colors.white,
+                // color: Color(0xfff1f8fd),
+                clipBehavior: Clip.antiAlias,
+                // color: Colors.white,
                 child: ListTile(
+                  dense: true,
                   onTap: null,
-                  title: IntrinsicHeight(
-                    child: Row(
-                      children: [
-                        Container(
-                          width: size.width * 0.28,
-                          height: size.width * 0.28,
-                          child: ClipRRect(
-                            // borderRadius: BorderRadius.circular(20),
-                            child: Center(
-                                child: words[index].imagePath == null
-                                    ? Text(
-                                        '편집 버튼을 눌러 \n사진을 추가해주세요.',
-                                        style: TextStyle(fontSize: 10),
-                                      )
-                                    : Image.network(
-                                        words[index].imagePath!,
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        height: double.infinity,
-                                      )),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 24,
-                        ),
-                        Expanded(
-                          child: Container(
-                            height: 135,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  height: 35,
-                                  child: Text(
-                                    words[index].english,
-                                    style: TextStyle(
-                                        fontSize:
-                                            words[index].english.length > 17
-                                                ? 17
-                                                : 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
+                  title: Row(children: [
+                    Container(
+                      width: size.width * 0.28,
+                      height: size.width * 0.28,
+                      child: ClipRRect(
+                        // borderRadius: BorderRadius.circular(20),
+                        child: Center(
+                          child: words[index].imagePath == null
+                              ? Text(
+                                  '편집 버튼을 눌러 \n사진을 추가해주세요.',
+                                  style: TextStyle(fontSize: 10),
+                                )
+                              : Image.network(
+                                  words[index].imagePath!,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
                                 ),
-                                Container(
-                                  height: 35,
-                                  child: Text(
-                                    words[index].korean,
-                                    style: TextStyle(
-                                      fontSize: words[index].korean.length > 17
-                                          ? 15
-                                          : 17,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         ),
-                        Container(
-                          alignment: Alignment.topRight,
-                          child: IconButton(
-                            onPressed: () {
-                              tts.speak(words[index].english);
-                            },
-                            icon: Icon(
-                              Icons.volume_up_rounded,
-                              size: size.width * 0.055,
-                              color: Colors.grey.shade700,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  /*trailing: IconButton(
-                      onPressed: () {
-                        tts.speak(words[index].english);
-                      },
-                      icon: Icon(
-                        Icons.volume_up_rounded,
-                        size: size.width * 0.055,
                       ),
-                    ),*/
-                  contentPadding: EdgeInsets.only(left: 15, right: 0),
+                    ),
+                    SizedBox(
+                      width: 24,
+                    ),
+                    Expanded(
+                      child: Container(
+                        height: 135,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 35,
+                              child: Text(
+                                words[index].english,
+                                style: TextStyle(
+                                    fontSize: words[index].english.length > 17
+                                        ? 17
+                                        : 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Container(
+                              height: 35,
+                              child: Text(
+                                words[index].korean,
+                                style: TextStyle(
+                                  fontSize:
+                                      words[index].korean.length > 17 ? 15 : 17,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: size.width * 0.28,
+                      alignment: Alignment.topRight,
+                      child: IconButton(
+                        onPressed: () {
+                          tts.speak(words[index].english);
+                        },
+                        icon: Icon(
+                          Icons.volume_up_rounded,
+                          size: size.width * 0.055,
+                        ),
+                      ),
+                    ),
+                  ]),
+                  // trailing: Container(
+                  //   // alignment: Alignment.topRight,
+                  //   child: IconButton(
+                  //     onPressed: () {
+                  //       tts.speak(words[index].english);
+                  //     },
+                  //     icon: Icon(
+                  //       Icons.volume_up_rounded,
+                  //       size: size.width * 0.055,
+                  //     ),
+                  //   ),
+                  // ),
+                  // contentPadding: EdgeInsets.fromLTRB(12, 12, 8, 12),
                 ),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                  side: BorderSide(width: 1),
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(width: 1, color: Color(0x14000000)),
                 ),
               );
             },
@@ -253,6 +276,37 @@ class _WordNoteState extends State<WordNote> {
             // }
           );
         },
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.menu_book_outlined,
+              size: 64,
+            ),
+            SizedBox(
+              height: 6,
+            ),
+            Text(
+              '오른쪽 위 연필 아이콘을 눌러 단어를 추가해 보세요.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey.shade700),
+            )
+          ],
+        ),
       ),
     );
   }
