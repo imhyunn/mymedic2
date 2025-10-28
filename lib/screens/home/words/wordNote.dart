@@ -174,7 +174,7 @@ class _WordNoteState extends State<WordNote> {
             ),
             itemBuilder: (BuildContext context, int index) {
               return Card(
-                // color: Color(0xfff1f8fd),
+                color: Color(0xfff1f8ff),
                 clipBehavior: Clip.antiAlias,
                 // color: Colors.white,
                 child: ListTile(

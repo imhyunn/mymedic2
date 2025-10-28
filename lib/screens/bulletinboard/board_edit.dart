@@ -49,7 +49,7 @@ class _BoardEditScreenState extends State<BoardEditScreen> {
                   Navigator.pop(context, result);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.buttonColor,
+                  backgroundColor: Color(0xE8284FA4),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5.0),
                   ),

@@ -149,7 +149,7 @@ class _MyPageState extends State<MyPage> {
                   height: size.height * 0.17,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
-                      color: Color(0xffe8f1fb)),
+                      color: Color(0xfff1f8ff)),
                   child: Row(
                     children: [
                       const SizedBox(
@@ -245,6 +245,7 @@ class _MyPageState extends State<MyPage> {
                   margin: EdgeInsets.symmetric(horizontal: 5),
                   child: SizedBox.expand(
                     child: Card(
+                      color: Color(0xe5f1f8ff),
                       child: Center(
                         child: ListTile(
                           leading: Padding(
@@ -347,6 +348,7 @@ class _MyPageState extends State<MyPage> {
                   margin: EdgeInsets.symmetric(horizontal: 5),
                   child: SizedBox.expand(
                     child: Card(
+                      color: Color(0xe5f1f8ff),
                       child: Center(
                         child: ListTile(
                           title: Padding(

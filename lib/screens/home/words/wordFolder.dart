@@ -106,6 +106,7 @@ class _WordFolderState extends State<WordFolder> {
             return ListView.builder(
               itemBuilder: (BuildContext context, int index) {
                 return Card(
+                  color: Color(0xfff1f8ff),
                   child: Padding(
                     padding: EdgeInsets.all(12),
                     child: ListTile(

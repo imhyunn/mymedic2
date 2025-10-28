@@ -16,7 +16,7 @@ class _DrawingPageState extends State<DrawingPage> {
   Color _currentColor = Colors.black;
   bool _isEraser = false;
 
-  List<bool> _isSelected = [true, false, false, false];
+  List<bool> _isSelected = [true, false, false, false, false];
 
   MemoryImage? image = null;
 
@@ -114,6 +114,27 @@ class _DrawingPageState extends State<DrawingPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
+                          IconButton(
+                            icon: Icon(
+                              Icons.mode_edit_outline,
+                              color: Colors.black,
+                            ),
+                            onPressed: () {
+                              notifier.setColor(_pickedColor);
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.auto_fix_off_outlined,
+                              color: Colors.black,
+                            ),
+                            onPressed: () {
+                              notifier.setEraser();
+                            },
+                          ),
+                          SizedBox(
+                            width: 20,
+                          ),
                           InkWell(
                             onTap: () {
                               setState(() {
@@ -123,16 +144,18 @@ class _DrawingPageState extends State<DrawingPage> {
                                 _isSelected[1] = false;
                                 _isSelected[2] = false;
                                 _isSelected[3] = false;
+                                _isSelected[4] = false;
                               });
                             },
                             child: Container(
-                              width: 30,
-                              height: 30,
+                              width: 27,
+                              height: 27,
                               decoration: BoxDecoration(
                                 color: Color(0xFFFD0000),
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(16),
                                 border: _isSelected[0]
-                                    ? Border.all(color: Colors.grey, width: 2.5)
+                                    ? Border.all(
+                                        color: Color(0x57000000), width: 2.5)
                                     : null,
                               ),
                             ),
@@ -146,16 +169,18 @@ class _DrawingPageState extends State<DrawingPage> {
                                 _isSelected[1] = true;
                                 _isSelected[2] = false;
                                 _isSelected[3] = false;
+                                _isSelected[4] = false;
                               });
                             },
                             child: Container(
-                              width: 30,
-                              height: 30,
+                              width: 27,
+                              height: 27,
                               decoration: BoxDecoration(
                                 color: Color(0xFF0034FF),
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(16),
                                 border: _isSelected[1]
-                                    ? Border.all(color: Colors.grey, width: 2.5)
+                                    ? Border.all(
+                                        color: Color(0x57000000), width: 2.5)
                                     : null,
                               ),
                             ),
@@ -169,16 +194,43 @@ class _DrawingPageState extends State<DrawingPage> {
                                 _isSelected[1] = false;
                                 _isSelected[2] = true;
                                 _isSelected[3] = false;
+                                _isSelected[4] = false;
                               });
                             },
                             child: Container(
-                              width: 30,
-                              height: 30,
+                              width: 27,
+                              height: 27,
                               decoration: BoxDecoration(
                                 color: Color(0xFFFFD800),
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(16),
                                 border: _isSelected[2]
-                                    ? Border.all(color: Colors.grey, width: 2.5)
+                                    ? Border.all(
+                                        color: Color(0x57000000), width: 2.5)
+                                    : null,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                _pickedColor = Color(0xFF000000);
+                                notifier.setColor(_pickedColor);
+                                _isSelected[0] = false;
+                                _isSelected[1] = false;
+                                _isSelected[2] = false;
+                                _isSelected[3] = false;
+                                _isSelected[4] = true;
+                              });
+                            },
+                            child: Container(
+                              width: 27,
+                              height: 27,
+                              decoration: BoxDecoration(
+                                color: Color(0xFF000000),
+                                borderRadius: BorderRadius.circular(16),
+                                border: _isSelected[4]
+                                    ? Border.all(
+                                        color: Color(0x57000000), width: 2.5)
                                     : null,
                               ),
                             ),
@@ -188,7 +240,11 @@ class _DrawingPageState extends State<DrawingPage> {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                  title: const Text('색을 선택하세요.'),
+                                  backgroundColor: Color(0xfff4f4f4),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                  // title: Text('색을 선택하세요'),
+                                  contentPadding: EdgeInsets.all(23),
                                   content: SingleChildScrollView(
                                     child: ColorPicker(
                                       pickerColor: _pickedColor,
@@ -201,7 +257,10 @@ class _DrawingPageState extends State<DrawingPage> {
                                   ),
                                   actions: [
                                     ElevatedButton(
-                                      child: const Text('선택'),
+                                      child: const Text(
+                                        '선택',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
                                       onPressed: () {
                                         setState(() {
                                           _pickedColor = _currentColor;
@@ -210,9 +269,16 @@ class _DrawingPageState extends State<DrawingPage> {
                                           _isSelected[1] = false;
                                           _isSelected[2] = false;
                                           _isSelected[3] = true;
+                                          _isSelected[4] = false;
                                         });
                                         Navigator.of(context).pop();
                                       },
+                                      style: ElevatedButton.styleFrom(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(7),
+                                          ),
+                                          backgroundColor: Color(0xffe7effa)),
                                     ),
                                   ],
                                 ),
@@ -222,9 +288,10 @@ class _DrawingPageState extends State<DrawingPage> {
                               width: 30,
                               height: 30,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(16),
                                 border: _isSelected[3]
-                                    ? Border.all(color: Colors.grey, width: 2.5)
+                                    ? Border.all(
+                                        color: Color(0x57000000), width: 2.5)
                                     : null,
                                 color: _isSelected[3] ? _pickedColor : null,
                                 gradient: _isSelected[3]
@@ -243,39 +310,43 @@ class _DrawingPageState extends State<DrawingPage> {
                               ),
                             ),
                           ),
-                          IconButton(
-                            icon: Icon(Icons.mode_edit_outline),
-                            onPressed: () {
-                              notifier.setColor(_pickedColor);
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.edit_off),
-                            onPressed: () {
-                              notifier.setEraser();
-                            },
-                          )
                         ],
                       ),
                       Row(children: [
-                        Text('굵기', style: TextStyle(fontWeight: FontWeight.w600),),
-                        SizedBox(width: 10,),
+                        Text(
+                          '굵기',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
                         Expanded(
-                          child: SliderTheme(
-                            data: SliderTheme.of(context).copyWith(
-                              trackHeight: 3,
-                              activeTrackColor: Colors.black.withOpacity(0.45),
-                              inactiveTickMarkColor: Colors.black.withOpacity(0.15),
-                              thumbColor: Colors.black87,
-                            ),
-                            child: Slider(
-                              value: currentValue,
-                              max: 30,
-                              min: 1,
-                              onChanged: (value) => setState(() {
-                                currentValue = value;
-                                notifier.setStrokeWidth(currentValue);
-                              }),
+                          child: Padding(
+                            padding: EdgeInsets.all(15),
+                            child: SliderTheme(
+                              data: SliderTheme.of(context).copyWith(
+                                  trackHeight: 9,
+                                  activeTrackColor:
+                                      Colors.black.withOpacity(0.45),
+                                  inactiveTickMarkColor:
+                                      Colors.black.withOpacity(0.15),
+                                  overlayShape: RoundSliderOverlayShape(overlayRadius: 0),
+                                  thumbColor: Colors.black87,
+                                  thumbShape: _RectThumb(
+                                      width: 10,
+                                      height: 18,
+                                      radius: 10,
+                                      borderColor: Colors.black,
+                                      borderWidth: 1)),
+                              child: Slider(
+                                value: currentValue,
+                                max: 30,
+                                min: 1,
+                                onChanged: (value) => setState(() {
+                                  currentValue = value;
+                                  notifier.setStrokeWidth(currentValue);
+                                }),
+                              ),
                             ),
                           ),
                         ),
@@ -287,5 +358,56 @@ class _DrawingPageState extends State<DrawingPage> {
             ),
           ],
         ));
+  }
+}
+
+class _RectThumb extends SliderComponentShape {
+  _RectThumb({
+    this.width = 10,
+    this.height = 18,
+    this.radius = 2,
+    this.borderColor,
+    this.borderWidth = 1,
+  });
+
+  final double width;
+  final double height;
+  final double radius;
+  final Color? borderColor;
+  final double borderWidth;
+
+  @override
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) => Size(width, height);
+
+  @override
+  void paint(
+    PaintingContext context,
+    Offset center, {
+    required Animation<double> activationAnimation,
+    required Animation<double> enableAnimation,
+    required bool isDiscrete,
+    required TextPainter labelPainter,
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required TextDirection textDirection,
+    required double value,
+    required double textScaleFactor,
+    required Size sizeWithOverflow,
+  }) {
+    final rect = Rect.fromCenter(center: center, width: width, height: height);
+    final rrect = RRect.fromRectAndRadius(rect, Radius.circular(radius));
+
+    final fill = Paint()
+      ..color = sliderTheme.thumbColor ?? Colors.black87
+      ..style = PaintingStyle.fill;
+    context.canvas.drawRRect(rrect, fill);
+
+    if (borderColor != null && borderWidth > 0) {
+      final stroke = Paint()
+        ..color = borderColor!
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = borderWidth;
+      context.canvas.drawRRect(rrect, stroke);
+    }
   }
 }
