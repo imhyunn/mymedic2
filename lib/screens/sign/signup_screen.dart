@@ -522,7 +522,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   width: MediaQuery.of(context).size.width - 60,
                   margin: EdgeInsets.symmetric(horizontal: 30.0),
                   decoration: BoxDecoration(
-                    color: Color(0xE61D4097),
+                    color: Color(0xE8284FA4),
                     borderRadius: BorderRadius.circular(5.0),
                   ),
                   child: const Center(

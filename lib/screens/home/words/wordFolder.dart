@@ -313,14 +313,29 @@ class _WordFolderState extends State<WordFolder> {
                 padding: EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    await _firestore.collection('folder').doc(folder.id).set({
-                      'name': _folderController.text,
-                      'time': folder.time,
-                      'userId': userInfo!.uid,
-                      'wordCount': folder.wordCount,
+                    if (_isButtonDisabled) return;
+                    setState(() {
+                      _isButtonDisabled = true;
                     });
-                    setState(() {});
-                    Navigator.pop(context, true);
+
+                    try {
+                      await _firestore.collection('folder').doc(folder.id).set({
+                        'name': _folderController.text,
+                        'time': folder.time,
+                        'userId': userInfo!.uid,
+                        'wordCount': folder.wordCount,
+                      });
+
+                      if (mounted) {
+                        setState(() {
+                          _isButtonDisabled = false;
+                        });
+                        Navigator.pop(context, true);
+                      }
+                    } catch (e) {
+                      print('Error while updating folder: $e');
+                    }
+
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.buttonColor2,

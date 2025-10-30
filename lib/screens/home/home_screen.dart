@@ -130,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     // 오늘의 단어 카드
                     Container(
-                      height: size.height * 0.25,
+                      height: size.height * 0.28,
                       width: size.width * 0.95,
                       child: Card(
                         elevation: 4,

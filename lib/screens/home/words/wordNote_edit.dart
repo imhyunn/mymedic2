@@ -214,7 +214,7 @@ class _WordNoteEditState extends State<WordNoteEdit> {
                           // alignment: Alignment.topCenter,
                           child: Checkbox(
                               value: wordInfos[index].isChecked,
-                              activeColor: Color(0xff2a5fa9),
+                              activeColor: Color(0xE8284FA4),
                               onChanged: (value) {
                                 setState(() {
                                   wordInfos[index].isChecked = value!;
