@@ -9,6 +9,7 @@ import 'package:mymedic1/providers.dart';
 import 'package:mymedic1/screens/bulletinboard/board_edit.dart';
 import 'package:mymedic1/screens/bulletinboard/board_view_screen.dart';
 
+import '../../config/palette.dart';
 import 'board_new.dart';
 
 class BoardList extends StatefulWidget {
@@ -137,7 +138,7 @@ class _BoardListState extends State<BoardList> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.black,
+        backgroundColor: Palette.buttonColor2,
         child: Icon(
           Icons.add,
           color: Colors.white,

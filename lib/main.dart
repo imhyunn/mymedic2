@@ -22,7 +22,7 @@ Future<void> main() async {
   //수정
   MobileAds.instance.updateRequestConfiguration(
     RequestConfiguration(
-      tagForChildDirectedTreatment: TagForchildDirectedTreatment.yes,
+      tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes,
       maxAdContentRating: MaxAdContentRating.g,
     ),
   );  

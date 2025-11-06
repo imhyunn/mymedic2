@@ -69,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 130,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/images/logo_black.png'),
+                  image: AssetImage('assets/images/mymedic2.png'),
                 ),
               ),
             ),
@@ -229,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: MediaQuery.of(context).size.width - 60,
                 margin: EdgeInsets.symmetric(horizontal: 30.0),
                 decoration: BoxDecoration(
-                  color: Color(0xE8284FA4),
+                  color: Color(0xFF44649E),
                   borderRadius: BorderRadius.circular(5.0),
                 ),
                 child: const Center(
